@@ -28,7 +28,6 @@ export class AuthController {
       // Don't send token in body anymore
       return { user: result.user };
     } catch (error) {
-      console.error("Login error:", error);
       throw error;
     }
   }

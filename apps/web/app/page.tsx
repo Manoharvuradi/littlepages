@@ -1,7 +1,18 @@
+'use client';
+
 import Image from "next/image";
 import { Card } from "@repo/ui/card";
 import { Gradient } from "@repo/ui/gradient";
 import { TurborepoLogo } from "@repo/ui/turborepo-logo";
+import LandingPage from "../components/landingpage";
+import ProductsPage from "../components/products/page";
+import HowItWorksHomePage from "../components/howitworks-hm";
+import GetStartedWithUploads from "../components/getstartedwithuploads";
+import ReviewsPage from "../components/reviews";
+import FetaturedInPage from "../components/featuredin/page";
+import AboutUsPage from "../components/aboutus/page";
+import GetMyBoxHomePage from "../components/getmybox-hm";
+import FooterPage from "../components/footer";
 
 // const LINKS = [
 //   {
@@ -30,7 +41,15 @@ import { TurborepoLogo } from "@repo/ui/turborepo-logo";
 export default function Page() {
   return (
     <div>
-      Test
+      <LandingPage />
+      <ProductsPage />
+      <HowItWorksHomePage />
+      <GetStartedWithUploads />
+      <ReviewsPage />
+      <FetaturedInPage />
+      <AboutUsPage />
+      <GetMyBoxHomePage />
+      <FooterPage />
     </div>
   );
 }

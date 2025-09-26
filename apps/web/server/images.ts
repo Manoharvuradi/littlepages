@@ -1,5 +1,4 @@
 export const addImage = async (url: string, filename: string, userId: number) => {
-  console.log("userId in addImage:", userId);
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/images/add`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

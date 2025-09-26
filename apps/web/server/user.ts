@@ -33,11 +33,9 @@ export const loginUser = async(email: string, password: string) => {
 }
 
 export const getCurrentUser = async () => {
-    console.log('Fetching current user');
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
         credentials: 'include',
     });
-    console.log('Response status:', res);
     if (!res.ok) return null;
     return res.json();
 }

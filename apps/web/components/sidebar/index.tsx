@@ -19,7 +19,6 @@ export default function WithSidebar(Component: React.ComponentType) {
     const pathname = usePathname();
     const router = useRouter();
   async function handleLogout() {
-    console.log("Logging out...");
     const res = await signOut();
     if (res.ok) {
       router.push("/");
