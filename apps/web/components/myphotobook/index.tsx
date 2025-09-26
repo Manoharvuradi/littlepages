@@ -66,7 +66,7 @@ const MyPhotoBook = () => {
             Next
           </button>
         </div>
-        <div className="bg-white rounded-lg shadow p-8">
+        <div className="bg-white rounded-lg p-8">
           <StepComponent formData={formData} setFormData={setFormData} />
         </div>
       </main>
