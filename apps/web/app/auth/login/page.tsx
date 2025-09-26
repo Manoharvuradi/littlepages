@@ -20,7 +20,6 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    console.log("Logging in with:", { email, password });
     const { error } = await loginUser(email, password);
 
     if (error) {

@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Navigation from "../components/navbarbeforelogin";
+import { SelectedImagesProvider } from "../context";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -20,7 +21,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={geist.className}>
         <Navigation />
-        {children}
+        {/* {children} */}
+        <SelectedImagesProvider>{children}</SelectedImagesProvider>
       </body>
     </html>
   );
