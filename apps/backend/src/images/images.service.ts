@@ -10,17 +10,18 @@ export class ImagesService {
             where: { 
                 userId 
             },
+            select:{
+                id:true,
+                url:true,
+                filename:true,
+            },
             orderBy: { createdAt: 'desc' },
         });
     }
 
-    async addImage(userId: number, url: string, filename: string) {
+    async addImage(imageInput: ImageInput) {
         return this.prisma.images.create({
-            data: { 
-                userId, 
-                url, 
-                filename
-            },
+            data: imageInput
         });
     }
 
@@ -28,10 +29,34 @@ export class ImagesService {
         return this.prisma.images.delete({ where: { id } });
     }
 
-    // async updateImage(id: string, url: string, filename: string) {
-    //     return this.prisma.images.update({
-    //         where: { id },
-    //         data: { url, filename },
-    //     });
-    // }
+    async updateImage(id: string, imageInput: Partial<ImageUpdateInput>) {
+        return this.prisma.images.update({
+            where: { id },
+            data: imageInput,
+        });
+    }
 }
+
+export type ImageInput = {
+  id?: string;
+  userId: number;
+  url: string;
+  filename: string;
+  name?: string;
+  age?: string;
+  caption?: string;
+  date?: Date;
+  tags?: string; // or string[] if using Json in Prisma
+};
+
+export type ImageUpdateInput = {
+  id: string;
+  userId: number;
+  url: string;
+  filename: string;
+  name?: string;
+  age?: string;
+  caption?: string;
+  date?: Date;
+  tags?: string; // or string[] if using Json in Prisma
+};

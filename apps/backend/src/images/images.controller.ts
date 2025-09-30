@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { ImagesService } from './images.service';
+import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { ImageInput, ImagesService, ImageUpdateInput } from './images.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('images')
@@ -13,8 +13,8 @@ export class ImagesController {
     }
 
     @Post('add')
-    async addImage(@Req() req, @Body() body: { url: string, filename: string }) {
-        return this.imageService.addImage(req.user.userId, body.url, body.filename);
+    async addImage(@Req() req, @Body() body: Partial<ImageInput>) {
+        return this.imageService.addImage(this.createImageInput(req.user.userId, body));
     }
 
     @Delete('delete')
@@ -22,8 +22,36 @@ export class ImagesController {
         return this.imageService.deleteImage(body.id);
     }
 
-    // @Post('update')
-    // async updateImage(@Req() req, @Body() body: { id: string, url: string, filename: string }) {
-    //     return this.imageService.updateImage(body.id, body.url, body.filename);
-    // }
+    @Put('update/:id')
+    async updateImage(@Req() req, @Body() body: Partial<ImageInput>) {
+        const imageInput = this.updateImageInput(body);
+        return this.imageService.updateImage(req.params.id, imageInput);
+    }
+
+    private createImageInput(userId: number, body: Partial<ImageInput>): ImageInput {
+        return {
+            userId,
+            url: body.url!,
+            filename: body.filename!,
+            name: body.name,
+            age: body.age,
+            caption: body.caption,
+            date: body.date,
+            tags: body.tags,
+        };
+    }
+
+    private updateImageInput(body: Partial<ImageUpdateInput>): Partial<ImageUpdateInput> {
+        return {
+            id: body.id,
+            userId: body.userId,
+            url: body.url,
+            filename: body.filename,
+            name: body.name,
+            age: body.age,
+            caption: body.caption,
+            date: body.date,
+            tags: body.tags,
+        };
+    }
 }

@@ -2,11 +2,13 @@ import { Get, Injectable, Res, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService, 
+    private prisma: PrismaService,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
@@ -17,22 +19,16 @@ export class AuthService {
     });
   }
 
-  async login(email: string, password: string) {
-    const user = await this.prisma.users.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new UnauthorizedException('Invalid credentials');
-
-    // Remove password from user object
-    const { password: _, ...userWithoutPassword } = user;
-
-    // Create JWT payload
-    const payload = { sub: user.id, email: user.email };
-    const token = this.jwtService.sign(payload);
-
+  async login(email: string, pass: string) : Promise<{ access_token: string }>{
+    const user = await this.usersService.findOne(email);
+    const isPasswordValid = await bcrypt.compare(pass, user?.password || '');
+    if (!isPasswordValid) {
+      console.log("Invalid password");
+      throw new UnauthorizedException();
+    }
+        const payload = { email: user?.email || '', sub: user?.id || null };
     return {
-      user: userWithoutPassword,
-      token,
+      access_token: this.jwtService.sign(payload),
     };
   }
 

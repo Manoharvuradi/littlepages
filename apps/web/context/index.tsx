@@ -1,16 +1,17 @@
 'use client';
 
 import { createContext, useContext, useState } from "react";
+import { PreviewItem } from "../utils";
 
 type SelectedImagesContextType = {
-  selectedImages: string[];
-  setSelectedImages: (images: string[]) => void;
+  selectedImages: PreviewItem[];
+  setSelectedImages: (images: PreviewItem[]) => void;
 };
 
 const SelectedImagesContext = createContext<SelectedImagesContextType | null>(null);
 
 export const SelectedImagesProvider = ({ children }: { children: React.ReactNode }) => {
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedImages, setSelectedImages] = useState<PreviewItem[]>([]);
   return (
     <SelectedImagesContext.Provider value={{ selectedImages, setSelectedImages }}>
       {children}

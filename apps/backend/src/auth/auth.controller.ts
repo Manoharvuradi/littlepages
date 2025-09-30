@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Res, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { Public } from './public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -12,24 +13,14 @@ export class AuthController {
     return this.authService.signup(body.email, body.password, body.name);
   }
 
-  @Post('login')
+  @Public()
+  @Post("login")
+  @HttpCode(HttpStatus.OK)
   async login(
     @Body() body: { email: string; password: string },
     @Res({ passthrough: true }) res: Response
   ) {
-    try{
-      const result = await this.authService.login(body.email, body.password);
-      res.cookie('token', result.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
-      });
-      // Don't send token in body anymore
-      return { user: result.user };
-    } catch (error) {
-      throw error;
-    }
+    return await this.authService.login(body.email, body.password);
   }
 
   @Get('me')

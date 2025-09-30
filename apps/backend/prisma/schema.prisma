@@ -31,10 +31,15 @@ model Users {
 }
 
 model Images {
-  id      String  @id @default(uuid())
-  url     String
-  filename String
-  userId  Int
-  user    Users   @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+  id        String      @id @default(uuid())
+  url       String
+  filename  String
+  name      String?
+  age       String?
+  caption   String?
+  date      DateTime?   @default(now())
+  tags      String?
+  userId    Int
+  user      Users       @relation(fields: [userId], references: [id])
+  createdAt DateTime    @default(now())
 }

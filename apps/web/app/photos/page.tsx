@@ -9,11 +9,12 @@ import { getCurrentUser } from '../../server/user';
 import UserUploads from '../../components/useruploads';
 import { useRouter } from 'next/dist/client/components/navigation';
 import { useSelectedImages } from '../../context';
+import { PreviewItem } from '../../utils';
 
 
 const PhotosPage = () => {
     const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
-    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<PreviewItem[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [dragActive, setDragActive] = useState(false);
     const [userId, setUserId] = useState<number | null>(null);
@@ -33,8 +34,15 @@ const PhotosPage = () => {
     useEffect(() => {
       const fetchImages = async () => {
         const images = await getMyImages();
-        setPreviewUrls(images.map((img: any) => img.url));
+        // Each image has `id` and `url`
+        setPreviewUrls(
+          images.map((img: any) => ({
+            id: img.id,
+            url: img.url,
+          }))
+        );
       };
+
       if (userId) fetchImages();
     }, [userId]);
 
@@ -53,7 +61,7 @@ const PhotosPage = () => {
         if (!error) {
           const { data } = supabase.storage.from('photos').getPublicUrl(filePath);
           await addImage(data.publicUrl, file.name, userId); // save metadata in backend
-          setPreviewUrls(prev => [...prev, data.publicUrl]);
+          setPreviewUrls(prev => [...prev, { id: Date.now().toString(), url: data.publicUrl }]);
           setSelectedFiles(prev => [...prev, file]); // <-- add file to state
         }else{
           alert(`Failed to upload ${file.name}: ${error.message}`)
@@ -96,10 +104,10 @@ const PhotosPage = () => {
     }, [previewUrls]);
 
     const handleButtonClick = () => {
-      const images = previewUrls.filter((_, idx) => selected[idx]); // only checked
+      const images = previewUrls.filter((_, idx) => Boolean(selected[idx]));
       setSelectedImages(images);
       router.push("/books/create");
-    }
+    };
 
   return (
     <div className="p-8">
