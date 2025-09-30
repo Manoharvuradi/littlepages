@@ -26,7 +26,7 @@ const PhotosPage = () => {
     useEffect(() =>{
       const fetchUser = async () => {
         const user = await getCurrentUser();
-        setUserId(user?.userId ?? null);
+        setUserId(user?.sub ?? null);
       };
       fetchUser();
     })

@@ -13,8 +13,8 @@ import { APP_GUARD } from '@nestjs/core';
     JwtModule.register({
       global: true,
       // secret: process.env.JWT_SECRET || 'your_jwt_secret', // Use env var in production!
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '1d' },
+      secret: process.env.JWT_SECRET_KEY,
+      signOptions: { expiresIn: '7d' },
     }),
     PrismaModule,
   ],
