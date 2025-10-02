@@ -14,6 +14,9 @@ export class ImagesService {
                 id:true,
                 url:true,
                 filename:true,
+                name: true,
+                caption: true,
+                age: true
             },
             orderBy: { createdAt: 'desc' },
         });

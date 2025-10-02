@@ -29,7 +29,7 @@ const PhotosPage = () => {
         setUserId(user?.sub ?? null);
       };
       fetchUser();
-    })
+    }, [userId])
 
     useEffect(() => {
       const fetchImages = async () => {
@@ -39,6 +39,9 @@ const PhotosPage = () => {
           images.map((img: any) => ({
             id: img.id,
             url: img.url,
+            name: img.name,
+            caption: img.caption,
+            age: img.age
           }))
         );
       };
@@ -46,7 +49,7 @@ const PhotosPage = () => {
       if (userId) fetchImages();
     }, [userId]);
 
-
+console.log(previewUrls)
     // Upload files to Supabase Storage
     const uploadFilesToSupabase = async (files: File[]) => {
       if (!userId) {
@@ -61,7 +64,6 @@ const PhotosPage = () => {
         if (!error) {
           const { data } = supabase.storage.from('photos').getPublicUrl(filePath);
           await addImage(data.publicUrl, file.name, userId); // save metadata in backend
-          setPreviewUrls(prev => [...prev, { id: Date.now().toString(), url: data.publicUrl }]);
           setSelectedFiles(prev => [...prev, file]); // <-- add file to state
         }else{
           alert(`Failed to upload ${file.name}: ${error.message}`)

@@ -15,3 +15,15 @@ export interface images {
     updatedAt?: Date;
     userId: string;
 }
+
+export type ImageUpdateInput = {
+  id: string;
+  userId?: number;
+  url?: string;
+  filename?: string;
+  name?: string;
+  age?: string;
+  caption?: string;
+  date?: Date;
+  tags?: string; // or string[] if using Json in Prisma
+};

@@ -41,6 +41,9 @@ export const createBookSteps = [
 export type PreviewItem = {
   id: string;
   url: string;
+  name?: string;
+  caption?: string;
+  age?: string;
 };
 
 export interface IInputProps {
@@ -50,15 +53,15 @@ export interface IInputProps {
   index?: number;
   disabled?: boolean;
   tailwindClass?: string
+  value?: string
 }
 
 export interface IInput {
   id?: string;
+  label: string;
   name: string;
   type: string;
-  value: string;
-  required: boolean;
-  placeholder?: string;
+  value?: string;
   minLength?: number;
   maxLength?: number;
   pattern?: string;
@@ -72,31 +75,33 @@ export const generateAgeOptions = (maxAge: number) => {
   return options;
 }
 
-export const imageInputs = [
-  {
-    label: "Name",
-    type: "text",
-    name: "name",
-  },
-  {
-    label: "Age",
-    type: "select",
-    name: "age",
-    options: generateAgeOptions(100),
-  },
-  {
-    label: "Caption",
-    type: "text",
-    name: "caption",
-  },
-  {
-    label: "Date",
-    type: "date",
-    name: "date"
-  },
-  {
-    label: "Tags",
-    type: "text",
-    name: "tags"
-  }
-]
+export const nameInput = {
+  label: "Name",
+  type: "text",
+  name: "name",
+}
+
+export const ageInput = {
+  label: "Select Age / Grade",
+  type: "text",
+  name: "age",
+  // options: generateAgeOptions(100),
+}
+
+export const captionInput = {
+  label: "Caption",
+  type: "text",
+  name: "caption",
+}
+
+export const dateInput = {
+  label: "Date",
+  type: "date",
+  name: "date"
+}
+
+export const tagsInput = {
+  label: "Tags",
+  type: "text",
+  name: "tags"
+}
