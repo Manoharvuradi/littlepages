@@ -7,14 +7,14 @@ const InputField = ({
   formValues,
   tailwindClass
 }: IInputProps) => {
-    const { id, name, type, value } = input;
+    const { id, name, type, value, label } = input;
   return (
     <div
         key={name}
         className={`flex flex-col mb-4 ${tailwindClass ? tailwindClass : ''}`}
       >
-        <label htmlFor={name} className="mb-2 font-medium text-gray-700 capitalize">
-          {name.replace(/_/g, ' ')}
+        <label htmlFor={label} className="mb-2 font-medium text-gray-700 capitalize">
+          {label.replace(/_/g, ' ')}
         </label>
         <input
           id={id || name}

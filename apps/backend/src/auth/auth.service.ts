@@ -23,7 +23,6 @@ export class AuthService {
     const user = await this.usersService.findOne(email);
     const isPasswordValid = await bcrypt.compare(pass, user?.password || '');
     if (!isPasswordValid) {
-      console.log("Invalid password");
       throw new UnauthorizedException();
     }
         const payload = { email: user?.email || '', sub: user?.id || null };

@@ -8,8 +8,9 @@ export class ImagesController {
     constructor(private readonly imageService: ImagesService) {}
 
     @Get('my')
-    async getMyImages(@Req() req) {
-        return this.imageService.getImagesByUser(req.user.userId);
+    @UseGuards(JwtAuthGuard)
+    getMyImages(@Req() req) {
+        return this.imageService.getImagesByUser(req.user.sub);
     }
 
     @Post('add')
