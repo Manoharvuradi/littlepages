@@ -94,7 +94,6 @@ const UserUploads = ({
     }
   };
 
-  // console.log(previewUrls)
 
   return (
     <>

@@ -105,3 +105,34 @@ export const tagsInput = {
   type: "text",
   name: "tags"
 }
+
+
+interface ImageData {
+  id: string;
+  url: string;
+  caption?: string | undefined;
+  name?: string | undefined;
+  age?: string | undefined;
+  date?: string;
+  tags?: string;
+}
+
+interface DisplayOptions {
+  showCaption: boolean;
+  showName: boolean;
+  showDate: boolean;
+}
+
+export interface IFormData {
+  images: ImageData[];
+  bookSizeId: string | null;
+  coverPhotoUrl: string | null;
+  bookTitle: string;
+  displayOptions: DisplayOptions;
+}
+
+export type Props = {
+  formData: IFormData;
+  setFormData: React.Dispatch<React.SetStateAction<IFormData>>;
+  onNext: () => void;
+};

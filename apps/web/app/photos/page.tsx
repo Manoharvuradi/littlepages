@@ -49,7 +49,6 @@ const PhotosPage = () => {
       if (userId) fetchImages();
     }, [userId]);
 
-console.log(previewUrls)
     // Upload files to Supabase Storage
     const uploadFilesToSupabase = async (files: File[]) => {
       if (!userId) {
