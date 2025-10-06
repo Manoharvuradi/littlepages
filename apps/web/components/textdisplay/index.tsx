@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { Props } from "../../utils";
 
-const TextDisplay = () => {
+const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
   const [showImageTitle, setShowImageTitle] = useState(false);
   const [showName, setShowName] = useState(false);
   const [showAgeGrade, setShowAgeGrade] = useState(false);
@@ -37,14 +38,14 @@ const TextDisplay = () => {
           <span className="text-sm font-medium text-gray-700">Image Title</span>
           <button
             type="button"
-            onClick={() => setShowImageTitle(!showImageTitle)}
+            onClick={() => setFormData({ ...formData, displayOptions: { ...formData.displayOptions, showCaption: !formData.displayOptions.showCaption } })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              showImageTitle ? "bg-indigo-600" : "bg-gray-300"
+              formData.displayOptions.showCaption ? "bg-indigo-600" : "bg-gray-300"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                showImageTitle ? "translate-x-6" : "translate-x-1"
+                formData.displayOptions.showCaption ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>
@@ -55,20 +56,20 @@ const TextDisplay = () => {
           <span className="text-sm font-medium text-gray-700">Name</span>
           <button
             type="button"
-            onClick={() => setShowName(!showName)}
+            onClick={() => setFormData({ ...formData, displayOptions: { ...formData.displayOptions, showName: !formData.displayOptions.showName } })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              showName ? "bg-indigo-600" : "bg-gray-300"
+              formData.displayOptions.showName ? "bg-indigo-600" : "bg-gray-300"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                showName ? "translate-x-6" : "translate-x-1"
+                formData.displayOptions.showName ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>
         </div>
 
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">Age/Grade</span>
           <button
             type="button"
@@ -83,20 +84,20 @@ const TextDisplay = () => {
               }`}
             />
           </button>
-        </div>
+        </div> */}
 
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">Date</span>
           <button
             type="button"
-            onClick={() => setShowDate(!showDate)}
+            onClick={() => setFormData({ ...formData, displayOptions: { ...formData.displayOptions, showDate: !formData.displayOptions.showDate } })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              showDate ? "bg-indigo-600" : "bg-gray-300"
+              formData.displayOptions.showDate ? "bg-indigo-600" : "bg-gray-300"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                showDate ? "translate-x-6" : "translate-x-1"
+                formData.displayOptions.showDate ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>

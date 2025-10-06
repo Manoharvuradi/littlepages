@@ -1,23 +1,30 @@
 "use client";
 import React, { useState, } from "react";
-import { createBookSteps } from "../../utils";
-import Steps from "./steps";
+import { createBookSteps, IFormData } from "../../utils";
 import SideSteps from "./steps";
 
 
 const MyPhotoBook = () => {
-  const [bookCreationSteps, setBookCreationSteps] = useState(createBookSteps);
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
-    bookSize: null,
-    coverPageURL: null,
-    editedImages: [
-      {
-        imageName: "",
-        imageUrl: "",
-        imageDescription: "",
-      },
+  const [formData, setFormData] = useState<IFormData>({
+    images: [
+      { 
+        id: "",
+        url: "",
+        caption: "", 
+        name: "", age: "", 
+        date: "", 
+        tags: "" 
+      }
     ],
+    bookSizeId: null, // selected size
+    coverPhotoUrl: null,
+    bookTitle: "",
+    displayOptions: {
+      showCaption: false,
+      showName: false,
+      showDate: false,
+    },
   });
 
   const StepComponent: any = createBookSteps[currentStep]?.component;
@@ -67,7 +74,11 @@ const MyPhotoBook = () => {
           </button>
         </div>
         <div className="bg-white rounded-lg p-8">
-          <StepComponent formData={formData} setFormData={setFormData} />
+          <StepComponent 
+            formData={formData} 
+            setFormData={setFormData} 
+            onNext={handleNext}
+          />
         </div>
       </main>
     </div>

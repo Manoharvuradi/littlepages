@@ -4,12 +4,8 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { useSelectedImages } from "../../context";
 import { useRouter } from "next/navigation";
+import { Props } from "../../utils";
 
-type Props = {
-  formData: any;
-  setFormData: (data: any) => void;
-  onNext: () => void;
-};
 
 type Option = {
   id: string;
@@ -53,7 +49,10 @@ export default function BookSize({ formData, setFormData, onNext }: Props) {
     },[selectedImages])
 
   const handleSelect = (id: string) => {
-    setFormData({ ...formData, bookSize: id });
+    setFormData({ 
+      ...formData, 
+      bookSizeId: id
+    });
   };
 
   return (
@@ -62,7 +61,7 @@ export default function BookSize({ formData, setFormData, onNext }: Props) {
 
       <div className="grid grid-cols-2 gap-2 mb-10 items-start">
         {options.map((opt) => {
-          const isSelected = formData.bookSize === opt.id;
+          const isSelected = formData.bookSizeId === opt.id;
           const displayWidth = Math.round(opt.widthIn * SCALE);
           const displayHeight = Math.round(opt.heightIn * SCALE);
 
@@ -129,10 +128,10 @@ export default function BookSize({ formData, setFormData, onNext }: Props) {
       </div>
 
       <button
-        disabled={!formData.bookSize}
+        disabled={!formData.bookSizeId}
         onClick={onNext}
         className={`mt-2 px-8 py-3 rounded-full font-semibold ${
-          formData.bookSize
+          formData.bookSizeId
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
             : "bg-gray-200 text-gray-400 cursor-not-allowed"
         }`}
