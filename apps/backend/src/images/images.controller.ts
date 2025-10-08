@@ -48,11 +48,13 @@ export class ImagesController {
             userId: body.userId,
             url: body.url,
             filename: body.filename,
-            name: body.name,
-            age: body.age,
-            caption: body.caption,
-            date: body.date,
-            tags: body.tags,
+            displayOptions: {
+                name: body?.displayOptions?.name,
+                age: body.displayOptions?.age,
+                caption: body.displayOptions?.caption,
+                date: body.displayOptions?.date,
+                tags: body.displayOptions?.tags,
+            }
         };
     }
 }

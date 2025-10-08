@@ -14,9 +14,7 @@ export class ImagesService {
                 id:true,
                 url:true,
                 filename:true,
-                name: true,
-                caption: true,
-                age: true
+                displayOptions: true
             },
             orderBy: { createdAt: 'desc' },
         });
@@ -57,9 +55,11 @@ export type ImageUpdateInput = {
   userId: number;
   url: string;
   filename: string;
-  name?: string;
-  age?: string;
-  caption?: string;
-  date?: Date;
-  tags?: string; // or string[] if using Json in Prisma
+displayOptions: {
+    name?: string;
+    age?: string;
+    caption?: string;
+    date?: Date;
+    tags?: string; // or string[] if using Json in Prisma
+}
 };

@@ -10,6 +10,7 @@ import UserUploads from '../../components/useruploads';
 import { useRouter } from 'next/dist/client/components/navigation';
 import { useSelectedImages } from '../../context';
 import { PreviewItem } from '../../utils';
+import { users } from '@repo/types';
 
 
 const PhotosPage = () => {
@@ -36,12 +37,12 @@ const PhotosPage = () => {
         const images = await getMyImages();
         // Each image has `id` and `url`
         setPreviewUrls(
-          images.map((img: any) => ({
+          images?.map((img: any) => ({
             id: img.id,
             url: img.url,
-            name: img.name,
-            caption: img.caption,
-            age: img.age
+            name: img?.displayOptions?.name,
+            caption: img?.displayOptions?.caption,
+            age: img?.displayOptions?.age
           }))
         );
       };

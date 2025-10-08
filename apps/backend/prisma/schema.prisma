@@ -35,15 +35,12 @@ model Images {
   id        String      @id @default(uuid())
   url       String
   filename  String
-  name      String?
-  age       String?
-  caption   String?
-  date      DateTime?   @default(now())
-  tags      String?
+  displayOptions Json?
   userId    Int
   user      Users       @relation(fields: [userId], references: [id])
   createdAt DateTime    @default(now())
-  Book      Book[]
+  bookId    Int?
+  book      Book? @relation(fields: [bookId], references: [id])
 }
 
 model Book {
@@ -51,25 +48,26 @@ model Book {
   userId        Int
   user          Users     @relation(fields: [userId], references: [id])
 
-  // Step 2: Book size
-  bookSizeId    Int
-  bookSize      BookSize  @relation(fields: [bookSizeId], references: [id])
+  // Step 1: Book size
+  bookSize      String
+  // bookSize      BookSize  @relation(fields: [bookSizeId], references: [id])
 
-  // Step 3: Cover photo
+  // Step 2: Cover photo
   coverPhotoUrl String?
 
+  // Step 3: Book title
+  bookTitle     String
+
   // Step 4: Toggles
-  showCaption   Boolean   @default(true)
-  showName      Boolean   @default(true)
-  showDate      Boolean   @default(true)
+  displaySettings Json?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   images        Images[]  // directly link to Images
 }
 
-model BookSize {
-  id        Int     @id @default(autoincrement())
-  label     String  // e.g. "11in x 8.5in", "8in x 8in"
-  createdAt DateTime @default(now())
-  Book      Book[]
-}
+// model BookSize {
+//   id        Int     @id @default(autoincrement())
+//   label     String  // e.g. "11in x 8.5in", "8in x 8in"
+//   createdAt DateTime @default(now())
+//   Book      Book[]
+// }

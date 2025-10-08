@@ -52,10 +52,12 @@ const UserUploads = ({
       id: imageId as string,
       // url: formData.url,
       // filename: formData.filename,
-      name: formData.name,
-      age: formData.age,
-      caption: formData.caption,
-      date: new Date(formData.date as string),
+      displayOptions :{
+        name: formData.name,
+        age: formData.age,
+        caption: formData.caption,
+        date: new Date(formData.date as string),
+      }
       // tags: formData.tags,
     };
     // Here you can handle the form submission, e.g., send data to the server

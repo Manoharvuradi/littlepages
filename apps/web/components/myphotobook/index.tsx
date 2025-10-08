@@ -11,16 +11,20 @@ const MyPhotoBook = () => {
       { 
         id: "",
         url: "",
-        caption: "", 
-        name: "", age: "", 
-        date: "", 
-        tags: "" 
+        displayOptions: {
+          name: "",
+          age: "",
+          caption: "",
+          date: "",
+          tags: "",
+        }
       }
     ],
-    bookSizeId: null, // selected size
+    userId: null as any,
+    bookSize: null, // selected size
     coverPhotoUrl: null,
     bookTitle: "",
-    displayOptions: {
+    displaySettings: {
       showCaption: false,
       showName: false,
       showDate: false,
