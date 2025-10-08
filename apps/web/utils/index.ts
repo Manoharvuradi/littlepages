@@ -110,14 +110,16 @@ export const tagsInput = {
 interface ImageData {
   id: string;
   url: string;
-  caption?: string | undefined;
-  name?: string | undefined;
-  age?: string | undefined;
-  date?: string;
-  tags?: string;
+  displayOptions?: {
+    caption?: string | undefined;
+    name?: string | undefined;
+    age?: string | undefined;
+    date?: string;
+    tags?: string;
+  };
 }
 
-interface DisplayOptions {
+interface DisplaySettings {
   showCaption: boolean;
   showName: boolean;
   showDate: boolean;
@@ -125,10 +127,11 @@ interface DisplayOptions {
 
 export interface IFormData {
   images: ImageData[];
-  bookSizeId: string | null;
+  userId: number;
+  bookSize: string | null;
   coverPhotoUrl: string | null;
   bookTitle: string;
-  displayOptions: DisplayOptions;
+  displaySettings: DisplaySettings;
 }
 
 export type Props = {

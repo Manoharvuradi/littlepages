@@ -1,22 +1,69 @@
 "use client";
 
 import React, { useState } from "react";
-import { Props } from "../../utils";
+import { IFormData, Props } from "../../utils";
+import { bookInput } from "../../server/book";
+import { getCurrentUser } from "../../server/user";
 
 const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
-  const [showImageTitle, setShowImageTitle] = useState(false);
-  const [showName, setShowName] = useState(false);
-  const [showAgeGrade, setShowAgeGrade] = useState(false);
-  const [showDate, setShowDate] = useState(false);
 
-    const canGenerate = showImageTitle || showName;
-
-  const handleGenerate = () => {
-    // Replace with your logic
-    console.log("Generating book with:", {
-      showImageTitle,
-      showName,
+    const [result, setResult] = useState({
+      success: false,
+      loading: false,
+      error: false
     });
+
+
+  const handleGenerate = async () => {
+    const user = await getCurrentUser();
+    try{
+
+      const req: IFormData = {
+        images: formData.images,
+        bookSize: formData.bookSize,
+        coverPhotoUrl: formData.coverPhotoUrl,
+        bookTitle: formData.bookTitle,
+        userId: user.sub,
+        displaySettings: {
+          showCaption: true,
+          showName: formData.displaySettings.showName,
+          showDate: formData.displaySettings.showDate,
+        }
+      }
+
+      const res = await bookInput(req);
+
+      if(!res){
+        setResult((prev) => ({
+          ...prev, 
+          loading: false,
+          error: true
+        }));
+      }else{
+        setTimeout(() => {
+          setResult((prev) => ({
+            ...prev,
+            loading: false,
+            success: true
+          }));
+        },  3000);
+      }
+
+    }catch(err){
+      setResult((prev) => ({
+        ...prev, 
+        loading: false,
+        error: true
+      }))
+    }finally{
+      setTimeout(() => {
+        setResult((prev) => ({
+          ...prev,
+          success: false, 
+          error: false
+        }));
+      }, 5000);
+    }
   };
 
   return (
@@ -38,14 +85,14 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
           <span className="text-sm font-medium text-gray-700">Image Title</span>
           <button
             type="button"
-            onClick={() => setFormData({ ...formData, displayOptions: { ...formData.displayOptions, showCaption: !formData.displayOptions.showCaption } })}
+            onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showCaption: !formData.displaySettings.showCaption } })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              formData.displayOptions.showCaption ? "bg-indigo-600" : "bg-gray-300"
+              formData.displaySettings.showCaption ? "bg-indigo-600" : "bg-gray-300"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                formData.displayOptions.showCaption ? "translate-x-6" : "translate-x-1"
+                formData.displaySettings.showCaption ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>
@@ -56,14 +103,14 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
           <span className="text-sm font-medium text-gray-700">Name</span>
           <button
             type="button"
-            onClick={() => setFormData({ ...formData, displayOptions: { ...formData.displayOptions, showName: !formData.displayOptions.showName } })}
+            onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showName: !formData.displaySettings.showName } })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              formData.displayOptions.showName ? "bg-indigo-600" : "bg-gray-300"
+              formData.displaySettings.showName ? "bg-indigo-600" : "bg-gray-300"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                formData.displayOptions.showName ? "translate-x-6" : "translate-x-1"
+                formData.displaySettings.showName ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>
@@ -90,14 +137,14 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
           <span className="text-sm font-medium text-gray-700">Date</span>
           <button
             type="button"
-            onClick={() => setFormData({ ...formData, displayOptions: { ...formData.displayOptions, showDate: !formData.displayOptions.showDate } })}
+            onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showDate: !formData.displaySettings.showDate } })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              formData.displayOptions.showDate ? "bg-indigo-600" : "bg-gray-300"
+              formData.displaySettings.showDate ? "bg-indigo-600" : "bg-gray-300"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                formData.displayOptions.showDate ? "translate-x-6" : "translate-x-1"
+                formData.displaySettings.showDate ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>
@@ -106,9 +153,9 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
         {/* Generate button */}
       <button
         onClick={handleGenerate}
-        disabled={!canGenerate}
+        disabled={false}
         className={`w-full py-2 rounded-lg font-semibold ${
-          canGenerate
+          true
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
             : "bg-gray-200 text-gray-400 cursor-not-allowed"
         }`}
@@ -116,6 +163,13 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
         Generate Book
       </button>
       </div>
+
+      {result.success && (
+        <span className="text-green-600 font-bold text-sm mt-2">Book generated successfully!</span>
+      )}
+      {result.error && (
+        <span className="text-red-600 font-bold text-sm mt-2">Something went wrong!</span>
+      )}
     </div>
   );
 };
