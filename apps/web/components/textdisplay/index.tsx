@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { IFormData, Props } from "../../utils";
 import { bookInput } from "../../server/book";
 import { getCurrentUser } from "../../server/user";
+import Button from "../../common/buttons/filledbuttons";
+import { useRouter } from "next/navigation";
 
 const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
 
@@ -13,8 +15,14 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
       error: false
     });
 
+    const router = useRouter();
+
 
   const handleGenerate = async () => {
+       setResult((prev) => ({
+      ...prev, 
+      loading: true
+    }));
     const user = await getCurrentUser();
     try{
 
@@ -33,7 +41,7 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
 
       const res = await bookInput(req);
 
-      if(!res){
+      if(res.id == null){
         setResult((prev) => ({
           ...prev, 
           loading: false,
@@ -46,15 +54,19 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
             loading: false,
             success: true
           }));
-        },  3000);
+          router.push(`/books/${res.id}/preview`);
+        },  5000);
       }
 
     }catch(err){
-      setResult((prev) => ({
-        ...prev, 
-        loading: false,
-        error: true
-      }))
+      setTimeout(() => {
+        setResult((prev) => ({
+          ...prev,
+          loading: false,
+          error: true
+        }))
+      },
+      3000)
     }finally{
       setTimeout(() => {
         setResult((prev) => ({
@@ -62,7 +74,7 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
           success: false, 
           error: false
         }));
-      }, 5000);
+      }, 3000);
     }
   };
 
@@ -151,7 +163,7 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
         </div>
 
         {/* Generate button */}
-      <button
+      {/* <button
         onClick={handleGenerate}
         disabled={false}
         className={`w-full py-2 rounded-lg font-semibold ${
@@ -161,7 +173,13 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
         }`}
       >
         Generate Book
-      </button>
+      </button> */}
+      <Button 
+        text={"Generate Book"}
+        onClick={handleGenerate}
+        loading={result.loading}
+        className={`mt-2 font-semibold w-full rounded-md ${result.loading ? `bg-white border border-blue-500` : `bg-blue-500`} px-14 py-2 text-white`}
+      />
       </div>
 
       {result.success && (
