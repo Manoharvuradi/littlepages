@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, Get } from '@nestjs/common';
+import { Controller, Post, Body, Req, Get, Param, ParseIntPipe } from '@nestjs/common';
 import type { IFormData } from './book.service';
 import { BookService } from './book.service';
 
@@ -14,5 +14,10 @@ export class BookController {
   @Get("mybooks")
   async getMyBooks(@Req() req) {
     return this.bookService.getMyBooks(req.user.sub);
+  }
+
+  @Get("get/:id")
+  async getBook(@Param("id", ParseIntPipe) id: number) {
+    return this.bookService.getBook(id);
   }
 }

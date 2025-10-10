@@ -53,6 +53,17 @@ export class BookService {
             },
         });
     }
+
+    async getBook(id: number) {
+        return await this.prisma.book.findUnique({
+            where: {
+                id: id,
+            },
+            include: {
+                images: true
+            }, 
+        });
+    }
 }
 
 interface DisplayOptions {
