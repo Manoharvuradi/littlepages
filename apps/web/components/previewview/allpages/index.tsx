@@ -3,19 +3,23 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Page } from '..';
+import { useRouter } from 'next/navigation';
 
 
 type Props = {
   isExpanded: boolean;
   pages: Page[];
+  bookId: number | null;
   setPages: React.Dispatch<React.SetStateAction<Page[]>>;
   onSelectPage?: (index: number) => void;
 };
 
-export default function AllPages({ isExpanded, pages, setPages, onSelectPage }: Props) {
+export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId }: Props) {
   // Hover states
   const [hoveredContainer, setHoveredContainer] = useState<number | null>(null);
   const [hoveredGap, setHoveredGap] = useState<number | null>(null);
+
+  const router = useRouter();
 
   // Dragging state (local)
   const [dragged, setDragged] = useState<{ containerIndex: number; pageIndex: number } | null>(null);
@@ -113,7 +117,9 @@ const swapImages = () => {
                 <div className="absolute left-1/2 top-0 -translate-x-1/2 w-1 h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent opacity-30 pointer-events-none"></div>
 
                 {hoveredContainer === cIndex && (
-                  <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-blue-500 transition-all duration-300 pointer-events-auto">
+                  <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-blue-500 transition-all duration-300 pointer-events-auto"
+                    onClick={() => router.push(`/upload?container=${cIndex}&bookId=${bookId}`)}
+                  >
                     +
                   </button>
                 )}

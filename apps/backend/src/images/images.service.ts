@@ -36,6 +36,20 @@ export class ImagesService {
             data: imageInput,
         });
     }
+
+    async getAllImages(imagesId: string[]) {
+        return this.prisma.images.findMany({
+            where: {
+                id:{
+                    in: imagesId
+                }
+            },
+            select: {
+                id: true,
+                url: true,
+            },
+        });
+    }
 }
 
 export type ImageInput = {

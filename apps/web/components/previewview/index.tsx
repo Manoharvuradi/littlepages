@@ -5,6 +5,7 @@ import { getBook } from '../../server/book';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import AllPages from './allpages';
+import { getAllBookImages } from '../../server/images';
 
 export type Page = {
   id: number;
@@ -24,11 +25,17 @@ const PreviewPage = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
     const [pages, setPages] = useState<Page[]>([]);
+    const [bookId, setBookId] = useState<number | null>(null);
 
     useEffect(() => {
     const fetchBook = async () => {
+      setBookId(Number(params.id));
       const data = await getBook(Number(params.id));
-      setPages(data.images);
+
+      const imageIds = data.bookImages.map((bi: any) => bi.imageId);
+
+      const previewBookImages = await getAllBookImages(imageIds);
+      setPages(previewBookImages);
     };
     fetchBook();
   }, [params.id]);
@@ -139,6 +146,7 @@ const PreviewPage = () => {
               isExpanded={isExpanded}
               pages={pages}
               setPages={setPages}
+              bookId={bookId}
               onSelectPage={(index) => setCurrentPage(index)}
             />
           </div>

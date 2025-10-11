@@ -29,3 +29,15 @@ export interface ImageUpdateInput {
     tags?: string; // or string[] if using Json in Prisma
   }
 };
+
+export interface UploadBookImageInput  {
+  bookId: number;
+  fileUrl: string;
+  caption?: string;
+  name?: string;
+  age?: string;
+  date?: string; // ISO string
+  tags?: string; // or string[] if using Json in Prisma
+  userId: number; // ID of the user uploading the image
+  filename: string; // Original filename of the uploaded image
+}
