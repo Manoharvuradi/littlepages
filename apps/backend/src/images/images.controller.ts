@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ImageInput, ImagesService, ImageUpdateInput } from './images.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -56,5 +56,10 @@ export class ImagesController {
                 tags: body.displayOptions?.tags,
             }
         };
+    }
+
+    @Post("getAll")
+    async getAllBookImages(@Body() body: { imagesId: string[] }) {
+        return this.imageService.getAllImages(body.imagesId);
     }
 }

@@ -5,33 +5,51 @@ import { PrismaService } from 'src/prisma.service';
 export class BookService {
     constructor(private prisma: PrismaService) {}
 
-    async createBook(book: IFormData) {
-      const { images, ...rest } = book;
+async createBook(book: IFormData) {
+  const { images, ...rest } = book;
 
-      // 1. Create book
-      const response = await this.prisma.book.create({
-        data: {
-          ...rest,
-          displaySettings: { ...book.displaySettings },
-        },
-      });
+  // Step 1️⃣ — Create the book
+  const createdBook = await this.prisma.book.create({
+    data: {
+      userId: rest.userId,
+      bookSize: rest.bookSize,
+      coverPhotoUrl: rest.coverPhotoUrl,
+      bookTitle: rest.bookTitle,
+      displaySettings: { ...rest.displaySettings },
+      
 
-      // 2. Link images to the created book
-      if (images.length > 0) {
-        await this.prisma.images.updateMany({
-          where: {
-            id: {
-              in: images.map(image => image.id),
-            },
-          },
-          data: {
-            bookId: response.id,
-          },
-        });
-      }
+      // Step 2️⃣ — Create BookImage entries for each image
+      bookImages: {
+        create: images.map((img) => ({
+          imageId: img.id,
+          caption: img.displayOptions?.caption || null,
+          name: img.displayOptions?.name || null,
+          age: img.displayOptions?.age || null,
+          date: img.displayOptions?.date ? new Date(img.displayOptions?.date) : null,
+          tags: img.displayOptions?.tags || null,
+        })),
+      },
+    },
+    include: {
+      bookImages: true, // optional, to return created bookImages as well
+    },
+  });
 
-      return response;
-    }
+  // Step 3️⃣ — (Optional) Update images table if needed
+  // If you still want each image to store which book it belongs to:
+  if (images.length > 0) {
+    await this.prisma.images.updateMany({
+      where: {
+        id: { in: images.map((i) => i.id) },
+      },
+      data: {
+        bookId: createdBook.id,
+      },
+    });
+  }
+
+  return createdBook;
+}
 
     async getMyBooks(userId: number) {
         return this.prisma.book.findMany({
@@ -60,7 +78,7 @@ export class BookService {
                 id: id,
             },
             include: {
-                images: true
+                bookImages: true
             }, 
         });
     }
@@ -86,7 +104,7 @@ interface DisplaySettings {
   showDate: boolean;
 }
 
-export interface IFormData {
+export class IFormData {
   images: ImageData[];
   userId: number;
   bookSize: string;

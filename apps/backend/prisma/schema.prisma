@@ -20,11 +20,11 @@ enum Role {
 }
 
 model Users {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   name      String?
   password  String
-  role      Role    @default(USER)
+  role      Role     @default(USER)
   images    Images[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -32,37 +32,39 @@ model Users {
 }
 
 model Images {
-  id        String      @id @default(uuid())
-  url       String
-  filename  String
+  id             String      @id @default(uuid())
+  url            String
+  filename       String
   displayOptions Json?
-  userId    Int
-  user      Users       @relation(fields: [userId], references: [id])
-  createdAt DateTime    @default(now())
-  bookId    Int?
-  book      Book? @relation(fields: [bookId], references: [id])
+  userId         Int
+  user           Users       @relation(fields: [userId], references: [id])
+  createdAt      DateTime    @default(now())
+  bookId         Int?
+  book           Book?       @relation(fields: [bookId], references: [id])
+  bookImages     BookImage[]
 }
 
 model Book {
-  id            Int       @id @default(autoincrement())
-  userId        Int
-  user          Users     @relation(fields: [userId], references: [id])
+  id     Int   @id @default(autoincrement())
+  userId Int
+  user   Users @relation(fields: [userId], references: [id])
 
   // Step 1: Book size
-  bookSize      String
+  bookSize String
   // bookSize      BookSize  @relation(fields: [bookSizeId], references: [id])
 
   // Step 2: Cover photo
   coverPhotoUrl String?
 
   // Step 3: Book title
-  bookTitle     String
+  bookTitle String
 
   // Step 4: Toggles
   displaySettings Json?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  images        Images[]  // directly link to Images
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  images          Images[] // directly link to Images
+  bookImages      BookImage[] // additional metadata for each image
 }
 
 // model BookSize {
@@ -71,3 +73,23 @@ model Book {
 //   createdAt DateTime @default(now())
 //   Book      Book[]
 // }
+
+model BookImage {
+  id      Int    @id @default(autoincrement())
+  bookId  Int
+  imageId String
+
+  // relations
+  book  Book   @relation(fields: [bookId], references: [id])
+  image Images @relation(fields: [imageId], references: [id])
+
+  // per-book metadata (editable per book)
+  caption String?
+  name    String?
+  age     String?
+  date    DateTime?
+  tags    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
