@@ -44,6 +44,20 @@ export class BookimageService {
             
         });
     }
+
+    async updateBookImageOrder(bookId: number, pages: { id: number; pageOrder: number }[]) {
+        const updates = pages?.map((p) =>
+            this.prisma.bookImage.update({
+                where: { id: p.id },
+                data: { 
+                    pageOrder: p.pageOrder 
+                },
+            })
+        );
+
+        await this.prisma.$transaction(updates); // 👈 executes all updates together
+        return { success: true };
+    }
 }
 
 export class UploadBookImageInput  {

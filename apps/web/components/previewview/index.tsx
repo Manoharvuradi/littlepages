@@ -9,14 +9,15 @@ import { getAllBookImages } from '../../server/images';
 
 export type Page = {
   id: number;
-  url: string;
-  displayOptions?: {
-    caption?: string | undefined;
-    name?: string | undefined;
-    age?: string | undefined;
-    date?: string;
-    tags?: string;
-  }
+  image: {
+    url: string;
+  };
+  caption?: string | undefined;
+  name?: string | undefined;
+  age?: string | undefined;
+  date?: string;
+  tags?: string;
+  pageOrder?: number;
 };
 
 const PreviewPage = () => {
@@ -28,17 +29,13 @@ const PreviewPage = () => {
     const [bookId, setBookId] = useState<number | null>(null);
 
     useEffect(() => {
-    const fetchBook = async () => {
-      setBookId(Number(params.id));
-      const data = await getBook(Number(params.id));
-
-      const imageIds = data.bookImages.map((bi: any) => bi.imageId);
-
-      const previewBookImages = await getAllBookImages(imageIds);
-      setPages(previewBookImages);
-    };
-    fetchBook();
-  }, [params.id]);
+      const fetchBook = async () => {
+        setBookId(Number(params.id));
+        const data = await getBook(Number(params.id));
+        setPages(data.bookImages);
+      };
+      fetchBook();
+    }, [params.id]);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -80,9 +77,9 @@ const PreviewPage = () => {
         {/* Page Canvas */}
         <div className="flex-1 relative">
           <div className="relative bg-white shadow-lg p-6">
-            {pages[currentPage]?.url ? (
+            {pages[currentPage]?.image?.url ? (
               <Image
-                src={pages[currentPage].url}
+                src={pages[currentPage].image?.url}
                 alt="Page"
                 width={400}
                 height={300}
@@ -95,7 +92,7 @@ const PreviewPage = () => {
             )}
 
             <div className="mt-3 border-t text-center text-gray-500 text-sm py-2 cursor-pointer">
-              {pages[currentPage]?.displayOptions?.caption || "ADD IMAGE TITLE"}
+              {pages[currentPage]?.caption || "ADD IMAGE TITLE"}
             </div>
           </div>
 

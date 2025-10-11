@@ -20,13 +20,14 @@ async createBook(book: IFormData) {
 
       // Step 2️⃣ — Create BookImage entries for each image
       bookImages: {
-        create: images.map((img) => ({
+        create: images.map((img, index) => ({
           imageId: img.id,
           caption: img.displayOptions?.caption || null,
           name: img.displayOptions?.name || null,
           age: img.displayOptions?.age || null,
           date: img.displayOptions?.date ? new Date(img.displayOptions?.date) : null,
           tags: img.displayOptions?.tags || null,
+          pageOrder: index + 1,
         })),
       },
     },
@@ -78,7 +79,15 @@ async createBook(book: IFormData) {
                 id: id,
             },
             include: {
-                bookImages: true
+                // bookImages: true
+                bookImages: { 
+                  orderBy: { 
+                    pageOrder: 'asc' 
+                  }, 
+                  include: { 
+                    image:true
+                  } 
+                },
             }, 
         });
     }
