@@ -84,11 +84,12 @@ model BookImage {
   image Images @relation(fields: [imageId], references: [id])
 
   // per-book metadata (editable per book)
-  caption String?
-  name    String?
-  age     String?
-  date    DateTime?
-  tags    String?
+  caption   String?
+  name      String?
+  age       String?
+  date      DateTime?
+  tags      String?
+  pageOrder Int? // for ordering images within a book
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

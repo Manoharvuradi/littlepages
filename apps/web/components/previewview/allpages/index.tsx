@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Page } from '..';
 import { useRouter } from 'next/navigation';
+import { updatePageOrder } from '../../../server/bookimage';
 
 
 type Props = {
@@ -32,7 +33,7 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
   }
 
   // Swap images by updating parent pages state
-const swapImages = () => {
+const swapImages = async() => {
   if (!dragged || !dragOver.current) return;
 
   const newPages = [...pages];
@@ -45,6 +46,21 @@ const swapImages = () => {
       newPages[draggedIndex]!,
     ];
     setPages(newPages);
+    
+    // prepare pageOrder updates
+    const pageOrderUpdates = newPages.map((p, index) => ({
+      id: p.id,
+      pageOrder: index + 1,
+    }));
+
+    try{
+      if (bookId) {
+        await updatePageOrder(bookId, pageOrderUpdates);
+      }
+
+    }catch(err){
+      console.error("Failed to update page order:", err);
+    }
   }
 
   setDragged(null);
@@ -56,7 +72,7 @@ const swapImages = () => {
     setPages((prev) => {
       const nextId = prev.reduce((m, p) => Math.max(m, p.id), 0) + 1;
       const newPages = [...prev];
-      newPages.splice(index * 2 + 2, 0, { id: nextId, url: '', }, { id: nextId + 1, url: '' });
+      newPages.splice(index * 2 + 2, 0, { id: nextId, image: { url: '' }, caption: '', pageOrder: index + 1 }, { id: nextId + 1, image: { url: '' }, caption: '', pageOrder: index + 2 });
       return newPages;
     });
   };
@@ -91,9 +107,9 @@ const swapImages = () => {
                     className={`relative p-3 overflow-hidden bg-white shadow-md hover:shadow-lg border border-gray-200 hover:border-blue-400 cursor-pointer
                       ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-1/2 h-full' : 'w-[100px] h-[100px]'}`}
                   >
-                    {page?.url ? (
+                    {page?.image?.url ? (
                       <Image
-                        src={page.url}
+                        src={page.image?.url}
                         alt={`Page ${globalIndex + 1}`}
                         width={250}
                         height={350}
