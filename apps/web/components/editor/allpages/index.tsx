@@ -78,10 +78,18 @@ const swapImages = async() => {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex relative">
+    <div  className={`p-4 ${
+    !isExpanded ? 'overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth' : ''
+  }`}>
+      <div className={`relative ${
+      isExpanded
+        ? 'grid grid-cols-3 gap-6 place-items-center' // ✅ show 3 containers per row
+        : 'flex'
+    }`}>
         {containers.map((container, cIndex) => (
-          <div key={cIndex} className="relative flex items-center">
+          <div key={cIndex} 
+          className="relative flex bg-white transition-all duration-300"
+          >
             {/* Container */}
             <div
               className={`relative flex bg-white overflow-hidden transition-all duration-300 ${
@@ -90,6 +98,8 @@ const swapImages = async() => {
               style={{
                 marginRight: hoveredGap === cIndex ? '1rem' : '0',
                 marginLeft: hoveredGap === cIndex - 1 ? '1rem' : '0',
+                // width: isExpanded ? '400px' : 'auto', // ✅ fixed width when expanded
+            // height: isExpanded ? '500px' : 'auto', // ✅ fixed height when expanded
               }}
               onMouseEnter={() => setHoveredContainer(cIndex)}
               onMouseLeave={() => setHoveredContainer(null)}

@@ -1,2 +1,2 @@
-import PreviewUploads from "../../components/previewview/previewuploads";
+import PreviewUploads from "../../components/editor/previewuploads";
 export default PreviewUploads;
