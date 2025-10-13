@@ -1,2 +1,2 @@
-import PreviewPage from "../../../../components/editor";
-export default PreviewPage;
+import BookEditor from "../../../../components/editor";
+export default BookEditor;
