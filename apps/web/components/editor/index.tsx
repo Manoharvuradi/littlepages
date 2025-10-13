@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { getBook } from '../../server/book';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AllPages from './allpages';
 import { getAllBookImages } from '../../server/images';
@@ -20,13 +20,14 @@ export type Page = {
   pageOrder?: number;
 };
 
-const PreviewPage = () => {
+const BookEditor = () => {
   const params = useParams();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
     const [pages, setPages] = useState<Page[]>([]);
     const [bookId, setBookId] = useState<number | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
       const fetchBook = async () => {
@@ -72,6 +73,7 @@ const PreviewPage = () => {
         <div className="flex justify-center items-center space-x-4 py-4">
           <button className="px-3 py-1 border rounded" onClick={()=>{setIsDrawerOpen(!isDrawerOpen)}}>Text</button>
           <button className="px-3 py-1 border rounded">Image</button>
+          <button className="px-3 py-1 border rounded" onClick={()=>router.push(`/books/${bookId}/previewbook`)}>Preview Book</button>
         </div>
 
         {/* Page Canvas */}
@@ -192,4 +194,4 @@ const PreviewPage = () => {
   )
 }
 
-export default PreviewPage
+export default BookEditor
