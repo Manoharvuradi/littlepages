@@ -24,7 +24,7 @@ const Navigation = () => {
     >
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center">
-          <div className="text-2xl font-bold text-primary-600">Maya studios</div>
+          <div className="text-2xl font-bold text-primary-600">Little Pages</div>
         </div>
         <div className="hidden md:flex items-center space-x-8">
           <Link

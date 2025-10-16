@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
+    "@next/font": "^14.2.15",
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",
     "@supabase/supabase-js": "^2.57.4",

@@ -1,4 +1,5 @@
 import { users } from "@repo/types";
+import { useRouter } from "next/router";
 
 export const signupUser = async(userData: users) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
@@ -40,10 +41,16 @@ export const getCurrentUser = async () => {
     return res.json();
 }
 
-export const signOut = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sign-out`, {
-        credentials: 'include',
+// apps/web/server/auth.ts
+export const logout = async () => {
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
     });
-    if (!res.ok) return null;
-    return res.json();
+    return true;
+  } catch (err) {
+    console.error("Logout failed:", err);
+    return false;
+  }
 }

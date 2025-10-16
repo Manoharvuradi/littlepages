@@ -1,6 +1,5 @@
 'use client'
 
-
 import React, { useEffect, useRef, useState } from 'react'
 import WithSidebar from '../../components/sidebar';
 import { addImage, getMyImages } from '../../server/images';
@@ -10,7 +9,6 @@ import UserUploads from '../../components/useruploads';
 import { useRouter } from 'next/dist/client/components/navigation';
 import { useSelectedImages } from '../../context';
 import { PreviewItem } from '../../utils';
-import { users } from '@repo/types';
 
 
 const PhotosPage = () => {
@@ -20,6 +18,7 @@ const PhotosPage = () => {
     const [dragActive, setDragActive] = useState(false);
     const [userId, setUserId] = useState<number | null>(null);
     const [selected, setSelected] = useState<boolean[]>([]);
+    const [showPopup, setShowPopup] = useState(false);
     
     const { setSelectedImages } = useSelectedImages();
     const router = useRouter();
@@ -57,7 +56,10 @@ const PhotosPage = () => {
       }
       setDragActive(true);
       for (const file of files) {
-        const filePath = `user-uploads/${userId}/${Date.now()}-${file.name}`;
+        const safeFileName = file.name
+          .replace(/[^\w.-]+/g, "_") // replaces spaces, colons, etc with underscores
+          .toLowerCase();
+        const filePath = `user-uploads/${userId}/${Date.now()}-${safeFileName}`;
         const { error } = await supabase.storage
           .from('photos')
           .upload(filePath, file, { upsert: false });
@@ -106,25 +108,73 @@ const PhotosPage = () => {
     }, [previewUrls]);
 
     const handleButtonClick = () => {
+      if (selected.filter(Boolean).length < 10) {
+        setShowPopup(true);
+        return;
+      }
       const images = previewUrls.filter((_, idx) => Boolean(selected[idx]));
       setSelectedImages(images);
       router.push("/books/create");
     };
 
   return (
-    <div className="p-8">
+    <div className="p-6 bg-gray-100">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Upload Your Photos</h1>
+  <h1 className="text-2xl font-bold">My photos</h1>
+
+  <div className="flex items-center gap-3">
+    {/* Select Visible Button */}
+    <button
+  onClick={() => {
+    const allSelected = selected.every(Boolean);
+    if (allSelected) {
+      setSelected(previewUrls.map(() => false)); // Deselect all
+    } else {
+      setSelected(previewUrls.map(() => true)); // Select all visible
+    }
+  }}
+  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow transition
+    ${selected.every(Boolean)
+      ? 'bg-gray-300 text-gray-800 hover:bg-gray-400'
+      : 'bg-green-500 text-white hover:bg-green-600'}`}
+>
+  {selected.every(Boolean) ? (
+    <>
+      <svg xmlns="http://www.w3.org/2000/svg"
+           fill="none" viewBox="0 0 24 24" strokeWidth={2}
+           stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      Deselect All
+    </>
+  ) : (
+    <>
+      <svg xmlns="http://www.w3.org/2000/svg"
+           fill="none" viewBox="0 0 24 24" strokeWidth={2}
+           stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
+      Select Visible
+    </>
+  )}
+</button>
+
+    {/* Create Book Button */}
+    <div
+      onClick={() => handleButtonClick()}
+      className="px-4 py-2 bg-[#009FFF] text-white font-semibold rounded-lg shadow hover:bg-[#0A65C7] transition cursor-pointer"
+    >
+      Create Book
+    </div>
+  </div>
+</div>
+      <div className="mb-6 border bg-white border-gray-300 p-6">
+        <div className="flex flex-wrap gap-4">
+          {/* Upload Input */}
           <div
-            onClick={() => handleButtonClick()}
-            className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition"
-          >
-            Create Book
-          </div>
-      </div>
-      <div className="mb-6">
-          <div
-            className={`w-24 h-24 border-2 border-dashed flex flex-col items-center justify-center rounded-lg cursor-pointer transition-colors relative ${dragActive ? 'border-indigo-600 bg-indigo-50' : 'border-indigo-300 bg-white'}`}
+            className={`w-42 h-32 border-2 border-dashed hover:border-blue-400 flex flex-col items-center justify-center rounded-lg cursor-pointer transition-colors relative hover:shadow-2xl ${
+              dragActive ? "border-indigo-600 bg-indigo-50" : "border-indigo-300 bg-gray-50"
+            }`}
             onClick={handleUploadClick}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -132,15 +182,33 @@ const PhotosPage = () => {
           >
             {dragActive && (
               <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center z-10 rounded-lg">
-                  <svg className="animate-spin h-6 w-6 text-indigo-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                  </svg>
-                  <span className="text-indigo-600 text-xs font-semibold">Uploading...</span>
+                <svg
+                  className="animate-spin h-6 w-6 text-indigo-600 mb-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  ></path>
+                </svg>
+                <span className="text-indigo-600 text-xs font-semibold">Uploading...</span>
               </div>
             )}
             <span className="text-indigo-600 text-3xl mb-1">+</span>
-            <span className="text-xs text-gray-500 text-center">Click or Drag & Drop</span>
+            <span className="text-xs text-blue-500 text-center z-1">
+              Click or Drag & Drop
+            </span>
             <input
               type="file"
               accept="image/*"
@@ -150,12 +218,33 @@ const PhotosPage = () => {
               className="hidden"
             />
           </div>
+
+          {/* Images Component */}
+          <UserUploads 
+            previewUrls={previewUrls}
+            selected={selected}
+            setSelected={setSelected}
+          />
+        </div>
       </div>
-      <UserUploads 
-        previewUrls={previewUrls}
-        selected={selected}
-        setSelected={setSelected}
-      />     
+      {showPopup && (
+        <div className="fixed inset-0 bg-blue-400/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full  max-w-md text-center">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Select More Images
+            </h2>
+            <p className="text-gray-600 mb-4">
+              You must select at least 20 images to proceed.
+            </p>
+            <button
+              onClick={() => setShowPopup(false)}
+              className="bg-[#009FFF] text-white px-4 py-2 rounded-md hover:bg-[#0A65C7] cursor-pointer transition-colors"
+            >
+              OK, Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

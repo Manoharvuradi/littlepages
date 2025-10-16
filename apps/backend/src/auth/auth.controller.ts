@@ -32,10 +32,15 @@ export class AuthController {
     return user;
   }
 
-  @Get('sign-out')
-  async signOut(@Res() res: Response) {
-    res.clearCookie('token');
-    res.redirect(process.env.LOGOUT_URL || 'http://localhost:3000/');
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+    return { message: 'Logged out successfully' };
   }
 
   @Get('users')

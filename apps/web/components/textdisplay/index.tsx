@@ -54,7 +54,7 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
             loading: false,
             success: true
           }));
-          router.push(`/books/${res.id}/preview`);
+          router.push(`/books/${res.id}/bookeditor`);
         },  5000);
       }
 
