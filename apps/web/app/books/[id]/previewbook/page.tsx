@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { getBook } from '../../../../server/book';
 import { Page } from '../../../../components/editor';
@@ -9,9 +9,9 @@ const PreivewBook = () => {
       const params = useParams();
           const [bookId, setBookId] = useState<number | null>(null);
               const [pages, setPages] = useState<Page[]>([]);
-  // images = [coverFront, coverBack, page1Front, page1Back, page2Front, page2Back, ...]
   const [coverOpen, setCoverOpen] = useState(false);
-  const [pagesFlipped, setPagesFlipped] = useState({});
+  const [pagesFlipped, setPagesFlipped] = useState<Record<number, boolean>>({});
+  const router = useRouter();
 
   useEffect(() => {
         const fetchBook = async () => {
@@ -22,7 +22,7 @@ const PreivewBook = () => {
         fetchBook();
       }, [params.id]);
 
-  const togglePage = (pageIndex) => {
+  const togglePage = (pageIndex: number) => {
     setPagesFlipped(prev => ({ ...prev, [pageIndex]: !prev[pageIndex] }));
   };
 
@@ -31,6 +31,15 @@ const PreivewBook = () => {
 
   return (
     <>
+
+<div className="relative">
+  <button
+    onClick={() => router.push(`/books/${bookId}/checkout`)}
+    className="absolute top-4 right-4 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 cursor-pointer"
+  >
+    Approve
+  </button>
+</div>
       <style>{`
         .book {
           perspective: 1000px;
