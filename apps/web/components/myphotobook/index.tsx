@@ -46,7 +46,7 @@ const MyPhotoBook = () => {
   };
 
   return (
-    <div className="flex pt-18">
+    <div className="flex">
       <SideSteps steps={createBookSteps} currentStep={currentStep} />
       {/* Main content goes here */}
       <main className="flex-1 p-12">

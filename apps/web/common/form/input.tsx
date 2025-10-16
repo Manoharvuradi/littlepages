@@ -17,16 +17,16 @@ const InputField = ({
           {label.replace(/_/g, ' ')}
         </label>
         <input
-          id={id || name}
-          name={name}
-          type={type}
-          value={formValues[name] || value || ''}
-          onChange={(e) => {
-            e.target.value = e.target.value.trimStart();
-            handleChange(e);
-          }}
-          className='border-1 w-full appearance-none rounded px-3 py-2 leading-tight border-gray-300 focus:border-primary-blue'
-        />
+  id={id || name}
+  name={name}
+  type={type}
+  value={formValues[name] || value || ''}
+  onChange={(e) => {
+    e.target.value = e.target.value.trimStart();
+    handleChange(e);
+  }}
+  className='shadow border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 transition'
+/>
     </div>
   )
 }

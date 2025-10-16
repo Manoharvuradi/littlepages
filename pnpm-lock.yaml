@@ -84,6 +84,9 @@ importers:
       '@prisma/client':
         specifier: ^6.16.2
         version: 6.16.2(prisma@6.16.2)(typescript@5.9.2)
+      '@repo/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
@@ -248,6 +251,9 @@ importers:
       '@headlessui/react':
         specifier: ^2.2.9
         version: 2.2.9(react-dom@19.1.0)(react@19.1.0)
+      '@next/font':
+        specifier: ^14.2.15
+        version: 14.2.15(next@15.4.2)
       '@repo/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -1974,6 +1980,14 @@ packages:
     dependencies:
       fast-glob: 3.3.1
     dev: true
+
+  /@next/font@14.2.15(next@15.4.2):
+    resolution: {integrity: sha512-QopYhBmCDDrNDynbi+ZD1hDZXmQXVFo7TmAFp4DQgO/kogz1OLbQ92hPigJbj572eZ3GaaVxNIyYVn3/eAsehg==}
+    peerDependencies:
+      next: '*'
+    dependencies:
+      next: 15.4.2(react-dom@19.1.0)(react@19.1.0)
+    dev: false
 
   /@next/swc-darwin-arm64@15.4.2:
     resolution: {integrity: sha512-ovqjR8NjCBdBf1U+R/Gvn0RazTtXS9n6wqs84iFaCS1NHbw9ksVE4dfmsYcLoyUVd9BWE0bjkphOWrrz8uz/uw==}

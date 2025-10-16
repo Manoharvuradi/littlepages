@@ -15,7 +15,7 @@ export class ImagesController {
 
     @Post('add')
     async addImage(@Req() req, @Body() body: Partial<ImageInput>) {
-        return this.imageService.addImage(this.createImageInput(req.user.userId, body));
+        return this.imageService.addImage(this.createImageInput(req.user.sub, body));
     }
 
     @Delete('delete')

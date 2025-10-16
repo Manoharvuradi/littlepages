@@ -89,7 +89,7 @@ export default function PreviewUploads() {
       }
 
       // ✅ Redirect back to book page after upload
-      router.push(`/books/${bookId}/preview`);
+      router.push(`/books/${bookId}/bookeditor`);
     } catch (err: any) {
       alert(`Upload failed: ${err.message}`);
     } finally {
