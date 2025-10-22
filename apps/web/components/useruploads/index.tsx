@@ -101,88 +101,82 @@ const UserUploads = ({
       {previewUrls.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {previewUrls.map((img, idx) => (
-<div
-  key={idx}
-  className="relative cursor-pointer"
-  onClick={() => {
-    setStartIndex(idx);
-    setIsOpen(true);
-  }}
->
-  {/* Rounded image wrapper */}
-  <div className="relative rounded-md overflow-hidden">
-    <Image
-      src={img.url}
-      alt=""
-      className="!rounded-md w-40 h-32 object-cover"
-      width={160}
-      height={128}
-    />
+            <div
+              key={idx}
+              className="relative"
+              onClick={() => {
+                setStartIndex(idx);
+                setIsOpen(true);
+              }}
+            >
+              {/* Rounded image wrapper */}
+              <div className="relative rounded-md">
+                <Image
+                  src={img.url}
+                  alt=""
+                  className="!rounded-md w-40 h-32 object-cover cursor-pointer"
+                  width={160}
+                  height={128}
+                />
 
-              <div>
-                <p className="text-lg font-semibold">{img.caption}</p>
-                <div className="flex gap-2">
-                  <span className="text-sm text-gray-500">{img.age}</span>
-                  <span className="text-sm text-gray-500">{img.name}</span> 
+                {/* Fixed height for text area */}
+                <div className="">
+                  <p className="text-sm font-semibold leading-tight">
+                    {img.caption || <span className="invisible">placeholder</span>}
+                  </p>
+                  <div className="flex gap-2 text-xs text-[#B1B1B1] mt-0.5">
+                    <span>{img.age || <span className="invisible">.</span>}</span>
+                    <span>{img.name || <span className="invisible">.</span>}</span>
+                  </div>
+                </div>
+
+                {/* Checkmark Overlay */}
+                <div
+                  className={`group absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 cursor-pointer ${
+                    selected[idx]
+                      ? "bg-blue-500 border-blue-500"
+                      : "border-white hover:bg-white hover:border-white"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelected((prev) => {
+                      const updated = [...prev];
+                      updated[idx] = !updated[idx];
+                      return updated;
+                    });
+                  }}
+                >
+                  {selected[idx] ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="14"
+                      height="14"
+                      stroke="#FFFFFF"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="14"
+                      height="14"
+                      stroke="transparent"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="group-hover:stroke-black transition-colors duration-200"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
                 </div>
               </div>
-
-    {/* Checkmark Overlay (top-left) */}
-<div
-  className={`group absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
-    selected[idx]
-      ? "bg-blue-500 border-blue-500"
-      : "border-white hover:bg-white hover:border-white"
-  }`}
-  onClick={(e) => {
-    e.stopPropagation();
-    setSelected((prev) => {
-      const updated = [...prev];
-      updated[idx] = !updated[idx];
-      return updated;
-    });
-  }}
->
-  {selected[idx] ? (
-    <svg
-      viewBox="0 0 24 24"
-      width="14"
-      height="14"
-      stroke="#FFFFFF"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  ) : (
-    <svg
-      viewBox="0 0 24 24"
-      width="14"
-      height="14"
-      stroke="transparent"
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="group-hover:stroke-black transition-colors duration-200"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  )}
-</div>
-  </div>
-
-  {/* Text (outside rounded container) */}
-  <div className="mt-2">
-    <p className="text-xs font-semibold uppercase">{img.caption}</p>
-    <div className="flex gap-2">
-      <span className="text-gray-400 font-sans text-xs capitalize">{img.age}</span>
-      <span className="text-gray-400 font-sans text-xs capitalize">{img.name}</span>
-    </div>
-  </div>
-</div>
+            </div>
           ))}
         </div>
       )}
@@ -225,9 +219,6 @@ const UserUploads = ({
 
                 </div>
               </div>
-
-                
-              {/* Swiper for slides */}
               <div
               className={`transition-transform duration-300 ease-in-out ${
                 drawerOpen ? "-translate-x-20" : "translate-x-0"
@@ -268,7 +259,6 @@ const UserUploads = ({
               </Swiper>
               </div>
 
-              {/* 👇 Drawer must live INSIDE Dialog.Panel */}
               <div
                 className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 z-[3000] ${
                   drawerOpen ? "translate-x-0" : "translate-x-full"

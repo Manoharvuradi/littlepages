@@ -3,7 +3,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Montserrat } from "next/font/google";
 import AuthProvider from "./providers/AuthProvider";
-import { Roboto } from "next/font/google";
 
 const geist = Geist({ subsets: ["latin"] });
 

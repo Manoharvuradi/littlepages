@@ -42,7 +42,7 @@ export default function CheckoutPage() {
 
               <div className="relative w-[300px] h-[200px] mb-4">
                 <Image
-                  src="/book-preview.jpg"
+                  src="/finalDesign.png"
                   alt="Book Preview"
                   fill
                   className="object-cover rounded-md"

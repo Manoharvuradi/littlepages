@@ -56,7 +56,7 @@ export default function BookSize({ formData, setFormData, onNext }: Props) {
   };
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-full bg-gray-100">
       <h2 className="text-2xl font-semibold mb-8">Choose Book Size</h2>
 
       <div className="grid grid-cols-2 gap-2 mb-10 items-start">
@@ -73,7 +73,7 @@ export default function BookSize({ formData, setFormData, onNext }: Props) {
             >
               {/* bordered image container */}
               <div
-                className={`relative rounded-lg overflow-hidden flex items-center justify-center ${
+                className={`relative rounded-lg flex items-center justify-center ${
                   isSelected
                     ? "border-2 border-indigo-500"
                     : "border border-gray-200"

@@ -7,9 +7,10 @@ import React, { useEffect } from "react";
 import { useAuth } from "../../app/providers/AuthProvider";
 import Image from "next/image";
 import { useSelectedImages } from "../../context";
+import StaticNavbar from "../../common/staticnavbar/staticnavbar";
 
 const navItems = [
-  { name: "", href: "", icon: "/svg/back.svg" },
+  { name: "", href: "", icon: "⏮️" },
   { name: "My Photos", href: "/photos", icon: "📷" },
   { name: "My Books", href: "/books", icon: "📚" },
   { name: "My Orders", href: "/orders", icon: "📦" },
@@ -25,13 +26,6 @@ export default function WithSidebar(Component: React.ComponentType) {
     const router = useRouter();
       const { setUserId } = useAuth();
 
-        const { selectedImages } = useSelectedImages();
-
-        console.log("Selected images in sidebar:", selectedImages);
-
-
-  const selectedCount = selectedImages.length;
-  const hasSelection = selectedCount > 0;
 
       useEffect(() => {
     async function verifyUser() {
@@ -53,77 +47,7 @@ export default function WithSidebar(Component: React.ComponentType) {
 
     return (
       <>
-          <nav
-      className={`fixed top-0 left-0 w-full z-50 px-6 py-3 flex items-center justify-between transition-colors duration-300 ${
-        hasSelection
-          ? "bg-[rgb(16,35,113)] text-white shadow-lg"
-          : "bg-white text-gray-800 shadow-md"
-      }`}
-    >
-      {/* LEFT SIDE */}
-      <div className="flex items-center space-x-3">
-        {hasSelection ? (
-          <>
-            <button
-              onClick={() => console.log("onClearSelection")}
-              className="p-2 rounded-full hover:bg-white/20 transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            {/* Count + text */}
-            <span className="text-lg font-semibold">
-              {selectedCount} selected
-            </span>
-          </>
-        ) : (
-          <span className="font-bold text-lg">Little Pages</span>
-        )}
-      </div>
-
-      {/* RIGHT SIDE */}
-      {hasSelection ? (
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => console.log("onEdit")}
-            className="px-3 py-1.5 rounded-md bg-white text-[rgb(16,35,113)] font-semibold hover:bg-gray-100 transition"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => console.log("onDownload")}
-            className="px-3 py-1.5 rounded-md bg-white text-[rgb(16,35,113)] font-semibold hover:bg-gray-100 transition"
-          >
-            Download
-          </button>
-          <button
-            onClick={() => console.log("onDelete")}
-            className="px-3 py-1.5 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition"
-          >
-            Delete
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center space-x-3 cursor-pointer">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-            LP
-          </div>
-        </div>
-      )}
-    </nav>
+      <StaticNavbar />
 
   {/* Wrapper for sidebar + main */}
   <div className="flex h-screen overflow-hidden pt-14">
@@ -157,7 +81,8 @@ export default function WithSidebar(Component: React.ComponentType) {
                 }`}
                 onClick={() => setSideBar(!sideBar)}
               >
-                <Image src={item.icon} alt={item.name} width={24} height={24} />
+                <span>{item.icon}</span>
+                {/* <Image src={item.icon} alt={item.name} width={24} height={24} /> */}
               </span>
             );
           })}

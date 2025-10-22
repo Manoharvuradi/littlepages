@@ -20,6 +20,7 @@ export default function BookTitle({ formData, setFormData, onNext }: Props) {
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto">
       {/* Label */}
+      <h1 className="text-2xl font-bold mb-4">TITLE YOUR BOOK</h1>
       <label
         htmlFor="book-title"
         className="block text-sm font-medium text-gray-700 mb-2"

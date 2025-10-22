@@ -30,10 +30,9 @@ export default function LoginPage() {
     setLoading(false);
   }
 
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-pink-100">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 w-full max-w-md flex flex-col items-center">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-10 w-full max-w-md flex flex-col items-center">
         <div className="mb-6 flex flex-col items-center">
           <div className="bg-indigo-100 rounded-full p-4 mb-3">
             <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
