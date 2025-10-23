@@ -128,23 +128,6 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
           </button>
         </div>
 
-        {/* <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Age/Grade</span>
-          <button
-            type="button"
-            onClick={() => setShowAgeGrade(!showAgeGrade)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              showAgeGrade ? "bg-indigo-600" : "bg-gray-300"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                showAgeGrade ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-        </div> */}
-
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">Date</span>
           <button
@@ -162,18 +145,6 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
           </button>
         </div>
 
-        {/* Generate button */}
-      {/* <button
-        onClick={handleGenerate}
-        disabled={false}
-        className={`w-full py-2 rounded-lg font-semibold ${
-          true
-            ? "bg-indigo-600 text-white hover:bg-indigo-700"
-            : "bg-gray-200 text-gray-400 cursor-not-allowed"
-        }`}
-      >
-        Generate Book
-      </button> */}
       <Button 
         text={"Generate Book"}
         onClick={handleGenerate}

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Props } from "../../utils";
 
 
-type Option = {
+export type Option = {
   id: string;
   label: string;
   widthIn: number;

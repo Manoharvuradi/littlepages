@@ -139,3 +139,6 @@ export type Props = {
   setFormData: React.Dispatch<React.SetStateAction<IFormData>>;
   onNext: () => void;
 };
+
+const square = "8in x 8in";
+const landscape = "11in x 8.5in";
