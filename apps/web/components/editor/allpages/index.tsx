@@ -114,22 +114,25 @@ const swapImages = async() => {
                     onDragStart={() => setDragged({ containerIndex: cIndex, pageIndex: pIndex })}
                     onDragEnter={() => (dragOver.current = { containerIndex: cIndex, pageIndex: pIndex })}
                     onDragEnd={swapImages}
-                    className={`relative p-3 overflow-hidden bg-white shadow-md hover:shadow-lg border border-gray-200 hover:border-blue-400 cursor-pointer
-                      ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-1/2 h-full' : 'w-[100px] h-[100px]'}`}
+                    className={`relative  overflow-hidden bg-white shadow-md hover:shadow-lg border border-gray-200 hover:border-blue-400 cursor-pointer
+                      ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-[185px] h-[144px] px-3 pt-3 pb-5' : 'w-[100px] h-[100px] px-2 pt-2 pb-3'}`}
                   >
                     {page?.image?.url ? (
                       <Image
                         src={page.image?.url}
                         alt={`Page ${globalIndex + 1}`}
-                        width={250}
-                        height={350}
-                        className="object-cover w-full h-full"
+                        width={100}
+                        height={100}
+                        className="object-contain w-full h-full"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded">
                         Empty
                       </div>
                     )}
+                    <div className={`text-center text-gray-500 text-[3px] ${isExpanded ? 'pt-2' : ''} cursor-pointer`}>
+                        {page?.caption || "ADD IMAGE TITLE"}
+                      </div>
                   </div>
                 );
               })}
