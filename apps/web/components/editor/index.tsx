@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { getBook } from '../../server/book';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AllPages from './allpages';
 import SidebarWithPopup from './sidebarpanels';
 import InputField from '../../common/form/input';
+import { updateBookImageDescription } from '../../server/bookimage';
+import { get } from 'http';
 
 export type Page = {
   id: number;
@@ -24,8 +26,12 @@ export type Page = {
 const BookEditor = () => {
   const params = useParams();
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isImageDrawerOpen, setIsImageDrawerOpen] = useState(false);
+
+  const [isDrawer, setIsDrawer] = useState({
+    isTextDrawer: false,
+    isImageDrawer: false,
+  });
+  const [bookImageId, setBookImageId] = useState<number | null>(null);
 
   const [data, setData] = useState({} as any);
 
@@ -45,6 +51,7 @@ const BookEditor = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -53,13 +60,64 @@ const BookEditor = () => {
     date: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const refetch = async () => {
+    if (!bookId) return;
+    const res: any = await getBook(bookId);
+    setData(res);
+    setPages(res.bookImages);
+  }
+
+  const handleChange = async(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    setPages((prevPages) =>
+    prevPages.map((page) =>
+      page.id === bookImageId ? { ...page, [name]: value } : page
+    )
+  );
+
+  if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+  debounceTimeout.current = setTimeout(async () => {
+    try {
+      await updateBookImageDescription(bookImageId!, { [name]: value });
+      refetch();
+    } catch (err) {
+      console.error(err);
+    }
+  }, 500);
+
+     // Prepare payload for API
+    // const updatedData = { [name]: value };
+
+    // console.log("Updating book image ID:", bookImageId, "with data:", updatedData);
+
+    // try {
+    //   if (bookImageId === null || bookImageId === undefined) {
+    //     console.warn("No book image ID found — skipping API update");
+    //     return;
+    //   }
+
+    //   console.log("Calling API to update book image...");
+    //   const response = await updateBookImageDescription(
+    //     bookImageId,
+    //     updatedData
+    //   );
+
+    //   if (!response.ok && response.error) {
+    //     console.error("API error updating book image:", response.error);
+    //   }else if(response.ok){
+    //     refetch();
+    //   }
+    // } catch (err) {
+    //   console.error("Error updating book image description:", err);
+    // }
   };
+
 
   const onCrop = () => {
     console.log("Crop/Rotate clicked");
@@ -76,7 +134,6 @@ const BookEditor = () => {
   const onRemove = () => {
     console.log("Remove clicked");
   }
-
 
   return (
 
@@ -113,90 +170,117 @@ const BookEditor = () => {
           }}
         >
           <div
-            className={`space-x-4 py-4 transition-transform duration-500 ease-in-out ${isDrawerOpen || isImageDrawerOpen ? "-translate-x-1/4" : "translate-x-0"}`}
+            className={`space-x-4 py-4 transition-transform duration-500 ease-in-out ${isDrawer.isTextDrawer || isDrawer.isImageDrawer ? "-translate-x-1/4" : "translate-x-0"}`}
           >
             <div className="flex space-x-4 justify-center mb-4">
               <button
-                className={`px-3 py-1 border  rounded flex  cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isDrawerOpen ? "border-blue-200 bg-blue-100" : "border-blue-100 hover:border-blue-200"}`}
-                onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                className={`px-3 py-1 border  rounded flex  cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isDrawer.isTextDrawer ? "border-blue-400 bg-blue-100" : "border-blue-100 hover:border-blue-200"}`}
+                onClick={() => {
+                  setIsDrawer({isImageDrawer: false, isTextDrawer: !isDrawer.isTextDrawer})
+                  setBookImageId(pages[currentPage]?.id ?? null);
+                }}
               >
                 <div className='mt-0.5'>
-                  <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="TextFieldsIcon"><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"></path></svg>
+                  <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="TextFieldsIcon" fill={isDrawer.isTextDrawer ? `#009FFF` : ``}><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"></path></svg>
                 </div>
                 <span 
-                  className={`font-semibold text-sm ml-1 ${isDrawerOpen ? "text-[#009FFF]" : "text-gray-700"}`}
+                  className={`font-semibold text-sm ml-1 ${isDrawer.isTextDrawer ? "text-[#009FFF]" : "text-gray-700"}`}
                 >
                   Text
                 </span>
               </button>
               <button
-                className={`px-3 py-1 border rounded flex cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isImageDrawerOpen ? "border-blue-400 bg-blue-200" : "border-blue-100 hover:border-blue-200"}`}
-                onClick={() => setIsImageDrawerOpen(!isImageDrawerOpen)}
+                className={`px-3 py-1 border rounded flex cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isDrawer.isImageDrawer ? "border-blue-400 bg-blue-100" : "border-blue-100 hover:border-blue-200"}`}
+                onClick={() => {
+                  setIsDrawer({isImageDrawer: !isDrawer.isImageDrawer, isTextDrawer: false})
+                  setBookImageId(pages[currentPage]?.id ?? null);
+                }}
               >
                 <div 
                   className='mt-0.5'
                 >
-                  <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="ImageOutlinedIcon"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86-3 3.87L9 13.14 6 17h12l-3.86-5.14z"></path>
+                  <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="ImageOutlinedIcon" fill={isDrawer.isImageDrawer ? `#009FFF` : ``}><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86-3 3.87L9 13.14 6 17h12l-3.86-5.14z"></path>
                   </svg>
                 </div>
-                <span className="text-gray-700 font-semibold text-sm ml-1">Image</span>
+                <span className={`font-semibold text-sm ml-1 ${isDrawer.isImageDrawer ? "text-[#009FFF]" : "text-gray-700"}`}>Image</span>
               </button>
             </div>
 
             <div
-              className={`shadow-xl flex-1 relative overflow-hidden transform transition-transform duration-500 ease-in-out`}
+              className="shadow-xl flex-1 relative overflow-hidden transform transition-transform duration-500 ease-in-out"
             >
-              <div className="relative bg-white p-6">
-                {pages[currentPage]?.image?.url ? (
-                  <Image
-                    src={pages[currentPage].image?.url}
-                    alt="Page"
-                    width={360}
-                    height={270}
-                    className="object-contain w-[360px] h-[270px]"
-                  />
-                ) : (
-                  <div className="w-[360px] h-[270px] bg-gray-100 flex items-center justify-center text-gray-400">
-                    No image
-                  </div>
-                )}
+              {/* Canvas tag */}
+              <canvas
+                id="pageCanvas"
+                width={360}
+                height={400}
+                className="absolute top-0 left-0 w-full h-full pointer-events-none"
+              ></canvas>
 
-                <div 
-                  className=" text-center text-gray-500 text-sm pt-2 pb-3 cursor-pointer"
+              <div className="relative bg-white p-4">
+                {/* Image block */}
+                <div
+                  className={`text-center text-gray-500 text-sm cursor-pointer transition-all duration-200 ease-in-out border ${
+                    isDrawer.isImageDrawer
+                      ? "border-[#009FFF]"
+                      : "border-transparent hover:border-[#009FFF]"
+                  }`}
+                  onClick={() =>{
+                    setIsDrawer({
+                      isTextDrawer: false,
+                      isImageDrawer: !isDrawer.isImageDrawer,
+                    })
+                    setBookImageId(pages[currentPage]?.id ?? null);
+                  }}
                 >
-                  {pages[currentPage]?.caption || "ADD IMAGE TITLE"}
+                  {pages[currentPage]?.image?.url ? (
+                    <Image
+                      src={pages[currentPage].image?.url}
+                      alt="Page"
+                      width={360}
+                      height={270}
+                      className="object-contain w-[360px] h-[270px]"
+                    />
+                  ) : (
+                    <div className="w-[360px] h-[270px] bg-gray-100 flex items-center justify-center text-gray-400">
+                      No image
+                    </div>
+                  )}
+                </div>
+
+                {/* Caption / name / age */}
+                <div
+                  className={`p-1 text-center text-gray-500 cursor-pointer transition-all duration-200 ease-in-out border ${
+                    isDrawer.isTextDrawer
+                      ? "border-[#009FFF]"
+                      : "border-transparent hover:border-[#009FFF]"
+                  }`}
+                  onClick={() =>{
+                    setIsDrawer({
+                      isImageDrawer: false,
+                      isTextDrawer: !isDrawer.isTextDrawer,
+                    })
+                    setBookImageId(pages[currentPage]?.id ?? null);
+                  }}
+                >
+                  <div className="flex flex-col items-center justify-center leading-none space-y-0.5">
+                    <span className="text-[10px]">
+                      {pages[currentPage]?.caption || "ADD IMAGE TITLE"}
+                    </span>
+                    <div className="flex items-center justify-center gap-[2px] leading-none">
+                      <span className="text-[10px]">
+                        {pages[currentPage]?.name || "ADD NAME"}
+                      </span>
+                      <span className="text-[10px]">
+                        {pages[currentPage]?.age || "ADD AGE"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            {/* <div
-              className={`shadow-xl flex-1 relative overflow-hidden transform transition-transform duration-500 ease-in-out `}
-            >
-              <div className="relative bg-white p-6">
-                {pages[currentPage]?.image?.url ? (
-                  <Image
-                    src={pages[currentPage].image?.url}
-                    alt="Page"
-                    width={400}
-                    height={300}
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-[400px] h-[300px] bg-gray-100 flex items-center justify-center text-gray-400">
-                    No image
-                  </div>
-                )}
-
-                <div 
-                  className="mt-3 border-t text-center text-gray-500 text-sm py-2 cursor-pointer"
-                >
-                  {pages[currentPage]?.caption || "ADD IMAGE TITLE"}
-                </div>
-              </div>
-
-            </div> */}
 
             <div>
-
               {currentPage > 0 && (
                 <button
                   onClick={() => setCurrentPage(currentPage - 1)}
@@ -249,10 +333,6 @@ const BookEditor = () => {
             </div>
             </div>
 
-            {/* TEXT LABEL (no clicking needed here now) */}
-            
-
-            {/* Thumbnails */}
             <div className="relative z-10 w-full px-4 py-3 h-full overflow-y-auto">
               <AllPages
                 isExpanded={isExpanded}
@@ -260,28 +340,32 @@ const BookEditor = () => {
                 setPages={setPages}
                 bookId={bookId}
                 onSelectPage={(index) => setCurrentPage(index)}
+                setBookImageId={setBookImageId}
               />
             </div>
           </div>
         </main>
         <aside
           className={`fixed right-0 h-115 w-72 bg-white p-6 transform transition-transform duration-500 ease-in-out z-50
-          ${isDrawerOpen ? "translate-x-0 " : "translate-x-full "}`}
+          ${isDrawer.isTextDrawer ? "translate-x-0 " : "translate-x-full "}`}
         >
           <div className="flex justify-between items-center mb-4 mx-auto">
             <h2 className="text-sm font-semibold">Edit Text</h2>
-            <button className='cursor-pointer' onClick={() => setIsDrawerOpen(false)}>✕</button>
+            <button className='cursor-pointer' onClick={() => setIsDrawer({...isDrawer, isTextDrawer: false})}>✕</button>
           </div>
 
           <InputField
             input={{
               label: "Image Title",
               type: "text",
-              name: "title",
+              name: "caption",
+              liveCountMax: 50,
+              value: pages[currentPage]?.caption || '',
             }}
             handleChange={handleChange}
             formValues={formData}
             tailwindClass=''
+            liveCount={true}
           />
 
           <InputField
@@ -289,19 +373,25 @@ const BookEditor = () => {
               label: "Name",
               type: "text",
               name: "name",
+              liveCountMax: 25,
+              value: pages[currentPage]?.name || '',
             }}
             handleChange={handleChange}
             formValues={formData}
+            liveCount={true}
           />
 
           <InputField
             input={{
               label: "Age/Grade",
               type: "text",
-              name: "ageGrade",
+              name: "age",
+              liveCountMax: 25,
+              value: pages[currentPage]?.age || '',
             }}
             handleChange={handleChange}
             formValues={formData}
+            liveCount={true}
           />
 
           <InputField
@@ -309,6 +399,7 @@ const BookEditor = () => {
               label: "Date",
               type: "date",
               name: "date",
+              value: pages[currentPage]?.date || '',
             }}
             handleChange={handleChange}
             formValues={formData}
@@ -316,12 +407,12 @@ const BookEditor = () => {
         </aside>
         <aside
           className={`fixed right-0 h-115  p-6 w-72 bg-white transform transition-transform duration-500 ease-in-out z-50
-          ${isImageDrawerOpen ? "translate-x-0" : "translate-x-full"}`}
+          ${isDrawer.isImageDrawer ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex justify-between items-center mb-6 pb-3">
             <h2 className="text-center text-sm font-semibold text-gray-800">Edit Image</h2>
             <button
-              onClick={() => setIsImageDrawerOpen(false)}
+              onClick={() => setIsDrawer({...isDrawer, isImageDrawer: false})}
               className="text-gray-500 hover:text-gray-700 transition cursor-pointer"
             >
               ✕

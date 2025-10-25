@@ -13,9 +13,10 @@ type Props = {
   bookId: number | null;
   setPages: React.Dispatch<React.SetStateAction<Page[]>>;
   onSelectPage?: (index: number) => void;
+  setBookImageId: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
-export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId }: Props) {
+export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId, setBookImageId }: Props) {
   // Hover states
   const [hoveredContainer, setHoveredContainer] = useState<number | null>(null);
   const [hoveredGap, setHoveredGap] = useState<number | null>(null);
@@ -110,7 +111,7 @@ const swapImages = async() => {
                   <div
                     key={page?.id ?? `empty-${cIndex}-${pIndex}`}
                     draggable
-                    onClick={() => onSelectPage?.(globalIndex)}
+                    onClick={() => {onSelectPage?.(globalIndex); setBookImageId(page?.id || null);}}
                     onDragStart={() => setDragged({ containerIndex: cIndex, pageIndex: pIndex })}
                     onDragEnter={() => (dragOver.current = { containerIndex: cIndex, pageIndex: pIndex })}
                     onDragEnd={swapImages}
