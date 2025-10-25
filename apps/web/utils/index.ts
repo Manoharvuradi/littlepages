@@ -52,8 +52,9 @@ export interface IInputProps {
   formValues: { [key: string]: any };
   index?: number;
   disabled?: boolean;
-  tailwindClass?: string
-  value?: string
+  tailwindClass?: string;
+  value?: string;
+  liveCount?: boolean;
 }
 
 export interface IInput {
@@ -65,6 +66,7 @@ export interface IInput {
   minLength?: number;
   maxLength?: number;
   pattern?: string;
+  liveCountMax?: number;
 }
 
 export const generateAgeOptions = (maxAge: number) => {

@@ -5,16 +5,17 @@ const InputField = ({
   input,
   handleChange,
   formValues,
-  tailwindClass
+  tailwindClass,
+  liveCount,
 }: IInputProps) => {
-    const { id, name, type, value, label } = input;
+    const { id, name, type, value, label, liveCountMax } = input;
   return (
     <div
         key={name}
         className={`flex flex-col mb-4 ${tailwindClass ? tailwindClass : ''}`}
       >
         <label htmlFor={label} className="mb-2 text-xs font-medium text-gray-700 capitalize">
-          {label.replace(/_/g, ' ')}
+          {label.replace(/_/g, ' ')} {liveCount && formValues[name] ? `(${formValues[name].length}/${input.liveCountMax})` : ''}
         </label>
         <input
   id={id || name}
@@ -25,6 +26,7 @@ const InputField = ({
     e.target.value = e.target.value.trimStart();
     handleChange(e);
   }}
+  maxLength={liveCount ? liveCountMax : undefined}
   className='shadow border border-gray-300 rounded-lg px-1.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 transition'
 />
     </div>

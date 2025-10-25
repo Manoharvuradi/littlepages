@@ -58,6 +58,23 @@ export class BookimageService {
         await this.prisma.$transaction(updates); // 👈 executes all updates together
         return { success: true };
     }
+
+    async updateBookImageDescription(id: number, data: Partial<UploadBookImageInput>) {
+        const updateData: any = {};
+
+        if (data.caption !== undefined) updateData.caption = data.caption;
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.age !== undefined) updateData.age = data.age;
+        if (data.date !== undefined) updateData.date = data.date ? new Date(data.date) : null;
+        if (data.tags !== undefined) updateData.tags = data.tags;
+
+        const updatedBookImage = await this.prisma.bookImage.update({
+            where: { id },
+            data: updateData,
+        });
+
+        return updatedBookImage;
+    }
 }
 
 export class UploadBookImageInput  {
