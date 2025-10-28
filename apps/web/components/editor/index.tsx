@@ -8,7 +8,8 @@ import AllPages from './allpages';
 import SidebarWithPopup from './sidebarpanels';
 import InputField from '../../common/form/input';
 import { updateBookImageDescription } from '../../server/bookimage';
-import { get } from 'http';
+import Modal from '../model';
+import RotatingImage from './cropandrotate';
 
 export type Page = {
   id: number;
@@ -30,6 +31,8 @@ const BookEditor = () => {
   const [isDrawer, setIsDrawer] = useState({
     isTextDrawer: false,
     isImageDrawer: false,
+    isCropRotate: false,
+    isReplaceImage: false,
   });
   const [bookImageId, setBookImageId] = useState<number | null>(null);
 
@@ -90,32 +93,6 @@ const BookEditor = () => {
       console.error(err);
     }
   }, 500);
-
-     // Prepare payload for API
-    // const updatedData = { [name]: value };
-
-    // console.log("Updating book image ID:", bookImageId, "with data:", updatedData);
-
-    // try {
-    //   if (bookImageId === null || bookImageId === undefined) {
-    //     console.warn("No book image ID found — skipping API update");
-    //     return;
-    //   }
-
-    //   console.log("Calling API to update book image...");
-    //   const response = await updateBookImageDescription(
-    //     bookImageId,
-    //     updatedData
-    //   );
-
-    //   if (!response.ok && response.error) {
-    //     console.error("API error updating book image:", response.error);
-    //   }else if(response.ok){
-    //     refetch();
-    //   }
-    // } catch (err) {
-    //   console.error("Error updating book image description:", err);
-    // }
   };
 
 
@@ -134,6 +111,12 @@ const BookEditor = () => {
   const onRemove = () => {
     console.log("Remove clicked");
   }
+
+  const onSave = (editedImage: string) => {
+    console.log("Save clicked");
+    // setEditedImagePreview(editedImage); // 👈 store the image locally for preview
+  }
+
 
   return (
 
@@ -162,6 +145,21 @@ const BookEditor = () => {
           displaySettings={data?.displaySettings }
           bookSize={data?.bookSize}
         />
+        {/* 🟣 Modal to edit image */}
+        <Modal
+          isOpen={isDrawer.isCropRotate && !!bookImageId}
+          onClose={() =>
+            setIsDrawer({ ...isDrawer, isCropRotate: false })
+          }
+        >
+          <RotatingImage
+            imageUrl={pages[currentPage]?.image?.url || ''}
+            onClose={() =>
+              setIsDrawer({ ...isDrawer, isCropRotate: false })
+            }
+            onSave={(editedImageUrl) => onSave(editedImageUrl)}
+          />
+        </Modal>
         <main
           className="flex-1 flex flex-col items-center justify-between relative bg-[#F5F9FA] overflow-hidden"
           style={{
@@ -176,7 +174,7 @@ const BookEditor = () => {
               <button
                 className={`px-3 py-1 border  rounded flex  cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isDrawer.isTextDrawer ? "border-blue-400 bg-blue-100" : "border-blue-100 hover:border-blue-200"}`}
                 onClick={() => {
-                  setIsDrawer({isImageDrawer: false, isTextDrawer: !isDrawer.isTextDrawer})
+                  setIsDrawer({...isDrawer,isImageDrawer: false, isTextDrawer: !isDrawer.isTextDrawer})
                   setBookImageId(pages[currentPage]?.id ?? null);
                 }}
               >
@@ -192,7 +190,7 @@ const BookEditor = () => {
               <button
                 className={`px-3 py-1 border rounded flex cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isDrawer.isImageDrawer ? "border-blue-400 bg-blue-100" : "border-blue-100 hover:border-blue-200"}`}
                 onClick={() => {
-                  setIsDrawer({isImageDrawer: !isDrawer.isImageDrawer, isTextDrawer: false})
+                  setIsDrawer({...isDrawer, isImageDrawer: !isDrawer.isImageDrawer, isTextDrawer: false})
                   setBookImageId(pages[currentPage]?.id ?? null);
                 }}
               >
@@ -209,13 +207,6 @@ const BookEditor = () => {
             <div
               className="shadow-xl flex-1 relative overflow-hidden transform transition-transform duration-500 ease-in-out"
             >
-              {/* Canvas tag */}
-              <canvas
-                id="pageCanvas"
-                width={360}
-                height={400}
-                className="absolute top-0 left-0 w-full h-full pointer-events-none"
-              ></canvas>
 
               <div className="relative bg-white p-4">
                 {/* Image block */}
@@ -227,6 +218,7 @@ const BookEditor = () => {
                   }`}
                   onClick={() =>{
                     setIsDrawer({
+                      ...isDrawer,
                       isTextDrawer: false,
                       isImageDrawer: !isDrawer.isImageDrawer,
                     })
@@ -257,6 +249,7 @@ const BookEditor = () => {
                   }`}
                   onClick={() =>{
                     setIsDrawer({
+                      ...isDrawer,
                       isImageDrawer: false,
                       isTextDrawer: !isDrawer.isTextDrawer,
                     })
@@ -424,23 +417,34 @@ const BookEditor = () => {
 
             <button
               className="text-sm w-full px-4 py-2 bg-[#F5F9FA] border border-gray-100 text-gray-800 font-medium rounded-lg hover:bg-blue-100 transform transition-transform  duration-500 ease-in-out cursor-pointer"
-              onClick={onReplaceImage}
+              onClick={()=>{
+                setIsDrawer({...isDrawer, isReplaceImage: true})
+              }}
             >
-              Replace Image
+              <div className="flex items-center justify-center">
+                <svg className="h-6 w-6" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CachedIcon"><path d="m19 8-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"></path></svg>
+                <span className='ml-2'>Replace Image</span>
+              </div>
             </button>
 
             <button
               className="text-sm w-full border border-gray-100 px-4 py-2 bg-[#F5F9FA] font-medium rounded-lg transition cursor-pointer hover:bg-blue-100"
-              onClick={onCrop}
+              onClick={() => setIsDrawer({...isDrawer, isImageDrawer:false ,isCropRotate: true})}
             >
-              Crop / Rotate
+              <div className="flex items-center justify-center">
+                <svg className="h-5 w-5" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="CropRotateIcon"><path d="M7.47 21.49C4.2 19.93 1.86 16.76 1.5 13H0c.51 6.16 5.66 11 11.95 11 .23 0 .44-.02.66-.03L8.8 20.15l-1.33 1.34zM12.05 0c-.23 0-.44.02-.66.04l3.81 3.81 1.33-1.33C19.8 4.07 22.14 7.24 22.5 11H24c-.51-6.16-5.66-11-11.95-11zM16 14h2V8c0-1.11-.9-2-2-2h-6v2h6v6zm-8 2V4H6v2H4v2h2v8c0 1.1.89 2 2 2h8v2h2v-2h2v-2H8z"></path></svg>
+                <span className='ml-2'>Crop / Rotate</span>
+              </div>
             </button>
 
             <button
               className="text-sm w-full border border-gray-100 px-4 py-2 bg-[#F5F9FA] font-medium rounded-lg transition cursor-pointer hover:bg-blue-100"
               onClick={onDownload}
             >
-              Download
+              <div className="flex items-center justify-center">
+                <svg className="h-5 w-5" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DownloadIcon"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>
+                <span className='ml-2'>Download</span>
+              </div>
             </button>
             </div>
             <button
