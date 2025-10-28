@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
 import { BookimageService, UploadBookImageInput } from './bookimage.service';
 
 @Controller('bookimage')
@@ -28,5 +28,18 @@ export class BookimageController {
         @Body() body: Partial<UploadBookImageInput>
     ) {
         return this.bookimageService.updateBookImageDescription(id, body);
+    }
+
+    @Delete("delete/:id")
+    async deleteBookImage(@Param("id", ParseIntPipe) id: number) {
+        return this.bookimageService.deleteBookImage(id);
+    }
+
+    @Patch("update/:id")
+    async updateBookImageApi(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() body: Partial<UploadBookImageInput>
+    ) {
+        return this.bookimageService.updateBookImage(id, body);
     }
 }
