@@ -7,9 +7,11 @@ import Image from 'next/image';
 import AllPages from './allpages';
 import SidebarWithPopup from './sidebarpanels';
 import InputField from '../../common/form/input';
-import { updateBookImageDescription } from '../../server/bookimage';
+import { updateBookImage, updateBookImageDescription } from '../../server/bookimage';
 import Modal from '../model';
 import RotatingImage from './cropandrotate';
+import { supabase } from '../../lib/supabaseClient';
+import { getCurrentUser } from '../../server/user';
 
 export type Page = {
   id: number;
@@ -112,10 +114,53 @@ const BookEditor = () => {
     console.log("Remove clicked");
   }
 
-  const onSave = (editedImage: string) => {
-    console.log("Save clicked");
-    // setEditedImagePreview(editedImage); // 👈 store the image locally for preview
+const onSave = async (editedImageBlobUrl: string) => {
+
+  if (!bookImageId || !bookId) {
+    console.warn("⚠️ Missing book ID or image ID — cannot save");
+    return;
   }
+
+  try {
+    // Step 1: Fetch blob from blob URL
+    const response = await fetch(editedImageBlobUrl);
+    const blob = await response.blob();
+
+    // Step 2: Convert blob to File
+    const file = new File([blob], `edited-${Date.now()}.jpg`, { type: blob.type });
+
+    // Step 3: Get user ID
+    const userId = await getCurrentUser();
+    if (!userId) throw new Error("User not logged in");
+
+    // Step 4: Prepare file path
+    const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
+    const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
+
+    // Step 5: Upload to Supabase
+    const { error } = await supabase.storage.from("photos").upload(filePath, file, { upsert: false });
+    if (error) throw error;
+
+    // Step 6: Get public URL
+    const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+    const publicUrl = data.publicUrl;
+
+    // Step 7: Update DB with the new URL
+    const res = await updateBookImage(bookImageId, { fileUrl: publicUrl });
+    if (!res || res.error) throw new Error("Failed to update book image");
+
+    console.log("✅ Image updated successfully in DB:", publicUrl);
+
+    // Step 8: Refetch updated data
+    await refetch();
+
+  } catch (error) {
+    console.error(" Error saving edited image:", error);
+  } finally {
+    // Step 9: Close editor modal
+    setIsDrawer((prev) => ({ ...prev, isCropRotate: false }));
+  }
+};
 
 
   return (

@@ -75,6 +75,50 @@ export class BookimageService {
 
         return updatedBookImage;
     }
+
+    async deleteBookImage(id: number) {
+        // First, find the BookImage to get the associated Image ID
+        const bookImage = await this.prisma.bookImage.findUnique({
+            where: { id },
+        });
+
+        if (!bookImage) {
+            throw new Error('BookImage not found');
+        }
+
+        await this.prisma.bookImage.delete({
+            where: { id },
+        });
+
+        // Optionally, delete the associated Image as well
+        await this.prisma.images.delete({
+            where: { id: bookImage.imageId },
+        });
+
+        return { success: true };
+    }
+
+    async updateBookImage(id: number, data: Partial<UploadBookImageInput>) {
+        const updateData: any = {};
+        let response: any = {};
+
+        if (data.bookId !== undefined) updateData.bookId = data.bookId;
+        if (data.fileUrl !== undefined) {
+            // Update the associated Image's URL
+            const bookImage = await this.prisma.bookImage.findUnique({
+            where: { id },
+            });
+
+            if (bookImage) {
+            response = await this.prisma.images.update({
+                where: { id: bookImage.imageId },
+                data: { url: data.fileUrl },
+            });
+            }
+        }
+
+        return response;
+    }
 }
 
 export class UploadBookImageInput  {

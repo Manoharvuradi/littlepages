@@ -48,3 +48,32 @@ export const updateBookImageDescription = async (id: number, data: Partial<Uploa
     });
     return res.json();
 };
+
+export const deleteBookImage = async (id: number) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookimage/delete/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return res.json();
+}
+
+export const updateBookImage = async (id: number, data: Partial<UploadBookImageInput>) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookimage/update/${id}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to update book image: ${err}`);
+  }
+
+  return res.json();
+};
