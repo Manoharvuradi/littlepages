@@ -7,7 +7,7 @@ import Image from 'next/image';
 import AllPages from './allpages';
 import SidebarWithPopup from './sidebarpanels';
 import InputField from '../../common/form/input';
-import { updateBookImage, updateBookImageDescription } from '../../server/bookimage';
+import { deleteBookImage, updateBookImage, updateBookImageDescription } from '../../server/bookimage';
 import Modal from '../model';
 import RotatingImage from './cropandrotate';
 import { supabase } from '../../lib/supabaseClient';
@@ -29,7 +29,6 @@ export type Page = {
 const BookEditor = () => {
   const params = useParams();
 
-
   const [isDrawer, setIsDrawer] = useState({
     isTextDrawer: false,
     isImageDrawer: false,
@@ -37,9 +36,7 @@ const BookEditor = () => {
     isReplaceImage: false,
   });
   const [bookImageId, setBookImageId] = useState<number | null>(null);
-
   const [data, setData] = useState({} as any);
-
   const [pages, setPages] = useState<Page[]>([]);
   const [bookId, setBookId] = useState<number | null>(null);
   const router = useRouter();
@@ -65,12 +62,24 @@ const BookEditor = () => {
     date: "",
   });
 
-  const refetch = async () => {
-    if (!bookId) return;
+  useEffect(() => {
+    if (pages.length > 0 && pages[currentPage]) {
+      setFormData({
+        title: pages[currentPage]?.caption || "",
+        name: pages[currentPage]?.name || "",
+        ageGrade: pages[currentPage]?.age || "",
+        date: pages[currentPage]?.date || "",
+      });
+    }
+  }, [pages, currentPage]);
+
+  const refetch = async (): Promise<Page[]> => {
+    if (!bookId) return [];
     const res: any = await getBook(bookId);
     setData(res);
     setPages(res.bookImages);
-  }
+    return res.bookImages; // ✅ return data for caller
+  };
 
   const handleChange = async(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -80,22 +89,22 @@ const BookEditor = () => {
     }));
 
     setPages((prevPages) =>
-    prevPages.map((page) =>
-      page.id === bookImageId ? { ...page, [name]: value } : page
-    )
-  );
+      prevPages.map((page) =>
+        page.id === bookImageId ? { ...page, [name]: value } : page
+      )
+    );
 
-  if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
-  debounceTimeout.current = setTimeout(async () => {
-    try {
-      await updateBookImageDescription(bookImageId!, { [name]: value });
-      refetch();
-    } catch (err) {
-      console.error(err);
-    }
-  }, 500);
-  };
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        await updateBookImageDescription(bookImageId!, { [name]: value });
+        refetch();
+      } catch (err) {
+        console.error(err);
+      }
+      }, 500);
+    };
 
 
   const onCrop = () => {
@@ -106,61 +115,97 @@ const BookEditor = () => {
     console.log("Replace Image clicked");
   }
 
-  const onDownload = () => {
-    console.log("Download clicked");
+  const onDownload = async () => {
+    try {
+      const imageUrl = pages[currentPage]?.image?.url;
+      if (!imageUrl) {
+        console.warn("No image URL to download");
+        return;
+      }
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error("Failed to fetch image for download");
+      }
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      // Try to extract a filename from URL or fallback
+      const urlParts = imageUrl.split("/");
+      let filename = urlParts[urlParts.length - 1] || "download.jpg";
+      if (!filename.includes(".")) filename += ".jpg";
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+      }, 1000);
+    } catch (err) {
+      console.error("Error downloading image:", err);
+    }
   }
 
-  const onRemove = () => {
-    console.log("Remove clicked");
-  }
-
-const onSave = async (editedImageBlobUrl: string) => {
-
-  if (!bookImageId || !bookId) {
-    console.warn("⚠️ Missing book ID or image ID — cannot save");
-    return;
-  }
-
-  try {
-    // Step 1: Fetch blob from blob URL
-    const response = await fetch(editedImageBlobUrl);
-    const blob = await response.blob();
-
-    // Step 2: Convert blob to File
-    const file = new File([blob], `edited-${Date.now()}.jpg`, { type: blob.type });
-
-    // Step 3: Get user ID
-    const userId = await getCurrentUser();
-    if (!userId) throw new Error("User not logged in");
-
-    // Step 4: Prepare file path
-    const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
-    const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
-
-    // Step 5: Upload to Supabase
-    const { error } = await supabase.storage.from("photos").upload(filePath, file, { upsert: false });
-    if (error) throw error;
-
-    // Step 6: Get public URL
-    const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
-    const publicUrl = data.publicUrl;
-
-    // Step 7: Update DB with the new URL
-    const res = await updateBookImage(bookImageId, { fileUrl: publicUrl });
-    if (!res || res.error) throw new Error("Failed to update book image");
-
-    console.log("✅ Image updated successfully in DB:", publicUrl);
-
-    // Step 8: Refetch updated data
+  const onRemove = async () => {
+    const req = {
+      bookImageId: bookImageId,
+    }
+    const res = await deleteBookImage(req.bookImageId!);
+    if (res.error) {
+      console.error("❌ Error deleting image:", res.error);
+      return;
+    }
     await refetch();
-
-  } catch (error) {
-    console.error(" Error saving edited image:", error);
-  } finally {
-    // Step 9: Close editor modal
-    setIsDrawer((prev) => ({ ...prev, isCropRotate: false }));
   }
-};
+
+  const onSave = async (editedImageBlobUrl: string) => {
+
+    if (!bookImageId || !bookId) {
+      console.warn("⚠️ Missing book ID or image ID — cannot save");
+      return;
+    }
+
+    try {
+      // Step 1: Fetch blob from blob URL
+      const response = await fetch(editedImageBlobUrl);
+      const blob = await response.blob();
+
+      // Step 2: Convert blob to File
+      const file = new File([blob], `edited-${Date.now()}.jpg`, { type: blob.type });
+
+      // Step 3: Get user ID
+      const userId = await getCurrentUser();
+      if (!userId) throw new Error("User not logged in");
+
+      // Step 4: Prepare file path
+      const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
+      const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
+
+      // Step 5: Upload to Supabase
+      const { error } = await supabase.storage.from("photos").upload(filePath, file, { upsert: false });
+      if (error) throw error;
+
+      // Step 6: Get public URL
+      const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+      const publicUrl = data.publicUrl;
+
+      // Step 7: Update DB with the new URL
+      const res = await updateBookImage(bookImageId, { fileUrl: publicUrl });
+      if (!res || res.error) throw new Error("Failed to update book image");
+
+      console.log("✅ Image updated successfully in DB:", publicUrl);
+
+      // Step 8: Refetch updated data
+      await refetch();
+
+    } catch (error) {
+      console.error(" Error saving edited image:", error);
+    } finally {
+      // Step 9: Close editor modal
+      setIsDrawer((prev) => ({ ...prev, isCropRotate: false }));
+    }
+  };
+
 
 
   return (
@@ -213,7 +258,9 @@ const onSave = async (editedImageBlobUrl: string) => {
           }}
         >
           <div
-            className={`space-x-4 py-4 transition-transform duration-500 ease-in-out ${isDrawer.isTextDrawer || isDrawer.isImageDrawer ? "-translate-x-1/4" : "translate-x-0"}`}
+            className={`space-x-4 py-4 transition-all duration-500 ease-in-out ${
+              isDrawer.isTextDrawer || isDrawer.isImageDrawer ? "-translate-x-1/4" : "translate-x-0"
+            } ${isExpanded ? 'blur-sm' : ''}`}
           >
             <div className="flex space-x-4 justify-center mb-4">
               <button
@@ -317,7 +364,6 @@ const onSave = async (editedImageBlobUrl: string) => {
                 </div>
               </div>
             </div>
-
             <div>
               {currentPage > 0 && (
                 <button
@@ -336,11 +382,10 @@ const onSave = async (editedImageBlobUrl: string) => {
                 </button>
               )}
             </div>
-
-            </div>
+          </div>
           <div
             className={`
-              absolute bottom-0 left-0 w-full bg-white z-40 
+              absolute bottom-0 left-0 w-full bg-white z-50 
               transition-all duration-500 ease-in-out shadow-2xl
               ${isExpanded ? "h-[95%]" : "h-34"}
             `}
@@ -379,12 +424,13 @@ const onSave = async (editedImageBlobUrl: string) => {
                 bookId={bookId}
                 onSelectPage={(index) => setCurrentPage(index)}
                 setBookImageId={setBookImageId}
+                refetch={refetch}
               />
             </div>
           </div>
         </main>
         <aside
-          className={`fixed right-0 h-115 w-72 bg-white p-6 transform transition-transform duration-500 ease-in-out z-50
+          className={`fixed right-0 h-115 w-72 bg-white p-6 transform transition-transform duration-500 ease-in-out z-40
           ${isDrawer.isTextDrawer ? "translate-x-0 " : "translate-x-full "}`}
         >
           <div className="flex justify-between items-center mb-4 mx-auto">
@@ -398,7 +444,7 @@ const onSave = async (editedImageBlobUrl: string) => {
               type: "text",
               name: "caption",
               liveCountMax: 50,
-              value: pages[currentPage]?.caption || '',
+              value: formData.title || '',
             }}
             handleChange={handleChange}
             formValues={formData}
@@ -412,7 +458,7 @@ const onSave = async (editedImageBlobUrl: string) => {
               type: "text",
               name: "name",
               liveCountMax: 25,
-              value: pages[currentPage]?.name || '',
+              value: formData.name || '',
             }}
             handleChange={handleChange}
             formValues={formData}
@@ -425,7 +471,7 @@ const onSave = async (editedImageBlobUrl: string) => {
               type: "text",
               name: "age",
               liveCountMax: 25,
-              value: pages[currentPage]?.age || '',
+              value: formData.ageGrade || '',
             }}
             handleChange={handleChange}
             formValues={formData}
@@ -437,14 +483,14 @@ const onSave = async (editedImageBlobUrl: string) => {
               label: "Date",
               type: "date",
               name: "date",
-              value: pages[currentPage]?.date || '',
+              value: formData.date || '',
             }}
             handleChange={handleChange}
             formValues={formData}
           />
         </aside>
         <aside
-          className={`fixed right-0 h-115  p-6 w-72 bg-white transform transition-transform duration-500 ease-in-out z-50
+          className={`fixed right-0 h-115  p-6 w-72 bg-white transform transition-transform duration-500 ease-in-out z-40
           ${isDrawer.isImageDrawer ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex justify-between items-center mb-6 pb-3">

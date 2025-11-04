@@ -157,6 +157,7 @@ const RotatingImage = ({ imageUrl, onClose, onSave }: Props) => {
   const handleAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAngle = Math.min(45, Math.max(-45, Number(e.target.value)));
     setAngle(newAngle);
+    setZoom(prev => Math.max(1, prev - 0.1));
   };
 
   const handleReset = () => {
@@ -185,9 +186,12 @@ const RotatingImage = ({ imageUrl, onClose, onSave }: Props) => {
   const mirrorTransform = `scaleX(${isMirrored ? -1 : 1}) scaleY(${isVerticallyMirrored ? -1 : 1})`;
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-[#0A1A6B] w-full max-w-md mx-auto">
+    <div
+      className="flex flex-col items-center justify-between bg-[#0A1A6B] w-full min-h-screen mx-auto overflow-hidden border-none px-4 py-6"
+      style={{ maxHeight: '100vh' }}
+    >
       {/* Cropper Container */}
-      <div className="relative w-full h-64 bg-black rounded-md overflow-hidden" style={{ transform: mirrorTransform }}>
+      <div className="relative w-full max-w-xl h-[45vh] rounded-md overflow-hidden" style={{ transform: mirrorTransform }}>
         <Cropper
           image={imageUrl}
           crop={crop}
@@ -200,80 +204,83 @@ const RotatingImage = ({ imageUrl, onClose, onSave }: Props) => {
           objectFit="contain"
           cropShape="rect"
           showGrid={false}
+          style={{ containerStyle: { width: '100%', height: '100%' } }}
         />
       </div>
 
-      {/* Zoom Slider */}
-      <div className="w-full mt-4">
-        <label htmlFor="zoom" className="block text-white text-sm mb-1">Zoom</label>
-        <input
-          id="zoom"
-          type="range"
-          min={1}
-          max={3}
-          step={0.01}
-          value={zoom}
-          onChange={(e) => setZoom(Number(e.target.value))}
-          className="w-full"
-        />
-      </div>
+      <div className="w-full max-w-3xl flex flex-col space-y-4 mt-4 overflow-visible">
+        {/* Zoom Slider */}
+        <div className="w-full">
+          <label htmlFor="zoom" className="block text-white text-sm mb-1">Zoom</label>
+          <input
+            id="zoom"
+            type="range"
+            min={1}
+            max={3}
+            step={0.01}
+            value={zoom}
+            onChange={(e) => setZoom(Number(e.target.value))}
+            className="w-full custom-range"
+          />
+        </div>
 
-      {/* Aspect Ratio Buttons */}
-      <div className="flex justify-center space-x-3 mt-4">
-        <button
-          onClick={() => setAspectRatio(4 / 3)}
-          className={`px-4 py-2 rounded-full text-white ${aspectRatio === 4 / 3 ? 'bg-indigo-600' : 'bg-indigo-400 hover:bg-indigo-500'}`}
-        >
-          4:3
-        </button>
-        <button
-          onClick={() => setAspectRatio(16 / 9)}
-          className={`px-4 py-2 rounded-full text-white ${aspectRatio === 16 / 9 ? 'bg-indigo-600' : 'bg-indigo-400 hover:bg-indigo-500'}`}
-        >
-          16:9
-        </button>
-        <button
-          onClick={() => setAspectRatio(1 / 2)}
-          className={`px-4 py-2 rounded-full text-white ${aspectRatio === 1 / 2 ? 'bg-indigo-600' : 'bg-indigo-400 hover:bg-indigo-500'}`}
-        >
-          1:2
-        </button>
-      </div>
+        {/* Aspect Ratio Buttons */}
+        <div className="flex justify-center space-x-3">
+          <button
+            onClick={() => setAspectRatio(4 / 3)}
+            className={`px-4 py-2 rounded-full text-white ${aspectRatio === 4 / 3 ? 'bg-indigo-600' : 'bg-indigo-400 hover:bg-indigo-500'}`}
+          >
+            4:3
+          </button>
+          <button
+            onClick={() => setAspectRatio(16 / 9)}
+            className={`px-4 py-2 rounded-full text-white ${aspectRatio === 16 / 9 ? 'bg-indigo-600' : 'bg-indigo-400 hover:bg-indigo-500'}`}
+          >
+            16:9
+          </button>
+          <button
+            onClick={() => setAspectRatio(1 / 2)}
+            className={`px-4 py-2 rounded-full text-white ${aspectRatio === 1 / 2 ? 'bg-indigo-600' : 'bg-indigo-400 hover:bg-indigo-500'}`}
+          >
+            1:2
+          </button>
+        </div>
 
-      {/* Rotation Slider */}
-      <div className="w-full mt-6">
-        <label htmlFor="rotation" className="block text-white text-sm mb-1">Rotation Angle</label>
-        <input
-          id="rotation"
-          type="range"
-          min={-45}
-          max={45}
-          value={angle}
-          onChange={handleAngleChange}
-          className="w-full"
-        />
-        <div className="text-center text-white text-sm mt-1">Angle: {angle}°</div>
-      </div>
+        {/* Rotation Slider */}
+        <div className="w-full">
+          <label htmlFor="rotation" className="block text-white text-sm mb-1">Rotation Angle</label>
+          <input
+            id="rotation"
+            type="range"
+            min={-45}
+            max={45}
+            value={angle}
+            onChange={handleAngleChange}
+            className="w-full custom-range-rotation"
+          />
+          <div className="text-center text-white text-sm mt-1">Angle: {angle}°</div>
+        </div>
 
-      {/* Mirror Buttons */}
-      <div className="flex space-x-4 mt-6">
-        <button
-          onClick={() => setIsMirrored(!isMirrored)}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
-        >
-          {isMirrored ? 'Unmirror Image' : 'Mirror Image'}
-        </button>
+        {/* Mirror Buttons */}
+        <div className="flex justify-center space-x-4 mb-16">
+          <button
+            onClick={() => setIsMirrored(!isMirrored)}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
+          >
+            {isMirrored ? 'Unmirror Image' : 'Mirror Image'}
+          </button>
 
-        <button
-          onClick={() => setIsVerticallyMirrored(!isVerticallyMirrored)}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
-        >
-          {isVerticallyMirrored ? 'Unmirror Vertically' : 'Mirror Vertically'}
-        </button>
+          <button
+            onClick={() => setIsVerticallyMirrored(!isVerticallyMirrored)}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition"
+          >
+            {isVerticallyMirrored ? 'Unmirror Vertically' : 'Mirror Vertically'}
+          </button>
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-center space-x-6 mt-8 w-full">
+      <div className="flex justify-center space-x-6 w-full max-w-3xl px-4 mt-8">
         <button
           onClick={onClose}
           className="px-6 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition"
@@ -293,6 +300,79 @@ const RotatingImage = ({ imageUrl, onClose, onSave }: Props) => {
           Crop
         </button>
       </div>
+
+      <style jsx>{`
+        input[type='range'].custom-range {
+          -webkit-appearance: none;
+          width: 100%;
+          height: 4px;
+          background: #3730a3; /* darker indigo */
+          border-radius: 3px;
+          outline: none;
+        }
+        input[type='range'].custom-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 3px solid #4c51bf; /* indigo-600 */
+          cursor: pointer;
+          margin-top: -10px;
+          transition: background-color 0.3s ease;
+        }
+        input[type='range'].custom-range::-webkit-slider-thumb:hover {
+          background: #e0e7ff; /* lighter indigo */
+        }
+        input[type='range'].custom-range::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 3px solid #4c51bf;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        input[type='range'].custom-range::-moz-range-thumb:hover {
+          background: #e0e7ff;
+        }
+
+        input[type='range'].custom-range-rotation {
+          -webkit-appearance: none;
+          width: 100%;
+          height: 4px;
+          background: #3730a3; /* darker indigo */
+          border-radius: 3px;
+          outline: none;
+        }
+        input[type='range'].custom-range-rotation::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 3px solid #4c51bf; /* indigo-600 */
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        input[type='range'].custom-range-rotation::-webkit-slider-thumb:hover {
+          background: #e0e7ff; /* lighter indigo */
+        }
+        input[type='range'].custom-range-rotation::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 3px solid #4c51bf;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        input[type='range'].custom-range-rotation::-moz-range-thumb:hover {
+          background: #e0e7ff;
+        }
+      `}</style>
     </div>
   );
 };
