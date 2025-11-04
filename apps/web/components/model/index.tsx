@@ -42,14 +42,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
           `}</style>
         </div>
       ) : (
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full flex flex-col items-center justify-center bg-transparent border-0">
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+            className="absolute top-3 right-3 text-gray-500 hover:text-white-800 text-xl cursor-pointer"
           >
             ✕
           </button>
-          <div className="p-4">{children}</div>
+          <div
+            className="w-full h-full flex items-center justify-center bg-[#0A1A6B] border-0"
+            style={{ border: "none", boxShadow: "none" }}
+          >
+            {children}
+          </div>
         </div>
       )}
     </div>

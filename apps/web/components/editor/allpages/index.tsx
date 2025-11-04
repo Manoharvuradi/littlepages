@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Page } from '..';
 import { useRouter } from 'next/navigation';
 import { updatePageOrder } from '../../../server/bookimage';
+import UploadModal from '../previewuploads';
 
 
 type Props = {
@@ -14,12 +15,18 @@ type Props = {
   setPages: React.Dispatch<React.SetStateAction<Page[]>>;
   onSelectPage?: (index: number) => void;
   setBookImageId: React.Dispatch<React.SetStateAction<number | null>>;
+  refetch: () => Promise<Page[]>;
 };
 
-export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId, setBookImageId }: Props) {
+export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId, setBookImageId, refetch }: Props) {
   // Hover states
   const [hoveredContainer, setHoveredContainer] = useState<number | null>(null);
   const [hoveredGap, setHoveredGap] = useState<number | null>(null);
+  const [position, setPosition] = useState<{ containerIndex: number | null; insertPosition: number | null }>({
+    containerIndex: null,
+    insertPosition: null,
+  });
+  const [uploadModal, setUploadModal] = useState(false);
 
   const router = useRouter();
 
@@ -34,62 +41,86 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
   }
 
   // Swap images by updating parent pages state
-const swapImages = async() => {
-  if (!dragged || !dragOver.current) return;
+  const swapImages = async() => {
+    if (!dragged || !dragOver.current) return;
 
-  const newPages = [...pages];
-  const draggedIndex = dragged.containerIndex * 2 + dragged.pageIndex;
-  const overIndex = dragOver.current.containerIndex * 2 + dragOver.current.pageIndex;
+    const newPages = [...pages];
+    const draggedIndex = dragged.containerIndex * 2 + dragged.pageIndex;
+    const overIndex = dragOver.current.containerIndex * 2 + dragOver.current.pageIndex;
 
-  if (newPages[draggedIndex] && newPages[overIndex]) {
-    [newPages[draggedIndex], newPages[overIndex]] = [
-      newPages[overIndex]!,
-      newPages[draggedIndex]!,
-    ];
-    setPages(newPages);
-    
-    // prepare pageOrder updates
-    const pageOrderUpdates = newPages.map((p, index) => ({
-      id: p.id,
-      pageOrder: index + 1,
-    }));
+    if (newPages[draggedIndex] && newPages[overIndex]) {
+      [newPages[draggedIndex], newPages[overIndex]] = [
+        newPages[overIndex]!,
+        newPages[draggedIndex]!,
+      ];
+      setPages(newPages);
+      
+      // prepare pageOrder updates
+      const pageOrderUpdates = newPages.map((p, index) => ({
+        id: p.id,
+        pageOrder: index + 1,
+      }));
 
-    try{
-      if (bookId) {
-        await updatePageOrder(bookId, pageOrderUpdates);
+      try{
+        if (bookId) {
+          await updatePageOrder(bookId, pageOrderUpdates);
+        }
+
+      }catch(err){
+        console.error("Failed to update page order:", err);
       }
+    }
+
+    setDragged(null);
+    dragOver.current = null;
+  };
+
+  const handleUploadComplete = async() => {
+    if (!position || !bookId) return;
+    
+    try{
+
+      const freshPages = refetch ? await refetch() : [];
+      if (!Array.isArray(freshPages) || freshPages.length === 0) return;
+    // assume newly uploaded image appended to end
+    const newPage = freshPages[freshPages.length - 1];
+    const pagesWithoutNew = freshPages.slice(0, -1);
+
+      // Insert the new page at the desired position (position.insertPosition)
+      pagesWithoutNew.splice(position.insertPosition!, 0, newPage!);
+
+      // Update the local state immediately
+      setPages(pagesWithoutNew);
+
+          // Prepare pageOrder updates for database
+      const pageOrderUpdates = pagesWithoutNew.map((p, index) => ({
+        id: p.id,
+        pageOrder: index + 1,
+      }));
+      
+      // Update page order in database
+      await updatePageOrder(bookId, pageOrderUpdates);
+      
+      console.log(`Moved new image to position ${position.insertPosition}`);
 
     }catch(err){
       console.error("Failed to update page order:", err);
     }
   }
 
-  setDragged(null);
-  dragOver.current = null;
-};
-
-  // Add an empty container (two empty pages) after index
-  const addContainerAt = (index: number) => {
-    setPages((prev) => {
-      const nextId = prev.reduce((m, p) => Math.max(m, p.id), 0) + 1;
-      const newPages = [...prev];
-      newPages.splice(index * 2 + 2, 0, { id: nextId, image: { url: '' }, caption: '', pageOrder: index + 1 }, { id: nextId + 1, image: { url: '' }, caption: '', pageOrder: index + 2 });
-      return newPages;
-    });
-  };
 
   return (
-    <div  className={`p-4 ${
-    !isExpanded ? 'overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth' : ''
-  }`}>
-      <div className={`relative ${
-      isExpanded
-        ? 'grid grid-cols-3 gap-6 place-items-center' // ✅ show 3 containers per row
-        : 'flex'
-    }`}>
+  <>
+    <div  
+      className={`p-4 ${!isExpanded ? 'overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth' : ''}`}
+    >
+      <div 
+        className={`relative ${isExpanded ? 'grid grid-cols-3 gap-6 place-items-center':'flex'}`}
+      >
         {containers.map((container, cIndex) => (
-          <div key={cIndex} 
-          className="relative flex bg-white transition-all duration-300"
+          <div 
+            key={cIndex} 
+            className="relative flex bg-white transition-all duration-300"
           >
             {/* Container */}
             <div
@@ -146,27 +177,40 @@ const swapImages = async() => {
               >
                 <div className="absolute left-1/2 top-0 -translate-x-1/2 w-1 h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent opacity-30 pointer-events-none"></div>
 
-                {hoveredContainer === cIndex && (
-                  <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-blue-500 transition-all duration-300 pointer-events-auto"
-                    onClick={() => router.push(`/upload?container=${cIndex}&bookId=${bookId}`)}
-                  >
-                    +
-                  </button>
-                )}
+                  {hoveredContainer === cIndex && (
+                    <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-blue-500 transition-all duration-300 pointer-events-auto"
+                      onClick={() => {
+                        const i = cIndex * 2 + 1;
+                        // insertInContainer(cIndex, insertPosition, bookId!);
+                        setPosition({ containerIndex: cIndex, insertPosition: i });
+                        setUploadModal(true);
+                      }}
+                    >
+                      +
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
 
             {/* Between containers hover area */}
             {cIndex < containers.length - 1 && (
               <div
-                className="relative w-6 h-full cursor-pointer"
+                className={`cursor-pointer ${
+                  isExpanded 
+                    ? 'absolute -right-8 top-1/2 -translate-y-1/2 w-16 h-full z-10' 
+                    : 'relative w-6 h-full'
+                }`}
                 onMouseEnter={() => setHoveredGap(cIndex)}
                 onMouseLeave={() => setHoveredGap(null)}
               >
                 {hoveredGap === cIndex && (
                   <button
                     className="z-50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-green-700 transition-all duration-300"
-                    onClick={() => addContainerAt(cIndex)}
+                    onClick={() => {
+                      const i = (cIndex + 1) * 2;
+                      setPosition({ containerIndex: cIndex, insertPosition: i });
+                      setUploadModal(true);
+                    }}
                   >
                     +
                   </button>
@@ -177,5 +221,14 @@ const swapImages = async() => {
         ))}
       </div>
     </div>
+    {uploadModal && 
+      <UploadModal 
+        bookId={bookId} 
+        position={position} 
+        setUploadModal={setUploadModal}
+        onUploadComplete={handleUploadComplete}
+      />
+    }
+  </>
   );
 }
