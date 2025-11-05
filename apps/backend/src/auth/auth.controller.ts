@@ -9,6 +9,7 @@ import { GetUser } from './get-user.decorator';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @Post('signup')
   signup(@Body() body: { email: string; password: string; name?: string }) {
     return this.authService.signup(body.email, body.password, body.name);
