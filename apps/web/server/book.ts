@@ -22,3 +22,13 @@ export const getBook = async (id: number) => {
   });
   return res.json();
 };
+
+export const getOrderData = async (orderId: string) => {
+  // Replace with your actual API call
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, {
+    cache: 'no-store'
+  });
+  
+  if (!res.ok) return null;
+  return res.json();
+}
