@@ -5,8 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { getCurrentUser, logout } from "../../server/user";
 import React, { useEffect } from "react";
 import { useAuth } from "../../app/providers/AuthProvider";
-import Image from "next/image";
-import { useSelectedImages } from "../../context";
 import StaticNavbar from "../../common/staticnavbar/staticnavbar";
 
 const navItems = [
