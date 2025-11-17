@@ -25,10 +25,14 @@ model Users {
   name      String?
   password  String
   role      Role     @default(USER)
+
   images    Images[]
+  Book      Book[]
+  orders    Order[]
+  addresses Address[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Book      Book[]
 }
 
 model Images {
@@ -38,10 +42,10 @@ model Images {
   displayOptions Json?
   userId         Int
   user           Users       @relation(fields: [userId], references: [id])
-  createdAt      DateTime    @default(now())
   bookId         Int?
   book           Book?       @relation(fields: [bookId], references: [id])
   bookImages     BookImage[]
+  createdAt      DateTime    @default(now())
 }
 
 model Book {
@@ -49,22 +53,16 @@ model Book {
   userId Int
   user   Users @relation(fields: [userId], references: [id])
 
-  // Step 1: Book size
   bookSize String
-  // bookSize      BookSize  @relation(fields: [bookSizeId], references: [id])
-
-  // Step 2: Cover photo
   coverPhotoUrl String?
-
-  // Step 3: Book title
   bookTitle String
-
-  // Step 4: Toggles
   displaySettings Json?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+
   images          Images[] // directly link to Images
   bookImages      BookImage[] // additional metadata for each image
+  orderItems  OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
 // model BookSize {
@@ -93,4 +91,103 @@ model BookImage {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([bookId])
+  @@index([bookId, pageOrder])
+  @@unique([bookId, imageId]) // prevent adding same image twice
+}
+
+// Order Table (Main)
+model Order {
+  id                String   @id @default(cuid())
+  orderNumber       String   @unique // e.g., "ORD-2024-001234"
+  userId            Int
+  email             String
+  status            OrderStatus @default(CONFIRMED)
+  subtotal          Float
+  shipping          Float
+  tax               Float
+  discount          Float    @default(0)
+  total             Float
+  shippingAddressId String
+  billingAddressId  String
+  shippingMethod    String   // e.g., "Standard Shipping", "Express"
+  trackingNumber    String?
+  trackingUrl       String?
+  estimatedDelivery DateTime
+  
+  // Payment
+  // paymentMethodId   String
+  user              Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items             OrderItem[]
+  statusHistory     OrderStatusHistory[]
+  shippingAddress   Address         @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  billingAddress    Address         @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  // paymentMethod     PaymentMethod   @relation(fields: [paymentMethodId], references: [id])
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+}
+
+// Order Items Table
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  bookId    Int
+  name      String   // Store product name at time of order
+  image     String   // Product image URL
+  variant   String?  // e.g., "Size: L, Color: Blue"
+  quantity  Int
+  price     Float    // Price per unit at time of order
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book   Book  @relation(fields: [bookId], references: [id])
+  @@index([orderId])
+  @@index([bookId])
+}
+
+model OrderStatusHistory {
+  id          String      @id @default(cuid())
+  orderId     String
+  status      OrderStatus
+  description String      // e.g., "Order confirmed and processing"
+  createdAt   DateTime    @default(now())
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  @@index([orderId])
+  @@index([createdAt])
+}
+
+// Address Table (Reusable for shipping and billing)
+model Address {
+  id        String   @id @default(cuid())
+  userId    Int
+  name      String   // Full name for delivery
+  street    String   // Street address
+  city      String
+  state     String
+  zip       String   // Postal/ZIP code
+  country   String
+  phone     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user              Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shippingOrders    Order[] @relation("ShippingAddress")
+  billingOrders     Order[] @relation("BillingAddress")
+  
+  @@index([userId])
+}
+
+// Enum for Order Status
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
 }
