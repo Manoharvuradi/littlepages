@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -33,7 +34,7 @@ export class ImagesService {
     async updateImage(id: string, imageInput: Partial<ImageUpdateInput>) {
         return this.prisma.images.update({
             where: { id },
-            data: imageInput,
+            data: imageInput as Prisma.ImagesUpdateInput,
         });
     }
 
