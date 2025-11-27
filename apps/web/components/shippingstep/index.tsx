@@ -24,12 +24,6 @@ export default function ShippingStep({ onNext, onBack }: ShippingPageProps) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <nav className="bg-[#102371] text-white py-4 px-6 font-semibold text-lg flex items-center justify-between">
-        <button onClick={onBack} className="text-sm hover:underline">&lt; Address</button>
-        <div className="text-sm font-normal tracking-wide">
-          Address &gt; <span className="font-semibold">Shipping</span> &gt; Confirmation &gt; Review
-        </div>
-      </nav>
 
       {/* Main Content */}
       <div className="flex flex-col md:flex-row gap-8 p-8 max-w-6xl mx-auto w-full">
@@ -104,7 +98,7 @@ export default function ShippingStep({ onNext, onBack }: ShippingPageProps) {
         </div>
 
         {/* Right Side: Order Summary */}
-        <div className="w-full md:w-80 bg-white rounded-lg shadow p-6 self-start">
+        {/* <div className="w-full md:w-80 bg-white rounded-lg shadow p-6 self-start">
           <h2 className="text-lg font-bold text-gray-800 mb-4">
             Order Summary ({quantity} Items)
           </h2>
@@ -123,7 +117,7 @@ export default function ShippingStep({ onNext, onBack }: ShippingPageProps) {
           <hr className="my-3" />
 
           <div className="flex items-center justify-between text-gray-700 mb-2">
-            <p>Promo Code</p>
+            <p>j</p>
             <button className="text-blue-600 font-medium text-sm">+</button>
           </div>
 
@@ -148,7 +142,7 @@ export default function ShippingStep({ onNext, onBack }: ShippingPageProps) {
             <p>Total</p>
             <p>${total}</p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

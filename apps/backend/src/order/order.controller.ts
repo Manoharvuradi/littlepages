@@ -1,0 +1,13 @@
+import { Body, Controller, Post } from '@nestjs/common';
+import { OrderService } from './order.service';
+import { Prisma } from '@prisma/client';
+
+@Controller('order')
+export class OrderController {
+    constructor(private readonly orderService: OrderService) {}
+
+    @Post('create')
+    async createOrder(@Body() orderData: Prisma.OrderCreateInput | any) {
+        return this.orderService.createOrder(orderData);
+    }
+}
