@@ -6,7 +6,7 @@ const FooterPage = () => {
         <div className="container mx-auto px-6">
             <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
                 <div>
-                    <h3 className="text-2xl font-bold mb-4">BOXIFY</h3>
+                    <h3 className="text-2xl font-bold mb-4">Little Pages</h3>
                     <p className="text-gray-400 mb-4">
                         Preserving memories and creativity through premium art preservation services.
                     </p>

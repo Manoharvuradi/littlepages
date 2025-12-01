@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import feather from "feather-icons";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,9 +23,18 @@ const Navigation = () => {
     <nav
       className={`fixed w-full z-50 text-black nav-transition bg-white shadow-md`}
     >
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-6 py-1 flex justify-between items-center">
         <div className="flex items-center">
-          <div className="text-2xl font-bold text-primary-600">Little Pages</div>
+          <div className="">
+            <Image
+              src="/images/logo.png"
+              alt="Little Pages Logo"
+              width={100}
+              height={50}
+              className="cursor-pointer object-center"
+              onClick={() => router.push("/")}
+            />
+          </div>
         </div>
         <div className="hidden md:flex items-center space-x-8">
           <Link
