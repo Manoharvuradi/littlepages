@@ -1,39 +1,45 @@
 'use client';
 
 import React, { useState } from 'react';
+import { createAddress } from '../../server/address';
+import { getCurrentUser } from '../../server/user';
 
 interface AddressStepProps {
   onNext: () => void;
+  flowData?: any;
+  setFlowData?: any;
 }
 
-interface FormState {
+export interface IFormAddress {
   country: string;
-  firstName: string;
-  lastName: string;
-  streetAddress: string;
+  name: string;
+  street: string;
   apartment: string;
   city: string;
   state: string;
   zip: string;
+  user: {
+    sub: number;
+  };
 }
 
 interface Errors {
   [key: string]: string;
 }
 
-export default function AddressStep({ onNext }: AddressStepProps) {
+export default function AddressStep({ onNext, flowData, setFlowData }: AddressStepProps) {
   const inputBaseClasses =
     'w-full mt-1 border rounded-lg px-4 py-3 text-sm';
 
-  const [form, setForm] = useState<FormState>({
+  const [form, setForm] = useState<IFormAddress>({
     country: 'United States',
-    firstName: '',
-    lastName: '',
-    streetAddress: '',
+    name: '',
+    street: '',
     apartment: '',
     city: '',
     state: '',
     zip: '',
+    user: { sub: null as unknown as number },
   });
 
   const [errors, setErrors] = useState<Errors>({});
@@ -46,24 +52,33 @@ export default function AddressStep({ onNext }: AddressStepProps) {
 
   const validate = (): Errors => {
     const newErrors: Errors = {};
-    if (!form.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!form.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!form.streetAddress.trim()) newErrors.streetAddress = 'Street address is required';
+    if (!form.name.trim()) newErrors.name = 'Name is required';
+    if (!form.street.trim()) newErrors.streetAddress = 'Street address is required';
     if (!form.city.trim()) newErrors.city = 'City/Town is required';
     if (!form.state.trim()) newErrors.state = 'State/Province/Region is required';
     if (!form.zip.trim()) newErrors.zip = 'ZIP/Postal code is required';
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      onNext();
+      const user = await getCurrentUser();
+      const response = await createAddress({ ...form, user });
+      if(response && response.id){
+        console.log('Address created:', response);
+        setFlowData((prev: any) => ({ ...prev, address: response }));
+        onNext();
+      }else{
+        alert('Failed to create address. Please try again.');
+        // setIsSubmitting(false);
+        return;
+      }
     }
-    setIsSubmitting(false);
+    // setIsSubmitting(false);
   };
 
   return (
@@ -88,23 +103,23 @@ export default function AddressStep({ onNext }: AddressStepProps) {
         {/* Name Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">First Name</label>
+            <label className="text-sm font-medium text-gray-700">Full Name</label>
             <input
-              name="firstName"
-              value={form.firstName}
+              name="name"
+              value={form.name}
               onChange={handleChange}
-              placeholder="Enter first name"
+              placeholder="Enter full name"
               className={`${inputBaseClasses} ${
-                errors.firstName ? 'border-red-500' : 'border-gray-300'
+                errors.name ? 'border-red-500' : 'border-gray-300'
               }`}
-              aria-invalid={errors.firstName ? true : false}
+              aria-invalid={errors.name ? true : false}
             />
-            {errors.firstName && (
-              <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>
+            {errors.name && (
+              <p className="text-xs text-red-500 mt-1">{errors.name}</p>
             )}
           </div>
 
-          <div>
+          {/* <div>
             <label className="text-sm font-medium text-gray-700">Last Name</label>
             <input
               name="lastName"
@@ -119,7 +134,7 @@ export default function AddressStep({ onNext }: AddressStepProps) {
             {errors.lastName && (
               <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
             )}
-          </div>
+          </div> */}
         </div>
 
         <h3 className="text-lg font-semibold text-gray-700 mt-6">Address Details</h3>
@@ -128,17 +143,17 @@ export default function AddressStep({ onNext }: AddressStepProps) {
         <div>
           <label className="text-sm font-medium text-gray-700">Street Address</label>
           <input
-            name="streetAddress"
-            value={form.streetAddress}
+            name="street"
+            value={form.street}
             onChange={handleChange}
             placeholder="1234 Main St"
             className={`${inputBaseClasses} ${
-              errors.streetAddress ? 'border-red-500' : 'border-gray-300'
+              errors.street ? 'border-red-500' : 'border-gray-300'
             }`}
-            aria-invalid={errors.streetAddress ? true : false}
+            aria-invalid={errors.street ? true : false}
           />
-          {errors.streetAddress && (
-            <p className="text-xs text-red-500 mt-1">{errors.streetAddress}</p>
+          {errors.street && (
+            <p className="text-xs text-red-500 mt-1">{errors.street}</p>
           )}
         </div>
 
@@ -226,7 +241,7 @@ export default function AddressStep({ onNext }: AddressStepProps) {
           <button
             type="submit"
             className="bg-[#009FFF] text-white px-6 py-2 rounded-lg hover:bg-[#0A65C7] transition disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm"
-            disabled={isSubmitting}
+            disabled={false}
           >
             Continue to Shipping
           </button>

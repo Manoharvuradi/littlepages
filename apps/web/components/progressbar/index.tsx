@@ -1,6 +1,6 @@
 import React from 'react';
 
-const steps = ['Address', 'Shipping', 'Confirmation', 'Review'];
+const steps = ['Address', 'Shipping', 'Review'];
 
 export default function ProgressBar({ step }: { step: number }) {
   return (

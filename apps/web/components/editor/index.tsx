@@ -193,7 +193,6 @@ const BookEditor = () => {
       const res = await updateBookImage(bookImageId, { fileUrl: publicUrl });
       if (!res || res.error) throw new Error("Failed to update book image");
 
-      console.log("✅ Image updated successfully in DB:", publicUrl);
 
       // Step 8: Refetch updated data
       await refetch();

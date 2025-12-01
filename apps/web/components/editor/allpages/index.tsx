@@ -149,7 +149,6 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
       }));
       
       await updatePageOrder(bookId, pageOrderUpdates);
-      console.log(`Moved new image to position ${position.insertPosition}`);
 
     }catch(err){
       console.error("Failed to update page order:", err);
