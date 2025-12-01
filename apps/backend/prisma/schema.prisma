@@ -25,12 +25,11 @@ model Users {
   name      String?
   password  String
   role      Role     @default(USER)
-
   images    Images[]
   Book      Book[]
   orders    Order[]
   addresses Address[]
-
+  payments Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -52,12 +51,10 @@ model Book {
   id     Int   @id @default(autoincrement())
   userId Int
   user   Users @relation(fields: [userId], references: [id])
-
   bookSize String
   coverPhotoUrl String?
   bookTitle String
   displaySettings Json?
-
   images          Images[] // directly link to Images
   bookImages      BookImage[] // additional metadata for each image
   orderItems  OrderItem[]
@@ -76,19 +73,14 @@ model BookImage {
   id      Int    @id @default(autoincrement())
   bookId  Int
   imageId String
-
-  // relations
   book  Book   @relation(fields: [bookId], references: [id])
   image Images @relation(fields: [imageId], references: [id])
-
-  // per-book metadata (editable per book)
   caption   String?
   name      String?
   age       String?
   date      DateTime?
   tags      String?
   pageOrder Int? // for ordering images within a book
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -115,15 +107,12 @@ model Order {
   trackingNumber    String?
   trackingUrl       String?
   estimatedDelivery DateTime
-  
-  // Payment
-  // paymentMethodId   String
+  payments         Payment[]
   user              Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
   statusHistory     OrderStatusHistory[]
   shippingAddress   Address         @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
   billingAddress    Address         @relation("BillingAddress", fields: [billingAddressId], references: [id])
-  // paymentMethod     PaymentMethod   @relation(fields: [paymentMethodId], references: [id])
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -166,6 +155,7 @@ model Address {
   userId    Int
   name      String   // Full name for delivery
   street    String   // Street address
+  apartment String?
   city      String
   state     String
   zip       String   // Postal/ZIP code
@@ -181,6 +171,37 @@ model Address {
   @@index([userId])
 }
 
+model Payment {
+  id                String   @id @default(cuid())
+  userId            Int
+  orderId           String
+  razorpayOrderId   String    @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  amount            Float
+  currency          String   @default("INR")
+  status            PaymentStatus @default(PENDING)
+  method            String?   // card, upi, wallet
+  email             String?
+  contact           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  user    Users  @relation(fields: [userId], references: [id])
+
+  @@index([orderId])
+  @@index([razorpayOrderId])
+  @@index([razorpayPaymentId])
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
 // Enum for Order Status
 enum OrderStatus {
   PENDING
@@ -191,3 +212,20 @@ enum OrderStatus {
   CANCELLED
   REFUNDED
 }
+
+//About payments:
+//A) When order is created (/payment/create-order)
+
+// razorpayOrderId
+// amount
+// userId
+// orderId
+// status: "PENDING"
+
+//B) When payment is successful (/payment/verify)
+// razorpayPaymentId
+// razorpaySignature
+// status: "SUCCESS"
+// method
+// email
+// contact

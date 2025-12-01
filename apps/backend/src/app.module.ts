@@ -10,9 +10,10 @@ import { OrderModule } from './order/order.module';
 import { OrderitemModule } from './orderitem/orderitem.module';
 import { OrderstatushistoryModule } from './orderstatushistory/orderstatushistory.module';
 import { AddressModule } from './address/address.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
-  imports: [AuthModule, ImagesModule, UsersModule, BookModule, BookimageModule, OrderModule, OrderitemModule, OrderstatushistoryModule, AddressModule],
+  imports: [AuthModule, ImagesModule, UsersModule, BookModule, BookimageModule, OrderModule, OrderitemModule, OrderstatushistoryModule, AddressModule, PaymentModule],
   controllers: [AppController],
   providers: [AppService],
 })

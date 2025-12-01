@@ -2,13 +2,16 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import PayButton from './paybutton';
 
 interface ShippingPageProps {
   onNext: () => void;
+  flowData?: any;
+  setFlowData?: (data: any) => void;
   onBack: () => void;
 }
 
-export default function ShippingStep({ onNext, onBack }: ShippingPageProps) {
+export default function ShippingStep({ onNext, onBack, flowData, setFlowData }: ShippingPageProps) {
   const [selectedMethod, setSelectedMethod] = useState('ground');
   const [shippingCost, setShippingCost] = useState(6.99);
   const pricePerBook = 27.5;
@@ -20,6 +23,10 @@ export default function ShippingStep({ onNext, onBack }: ShippingPageProps) {
     setSelectedMethod(method);
     setShippingCost(cost);
   };
+
+  const handlePayment = () => {
+    
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -89,12 +96,13 @@ export default function ShippingStep({ onNext, onBack }: ShippingPageProps) {
           </div>
 
           {/* Continue Button */}
-          <button
+          {/* <button
             onClick={onNext}
             className="mt-8 w-full px-6 py-3 bg-[#009FFF] text-white font-semibold rounded-lg shadow hover:bg-[#0A65C7] transition"
           >
             Continue to Payment
-          </button>
+          </button> */}
+          <PayButton amount={parseInt("1")} setFlowData={setFlowData} onNext={onNext} />
         </div>
 
         {/* Right Side: Order Summary */}

@@ -6,10 +6,12 @@ import ProgressBar from '../progressbar';
 import AddressStep from '../addressstep';
 import ShippingStep from '../shippingstep';
 import ConfirmationStep from '../conformationstep/page';
+import OrderSuccess from '../ordersuccess';
 
 export default function CheckoutPage() {
   const [step, setStep] = useState(0); // 0 = book quantity, 1..4 = checkout steps
   const [quantity, setQuantity] = useState(1);
+  const [flowData, setFlowData] = useState<any>({});
   const pricePerBook = 27.5;
   const total = (pricePerBook * quantity).toFixed(2);
 
@@ -130,16 +132,16 @@ export default function CheckoutPage() {
           {step > 0 && (
             <div>
               <ProgressBar step={step} />
-              {step === 1 && <AddressStep onNext={nextStep} />}
-              {step === 2 && <ShippingStep onNext={nextStep} onBack={prevStep} />}
-              {step === 3 && (
+              {step === 1 && <AddressStep onNext={nextStep} flowData={flowData} setFlowData={setFlowData} />}
+              {step === 2 && <ShippingStep onNext={nextStep} onBack={prevStep} flowData={flowData} setFlowData={setFlowData} />}
+              {/* {step === 3 && (
                 <ConfirmationStep
                   onConfirm={nextStep}
                   onBack={prevStep}
                   totalAmount={parseFloat(total)}
                 />
-              )}
-              {/* {step === 4 && <ReviewStep onBack={prevStep} />} */}
+              )} */}
+              {step === 3 && <OrderSuccess flowData={flowData} setFlowData={setFlowData} onBack={prevStep} />}
             </div>
           )}
         </div>

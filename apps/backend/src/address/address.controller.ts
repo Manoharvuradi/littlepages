@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { Prisma } from '@prisma/client';
 
+
 @Controller('address')
 export class AddressController {
     constructor(private readonly addressService: AddressService) {}
