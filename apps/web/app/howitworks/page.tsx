@@ -6,7 +6,7 @@ import FooterPage from "../../components/footer";
 
 const steps = [
   {
-    id: 2,
+    id: 1,
     title: "Our creative process begins",
     description:
       "Simply take photos of your child’s drawings and upload them to Little Pages. Whether it’s a school project, a quick doodle, or a colourful masterpiece, our platform helps you organise everything in one place with captions, names, dates, and ages so each memory stays meaningful.",
@@ -14,7 +14,7 @@ const steps = [
     reverse: false,
   },
   {
-    id: 3,
+    id: 2,
     title: "It's time to collaborate",
     description:
       "Once the artwork is uploaded, our team turns the collection into a thoughtfully crafted book. Every page is arranged with clean layouts, gentle colours, and a design that highlights your child’s creativity. You’ll get a preview to make changes before the book goes to print, ensuring it looks exactly the way you imagined.",
@@ -22,7 +22,7 @@ const steps = [
     reverse: true,
   },
   {
-    id: 4,
+    id: 3,
     title: "Your art is Artkived!",
     description:
       "After you approve the design, we print the book on high-quality paper meant to last for years. It is then shipped directly to your home — a beautiful keepsake your child can hold, revisit, and be proud of. What once filled drawers and shelves becomes a single timeless book your family will treasure.",
