@@ -1,0 +1,114 @@
+/* ============== PRODUCTS PAGE ============== */
+
+/* products.module.scss */
+
+.section {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch; /* Ensures full width on mobile */
+    gap: 2rem;
+    padding: 0 1rem;
+  }
+}
+
+/* products.module.scss */
+
+.imageWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  /* No height defined here! Let the image push the height. */
+}
+
+.responsiveImage {
+  width: 100%;       /* Take up full container width */
+  height: auto;      /* Calculate height automatically based on width */
+  max-width: 100%;   /* Ensure it doesn't overflow */
+  object-fit: cover; /* Optional: keeps it nice */
+  
+  /* Optional: Limit max size on desktop if it gets too huge */
+  @media (min-width: 1024px) {
+    max-height: 650px; 
+    width: auto; /* On giant screens, constrain height instead */
+  }
+}
+
+/* You can delete .mobileImageFix entirely from CSS */
+
+// 🔥 THIS FIXES THE IMAGE NOT SHOWING ON MOBILE
+.mobileImageFix {
+  position: relative;
+  height: 300px; // mobile height (MANDATORY)
+  width: 100%;
+
+  @media (min-width: 768px) {
+    height: 100%; // desktop uses wrapper height
+  }
+}
+
+.section {
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
+
+/* Title */
+.title {
+  @media (max-width: 992px) {
+    font-size: 2.2rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.9rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+  }
+}
+
+/* Bullet paragraph text */
+.bulletText {
+  @media (max-width: 992px) {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+}
+
+/* Price text */
+.price {
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+}
+
+/* Create Book Button */
+.button {
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Layout switch for mobile */
+@media (max-width: 768px) {
+  .section {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0 1rem;
+  }
+}

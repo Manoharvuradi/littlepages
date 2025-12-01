@@ -18,8 +18,8 @@ export default function Page() {
       <ProductsPage />
       <HowItWorksHomePage />
       <GetStartedWithUploads />
-      <ReviewsPage />
-      <FetaturedInPage />
+      {/* <ReviewsPage /> */}
+      {/* <FetaturedInPage /> */}
       <AboutUsPage />
       <GetMyBoxHomePage />
       <FooterPage />

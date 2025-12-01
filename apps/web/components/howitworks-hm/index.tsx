@@ -1,73 +1,75 @@
-import React from 'react'
+import Image from 'next/image';
+import React from 'react';
+import styles from './howitworks.module.scss';
 
 const HowItWorksHomePage = () => {
-    const products = [
-        {
-            id: 1,
-            title: "Beauty Box",
-            description: "Premium skincare and makeup products from top brands",
-            price: "$49.99/month",
-            image: "http://static.photos/cosmetic/640x360/1"
-        },
-        {
-            id: 2,
-            title: "Tech Box",
-            description: "Latest gadgets and tech accessories for enthusiasts",
-            price: "$79.99/month",
-            image: "http://static.photos/technology/640x360/2"
-        },
-        {
-            id: 3,
-            title: "Foodie Box",
-            description: "Gourmet snacks and ingredients from around the world",
-            price: "$39.99/month",
-            image: "http://static.photos/food/640x360/3"
-        },
-        {
-            id: 4,
-            title: "Wellness Box",
-            description: "Self-care products for mind and body wellness",
-            price: "$59.99/month",
-            image: "http://static.photos/wellness/640x360/4"
-        }
-    ];
-  return (
-    <div className="py-20 bg-gray-50">
-        <div className="container mx-auto px-6">
-            <div className="text-center mb-16" data-aos="fade-up">
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                    How It Works
-                </h2>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Choose from our carefully curated subscription boxes
-                </p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {products.map((product) => (
-                    <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow" data-aos="fade-up">
-                        <div className="h-48 overflow-hidden">
-                            <img 
-                                src={product.image} 
-                                alt={product.title}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <div className="p-6">
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{product.title}</h3>
-                            <p className="text-gray-600 mb-4">{product.description}</p>
-                            <div className="flex items-center justify-between">
-                                <span className="text-2xl font-bold text-indigo-600">{product.price}</span>
-                                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors">
-                                    Subscribe
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    </div>
-  )
-}
+  const products = [
+    {
+      id: 1,
+      description:
+        "Simply upload photos of your child’s art to Little Pages. Organize everything with captions and dates to keep every memory meaningful.",
+      image: "/images/how-it-works-1.png",
+    },
+    {
+      id: 2,
+      description:
+        "Our team turns your uploaded art into a beautifully crafted book with clean layouts that highlight creativity. You approve a preview before printing.",
+      image: "/images/how-it-works-2.png",
+    },
+    {
+      id: 3,
+      description:
+        "We print your approved book on high-quality, lasting paper. Shipped directly to your home — a treasured keepsake your child will love.",
+      image: "/images/how-it-works-3.png",
+    },
+  ];
 
-export default HowItWorksHomePage
+  return (
+    <div className={`${styles.howItWorksSection} bg-gray-100 py-10`}>
+      <div className="container mx-auto px-6">
+
+        {/* Heading */}
+        <div className={`${styles.heading} text-center`}  data-aos="fade-up">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+            How It Works
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Turning your child’s artwork into a timeless keepsake is easy and magical.
+          </p>
+        </div>
+
+        {/* Cards */}
+        <div className={styles.cardGrid}>
+          {products.map((product) => (
+            <div
+              key={product.id}
+              data-aos="fade-up"
+              className={`${styles.card}`}
+            >
+              {/* Image */}
+              <div className={`h-56 overflow-hidden ${styles.cardImage}`}>
+                <Image
+                  src={product.image}
+                  alt={""}
+                  width={500}
+                  height={400}
+                  className="object-cover w-full h-full transform transition-transform duration-500"
+                />
+              </div>
+
+              {/* Content */}
+              <div className={`p-6 ${styles.cardBody}`}>
+                <p className="text-gray-600 leading-relaxed">
+                  {product.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default HowItWorksHomePage;
