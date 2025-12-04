@@ -1,6 +1,7 @@
 export const getUsers = async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/users`, {
+    const response = await fetch(`http://localhost:3001/auth/users`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
         },

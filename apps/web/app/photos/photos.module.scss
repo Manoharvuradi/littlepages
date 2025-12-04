@@ -1,0 +1,103 @@
+.photosPage {
+  padding-bottom: 4rem;
+
+  .headerRow {
+    align-items: center;
+  }
+
+  /* Upload container */
+  .uploadSection {
+    border-radius: 12px;
+  }
+
+  // .uploadGrid {
+  //   display: flex;
+  //   flex-wrap: wrap;
+  //   gap: 1.25rem;
+  // }
+
+  /* Upload box */
+  .uploadBox {
+    background: #f8faff;
+    border-color: #bcdcff;
+    transition: 0.25s ease;
+
+    &:hover {
+      border-color: #009fff;
+      background: #e9f5ff;
+    }
+  }
+
+  .dragActive {
+    border-color: #009fff !important;
+    background: #e6f4ff !important;
+  }
+
+  /* ----------------------------- */
+  /*          MEDIA QUERIES        */
+  /* ----------------------------- */
+
+  /* Tablets */
+  @media (max-width: 1024px) {
+    .headerRow {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .headerRow {
+      h1 {
+        font-size: 1.4rem;
+      }
+    }
+
+    .actionsRow {
+      width: 100%;
+      justify-content: space-between;
+
+      button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+    }
+
+    .uploadSection {
+      padding: 1rem;
+    }
+
+    .uploadGrid {
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .uploadBox {
+      width: 100% !important;
+      height: 120px !important;
+    }
+  }
+
+  /* Small phones */
+  @media (max-width: 480px) {
+    .headerRow h1 {
+      font-size: 1.2rem;
+    }
+
+    .actionsRow {
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .uploadBox {
+      height: 110px !important;
+
+      span {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
