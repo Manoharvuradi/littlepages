@@ -79,20 +79,18 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg">
-      {/* Title */}
-      <h2 className="text-xl font-semibold mb-2">
-        What text do you want to display on the pages?
-      </h2>
+    <div className="lg:max-w-md mx-auto rounded-lg">
+      <div className="mx-auto min-w-[32%]">
+        <h2 className="text-xl text-center font-bold mb-2">
+          What Text Do You Want to Display on the Pages?
+        </h2>
 
-      {/* Description */}
-      <p className="text-sm text-gray-600 mb-6">
-        You can add text and activate these options in Book Editor later on
-      </p>
+        <p className="text-sm text-center text-gray-600 mb-6">
+          You can add text and activate these options in Book Editor later on
+        </p>
+      </div>
 
-      {/* Options */}
       <div className="space-y-4">
-        {/* Image title */}
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">Image Title</span>
           <button
@@ -109,9 +107,7 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
             />
           </button>
         </div>
-
-        {/* Name */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-t border-blue-200 py-4">
           <span className="text-sm font-medium text-gray-700">Name</span>
           <button
             type="button"

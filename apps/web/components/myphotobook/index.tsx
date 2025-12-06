@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { createBookSteps, IFormData } from "../../utils";
 import SideSteps from "./steps";
 import { useRouter } from "next/navigation";
+import styles from "./index.module.scss";
 
 const MyPhotoBook = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -25,7 +26,9 @@ const MyPhotoBook = () => {
   return (
     <div className="flex h-screen overflow-hidden p-6 bg-gray-100">
       {/* Sidebar */}
-      <SideSteps steps={createBookSteps} currentStep={currentStep} />
+      <div className={`${styles.steps} w-64 bg-white shadow-md p-6 flex flex-col overflow-auto `}>
+        <SideSteps steps={createBookSteps} currentStep={currentStep} />
+      </div>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col p-6 overflow-hidden">

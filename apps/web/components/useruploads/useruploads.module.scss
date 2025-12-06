@@ -4,14 +4,14 @@
 
 .imageGrid {
   // Mobile: 2 columns (up to 640px)
-  @media (max-width: 640px) {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
-  }
+  // @media (max-width: 640px) {
+  //   grid-template-columns: repeat(2, 1fr) !important;
+  //   gap: 0.75rem !important;
+  // }
 
   // Tablet: 3 columns (641px to 768px)
   @media (min-width: 641px) and (max-width: 768px) {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 1rem !important;
   }
 
@@ -39,7 +39,7 @@
   @media (max-width: 640px) {
     img {
       width: 100% !important;
-    //   height: 140px !important;
+      height: 140px !important;
     }
 
     p {
@@ -55,7 +55,7 @@
   @media (min-width: 641px) and (max-width: 768px) {
     img {
       width: 100% !important;
-    //   height: 150px !important;
+      height: 150px !important;
     }
   }
 
@@ -63,7 +63,7 @@
   @media (min-width: 769px) and (max-width: 1024px) {
     img {
       width: 100% !important;
-    //   height: 160px !important;
+      height: 160px !important;
     }
   }
 
@@ -71,7 +71,7 @@
   @media (min-width: 1025px) and (max-width: 1280px) {
     img {
       width: 100% !important;
-    //   height: 170px !important;
+      height: 170px !important;
     }
   }
 
@@ -79,7 +79,7 @@
   @media (min-width: 1281px) {
     img {
       width: 100% !important;
-    //   height: 180px !important;
+      height: 180px !important;
     }
   }
 }

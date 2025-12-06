@@ -35,7 +35,7 @@ const CoverImage = ({ formData, setFormData, onNext }: Props) => {
         <button
           className={`mt-2 px-8 py-3 rounded-full transition ${
             activeButton === "book"
-              ? "bg-indigo-600 text-white"
+              ? "bg-[#009FFF] text-white"
               : "bg-white text-gray-700 border border-gray-300 hover:bg-indigo-100"
           }`}
           onClick={() => setActiveButton("book")}
@@ -100,8 +100,8 @@ const CoverImage = ({ formData, setFormData, onNext }: Props) => {
             <div
               className={`absolute top-1 right-1 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                 isSelected
-                  ? "bg-[#128C7E] border-white"
-                  : "bg-white border-white group-hover:bg-blue-200"
+                  ? "bg-[#009FFF] border-[#009FFF]"
+                  : "bg-transparent border-white group-hover:bg-blue-200"
               }`}
             >
               {isSelected && (
@@ -138,7 +138,7 @@ const CoverImage = ({ formData, setFormData, onNext }: Props) => {
         }}
         className={`mt-6 px-8 py-3 rounded-full font-semibold transition-colors duration-200 ${
           formData.coverPhotoUrl
-            ? "bg-indigo-600 text-white hover:bg-indigo-700"
+            ? "bg-[#009FFF] text-white hover:bg-[#007ACC]"
             : "bg-gray-200 text-gray-400 cursor-not-allowed"
         }`}
       >

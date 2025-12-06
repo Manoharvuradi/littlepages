@@ -73,19 +73,19 @@ async createBook(book: IFormData) {
         });
     }
 
-    async getBook(id: number) {
-        return await this.prisma.book.findUnique({
+    async getBook(id: number, userId: number) {
+        return await this.prisma.book.findFirst({
             where: {
                 id: id,
+                userId: userId    
             },
             include: {
-                // bookImages: true
-                bookImages: { 
-                  orderBy: { 
-                    pageOrder: 'asc' 
-                  }, 
-                  include: { 
-                    image:true
+                bookImages: {
+                  orderBy: {
+                    pageOrder: 'asc'
+                  },
+                  include: {
+                    image: true
                   } 
                 },
             }, 

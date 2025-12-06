@@ -12,13 +12,14 @@ export const bookInput = async (req: IFormData) => {
   return res.json();
 };
 
-export const getBook = async (id: number) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/book/get/${id}`, {
-    method: 'GET',
+export const getBook = async (id: number, userId: number) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/book/userbook/${id}`, {
+    method: 'PUT',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
+    body: JSON.stringify({ userId }),
   });
   return res.json();
 };
