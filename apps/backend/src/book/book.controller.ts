@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Req, Get, Param, ParseIntPipe, Put } from '@nestjs/common';
 import type { IFormData } from './book.service';
 import { BookService } from './book.service';
 
@@ -16,8 +16,8 @@ export class BookController {
     return this.bookService.getMyBooks(req.user.sub);
   }
 
-  @Get("get/:id")
-  async getBook(@Param("id", ParseIntPipe) id: number) {
-    return this.bookService.getBook(id);
+  @Put("userbook/:id")
+  async getBook(@Param("id", ParseIntPipe) id: number, @Req() req) {
+    return this.bookService.getBook(id, req.user.sub);
   }
 }

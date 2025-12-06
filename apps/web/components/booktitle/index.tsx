@@ -35,7 +35,7 @@ export default function BookTitle({ formData, setFormData, onNext }: Props) {
         placeholder="BOOK TITLE"
         value={title}
         onChange={handleChange}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#009FFF] uppercase"
       />
 
       {/* Next Button */}
@@ -44,7 +44,7 @@ export default function BookTitle({ formData, setFormData, onNext }: Props) {
         onClick={onNext}
         className={`mt-6 w-full py-2 rounded-lg font-semibold ${
           title.trim()
-            ? "bg-indigo-600 text-white hover:bg-indigo-700"
+            ? "bg-[#009FFF] text-white hover:bg-[#009FFF]"
             : "bg-gray-200 text-gray-400 cursor-not-allowed"
         }`}
       >

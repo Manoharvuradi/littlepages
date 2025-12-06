@@ -1,0 +1,18 @@
+.bookSizes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; // This is justify-center
+    align-items: center;     // (optional) similar to items-center
+    gap: 1rem; 
+  }
+}
+
+@media (max-width: 748px){
+    .nextButton {
+        width: 100%;
+    }
+}

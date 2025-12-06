@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { use, useEffect, useRef, useState } from 'react'
 import { getBook } from '../../server/book';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -44,7 +44,8 @@ const BookEditor = () => {
   useEffect(() => {
     const fetchBook = async () => {
       setBookId(Number(params.id));
-      const res: any = await getBook(Number(params.id));
+      const user = await getCurrentUser();
+      const res: any = await getBook(Number(params.id), user?.sub);
       setData(res);
       setPages(res.bookImages);
     };
@@ -75,7 +76,8 @@ const BookEditor = () => {
 
   const refetch = async (): Promise<Page[]> => {
     if (!bookId) return [];
-    const res: any = await getBook(bookId);
+    const user = await getCurrentUser();
+    const res: any = await getBook(bookId, user?.sub);
     setData(res);
     setPages(res.bookImages);
     return res.bookImages; // ✅ return data for caller

@@ -133,7 +133,7 @@ const UserUploads = ({
                 <div
                   className={`${styles.checkmark} group absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 cursor-pointer ${
                     selected[idx]
-                      ? "bg-blue-500 border-blue-500"
+                      ? "bg-[#009FFF] border-[#009FFF]"
                       : "border-white hover:bg-white hover:border-white"
                   }`}
                   onClick={(e) => {
@@ -146,7 +146,7 @@ const UserUploads = ({
                   }}
                 >
                   {selected[idx] ? (
-                    <img src="svg/check.svg" alt="selected" className="w-3.5 h-3.5" />
+                    <img src="/svg/check.svg" alt="selected" className="w-3.5 h-3.5" />
                   ) : (
                     <svg
                       viewBox="0 0 24 24"

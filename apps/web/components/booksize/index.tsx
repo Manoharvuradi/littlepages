@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSelectedImages } from "../../context";
 import { useRouter } from "next/navigation";
 import { Props } from "../../utils";
+import styles from "./index.module.scss";
 
 
 export type Option = {
@@ -24,7 +25,7 @@ const options: Option[] = [
     label: "11in x 8.5in Book",
     widthIn: 11,
     heightIn: 8.5,
-    src: "/images/book-horizontal.png",
+    src: "/images/finalbooksize.png",
     alt: "11 x 8.5 book preview",
   },
   {
@@ -32,7 +33,7 @@ const options: Option[] = [
     label: "8in x 8in Book",
     widthIn: 8,
     heightIn: 8,
-    src: "/images/book-square.png",
+    src: "/images/finalbooksize.png",
     alt: "8 x 8 book preview",
   },
 ];
@@ -59,80 +60,66 @@ export default function BookSize({ formData, setFormData, onNext }: Props) {
     <div className="flex flex-col items-center w-full bg-gray-100">
       <h2 className="text-2xl font-semibold mb-8">Choose Book Size</h2>
 
-      <div className="grid grid-cols-2 gap-2 mb-10 items-start">
-        {options.map((opt) => {
-          const isSelected = formData.bookSize === opt.id;
-          const displayWidth = Math.round(opt.widthIn * SCALE);
-          const displayHeight = Math.round(opt.heightIn * SCALE);
+<div className={`${styles.bookSizes} gap-4 mb-10 items-start`}>
 
-          return (
-            <div
-              key={opt.id}
-              className="flex flex-col items-center cursor-pointer"
-              onClick={() => handleSelect(opt.id)}
-            >
-              {/* bordered image container */}
-              <div
-                className={`relative rounded-lg flex items-center justify-center ${
-                  isSelected
-                    ? "border-2 border-indigo-500"
-                    : "border border-gray-200"
-                }`}
-                style={{
-                  width: `${displayWidth}px`,
-                  height: `${displayHeight}px`,
-                }}
-              >
-                {/* radio/check overlay */}
-                <div
-                  className={`absolute top-3 left-3 w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    isSelected
-                      ? "bg-indigo-600 border-indigo-600"
-                      : "bg-white border-gray-300"
-                  }`}
-                >
-                  {isSelected && (
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="14"
-                      height="14"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
-                </div>
+  {options.map((opt) => {
+    const isSelected = formData.bookSize === opt.id;
+    const displayWidth = Math.round(opt.widthIn * SCALE);
+    const displayHeight = Math.round(opt.heightIn * SCALE);
 
-                {/* Image */}
-                <Image
-                  src={opt.src}
-                  alt={opt.alt || opt.label}
-                  width={displayWidth}
-                  height={displayHeight}
-                  draggable={false}
-                  className="object-cover"
-                />
-              </div>
+    return (
+      <div
+        key={opt.id}
+        className="flex flex-col items-center cursor-pointer transition-transform hover:scale-[1.02]"
+        onClick={() => handleSelect(opt.id)}
+      >
+        <div
+          className={`relative rounded-lg flex items-center justify-center overflow-hidden transition-all duration-200
+            ${isSelected ? "border-3 border-[#009FFF] shadow-xl" : "hover:shadow-lg"}
+          `}
+          style={{
+            width: `${displayWidth}px`,
+            height: `${displayHeight}px`,
+          }}
+        >
+          {/* Floating checkbox */}
+          <div
+            className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200
+              ${isSelected ? "bg-[#009FFF] border-[#009FFF]" : "bg-transparent border-white"}
+            `}
+          >
+            {isSelected && (
+              <img src="/svg/check.svg" alt="selected" className="w-3.5 h-3.5" />
+            )}
+          </div>
 
-              {/* label below image */}
-              <div className="mt-3 text-center text-sm font-medium">
-                {opt.label}
-              </div>
-            </div>
-          );
-        })}
+          {/* IMAGE */}
+          <Image
+            src={opt.src}
+            alt={opt.alt || opt.label}
+            width={displayWidth}
+            height={displayHeight}
+            draggable={false}
+            className="object-cover w-full h-full"
+          />
+        </div>
+
+        {/* LABEL */}
+        <div className="mt-3 text-center text-sm font-medium text-gray-700">
+          {opt.label}
+        </div>
       </div>
+    );
+  })}
+
+</div>
 
       <button
         disabled={!formData.bookSize}
         onClick={onNext}
-        className={`mt-2 px-8 py-3 rounded-full font-semibold ${
+        className={`${styles.nextButton} mt-2 px-18 py-3 rounded-md font-semibold ${
           formData.bookSize
-            ? "bg-indigo-600 text-white hover:bg-indigo-700"
+            ? "bg-[#009FFF] text-white hover:bg-[#009FFF]"
             : "bg-gray-200 text-gray-400 cursor-not-allowed"
         }`}
       >

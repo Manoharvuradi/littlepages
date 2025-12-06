@@ -5,7 +5,7 @@ interface SideStepsProps { steps: Step[]; currentStep: number; }
 
 const SideSteps: React.FC<SideStepsProps> = ({ steps, currentStep }) => {
   return (
-    <aside className="w-64 bg-white shadow-md p-6 flex flex-col overflow-auto">
+    <aside className="">
       <div>
         <h1 className="text-2xl font-bold mb-4 text-center">Little Pages</h1>
         <hr className="my-4 text-gray-300" />
@@ -22,14 +22,14 @@ const SideSteps: React.FC<SideStepsProps> = ({ steps, currentStep }) => {
             return (
               <div key={idx} className="flex items-center space-x-3">
                 <div className={`w-5 h-5 flex items-center justify-center rounded-full border-2
-                  ${isActive ? "border-[#128C7E] bg-[#128C7E]" : isCompleted ? "border-[#128C7E]" : "border-gray-300"}`}>
+                  ${isActive ? "border-[#009FFF] bg-[#009FFF]" : isCompleted ? "border-[#009FFF]" : "border-gray-300"}`}>
                   {(isActive || isCompleted) && (
                     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} stroke="#fff">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                   )}
                 </div>
-                <span className={`text-sm ${isActive ? "text-indigo-600 font-semibold" : "text-gray-500"}`}>
+                <span className={`text-sm ${isActive ? "text-[#009FFF] font-semibold" : "text-gray-500"}`}>
                   {step.name}
                 </span>
               </div>
