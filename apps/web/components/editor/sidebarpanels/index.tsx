@@ -25,6 +25,7 @@ const SCALE = 20;
 export default function SidebarWithPopup({
   displaySettings,
   bookSize,
+  className
 }: {
   // displaySettings?: {
   //   showCaption: boolean;
@@ -33,6 +34,7 @@ export default function SidebarWithPopup({
   // } | undefined;
   displaySettings: any
   bookSize?: string;
+  className?: string;
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [bookSizeChange, setBookSizeChange] = useState<string | null>(null);
@@ -43,8 +45,8 @@ export default function SidebarWithPopup({
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <aside className="w-24 bg-blue-100 p-4 flex flex-col items-center gap-6">
+    <div className={`flex bg-gray-50 ${className}`}>
+      <aside className="w-24 bg-blue-100 p-4 flex flex-col items-center gap-6 lg:min-h-screen">
         {/* Book Size */}
         <button
           onClick={() => setIsPopupOpen(true)}

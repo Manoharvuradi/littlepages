@@ -41,4 +41,16 @@ export class AuthService {
       },
     });
   }
+
+  async showUserBooks(userId: number) {
+    console.log("userId: ", userId);
+    const userWithBooks = await this.prisma.users.findUnique({
+      where: { id: userId },
+      include: {
+        Book: true
+      }
+    });
+
+    return userWithBooks?.Book || [];
+  }
 }
