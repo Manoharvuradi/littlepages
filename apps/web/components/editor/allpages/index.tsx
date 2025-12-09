@@ -161,7 +161,7 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
       className={`p-4 ${!isExpanded ? 'overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth' : ''}`}
     >
       <div 
-        className={`relative ${isExpanded ? 'grid grid-cols-3 gap-6 place-items-center':'flex'}`}
+        className={`relative ${isExpanded ? 'grid lg:grid-cols-3 md:grid-cols-2 gap-6 place-items-center':'flex'}`}
       >
         {containers.map((container, cIndex) => {
           const isFirstContainer = cIndex === 0;
@@ -192,7 +192,7 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
                     return (
                       <div
                         key={`inside-cover-${cIndex}-${pIndex}`}
-                        className={`relative overflow-hidden bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center
+                        className={`relative overflow-hidden bg-white border border-gray-300 flex items-center justify-center
                           ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-[185px] h-[144px] px-3 pt-3 pb-5' : 'w-[100px] h-[100px] px-2 pt-2 pb-3'}`}
                       >
                         <span className={`text-gray-400 font-medium text-center ${isExpanded ? 'text-xs' : 'text-[8px]'}`}>
@@ -241,7 +241,7 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
                   onMouseEnter={() => setHoveredContainer(cIndex)}
                   onMouseLeave={() => setHoveredContainer(null)}
                 >
-                  <div className="absolute left-1/2 top-0 -translate-x-1/2 w-1 h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent opacity-30 pointer-events-none"></div>
+                  {/* <div className="absolute left-1/2 top-0 -translate-x-1/2 w-1 h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent opacity-30 pointer-events-none"></div> */}
 
                   {hoveredContainer === cIndex && (
                     <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-blue-500 transition-all duration-300 pointer-events-auto"

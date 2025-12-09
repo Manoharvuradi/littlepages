@@ -54,3 +54,17 @@ export const logout = async () => {
     return false;
   }
 }
+
+export const showUserBooks = async(userId: number) => {
+    try{
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/userbooks`, {
+            method: "PUT",
+            credentials: "include",
+            body: JSON.stringify({userId}),
+        });
+        if (!res.ok) throw new Error("Failed to fetch user books");
+        return res.json();
+    }catch(err){
+        console.error("Failed to fetch user books:", err);
+    }
+}

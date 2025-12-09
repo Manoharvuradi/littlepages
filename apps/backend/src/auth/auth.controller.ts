@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Get, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, UseGuards, Req, HttpCode, HttpStatus, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -47,5 +47,12 @@ export class AuthController {
   @Get('users')
   async findAllUsers() {
     return this.authService.findAllUsers();
+  }
+
+  @Put('userbooks')
+  @UseGuards(JwtAuthGuard)
+  async getUserBooks(@Req() req: any) {
+    const userId = req.user.sub;
+    return this.authService.showUserBooks(userId);
   }
 }

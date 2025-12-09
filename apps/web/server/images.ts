@@ -39,3 +39,14 @@ export const getAllBookImages = async (imagesId: string[]) => {
   });
   return res.json();
 };
+
+export const showCoverPhoto = async (bookId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/images/${bookId}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return res.json();
+};

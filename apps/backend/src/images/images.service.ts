@@ -51,6 +51,10 @@ export class ImagesService {
             },
         });
     }
+
+    async showImage(id: string) {
+        return this.prisma.images.findUnique({ where: { id } });
+    }
 }
 
 export type ImageInput = {
