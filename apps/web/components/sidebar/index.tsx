@@ -55,7 +55,8 @@ export default function WithSidebar(Component: React.ComponentType) {
     }, []);
     
 
-    async function handleLogout() {
+    const handleLogout = async () => {
+      // console.log("Logout clicked");
       const res = await logout();
       if (res) {
         setUserId(null);
@@ -121,7 +122,7 @@ export default function WithSidebar(Component: React.ComponentType) {
               <nav className="flex flex-col space-y-1 p-2">
                 {navItems.map((item) => {
                   const active = pathname === item.href;
-                  return  (
+                  return item.name != "Logout"  ? (
                     <Link
                       key={item.name}
                       href={item.href}
@@ -139,7 +140,25 @@ export default function WithSidebar(Component: React.ComponentType) {
                       />
                       {(sideBar) && <span className="whitespace-nowrap">{item.name}</span>}
                     </Link>
-                  ) 
+                  ) : (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 ${
+                        active ? "bg-blue-50 text-blue-600 font-medium" : ""
+                      }`}
+                      onClick={handleLogout}
+                    >
+                      <img
+                        src={item.icon as string}
+                        alt={item.name}
+                        width={24}
+                        height={24}
+                        className="flex-shrink-0"
+                      />
+                      {(sideBar) && <span className="whitespace-nowrap">{item.name}</span>}
+                    </Link>
+                  )
                 })}
               </nav>
             </div>}

@@ -20,4 +20,12 @@ export class BookController {
   async getBook(@Param("id", ParseIntPipe) id: number, @Req() req) {
     return this.bookService.getBook(id, req.user.sub);
   }
+
+  @Put("updateTitle/:id")
+  async updateBookTitle(
+    @Param("id", ParseIntPipe) id: number,
+    @Body("bookTitle") bookTitle: string
+  ) {
+    return this.bookService.updateBookTitle(id, bookTitle);
+  }
 }

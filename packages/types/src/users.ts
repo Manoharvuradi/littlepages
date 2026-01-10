@@ -41,3 +41,8 @@ export interface UploadBookImageInput  {
   userId: number; // ID of the user uploading the image
   filename: string; // Original filename of the uploaded image
 }
+
+export interface BookTitle {
+  id: number;
+  bookTitle: string;
+}
