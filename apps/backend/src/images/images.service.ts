@@ -55,6 +55,15 @@ export class ImagesService {
     async showImage(id: string) {
         return this.prisma.images.findUnique({ where: { id } });
     }
+
+    async replaceCoverImage(id: string, coverPhotoUrl: string | null) {
+      return this.prisma.images.update({
+        where: { id: id },
+        data: { 
+            url: coverPhotoUrl! 
+        },
+      });
+    }
 }
 
 export type ImageInput = {
