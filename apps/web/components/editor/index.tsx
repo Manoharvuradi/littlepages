@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useEffect, useRef, useState } from 'react'
-import { getBook } from '../../server/book';
+import { getBook, replaceCoverImage, updateBookTitle } from '../../server/book';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AllPages from './allpages';
@@ -12,6 +12,8 @@ import Modal from '../model';
 import RotatingImage from './cropandrotate';
 import { supabase } from '../../lib/supabaseClient';
 import { getCurrentUser } from '../../server/user';
+import { showCoverPhoto } from '../../server/images';
+import BookTitle from '../booktitle';
 
 export type Page = {
   id: number;
@@ -39,13 +41,21 @@ const BookEditor = () => {
   const [data, setData] = useState({} as any);
   const [pages, setPages] = useState<Page[]>([]);
   const [bookId, setBookId] = useState<number | null>(null);
+  const [coverPhoto, setCoverPhoto] = useState<string | null>();
+  const [coverPage, setCoverPage] = useState<boolean>(false); 
   const router = useRouter();
+  const [userId, setUserId] = useState<number | null>(null);
+  const [coverPhotoId, setCoverPhotoId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBook = async () => {
       setBookId(Number(params.id));
       const user = await getCurrentUser();
+      setUserId(user?.sub ?? null);
       const res: any = await getBook(Number(params.id), user?.sub);
+      setCoverPhotoId(res.coverPhotoUrl);
+      const url = await showCoverPhoto(res.coverPhotoUrl);
+      setCoverPhoto(url?.url)
       setData(res);
       setPages(res.bookImages);
     };
@@ -61,7 +71,9 @@ const BookEditor = () => {
     name: "",
     ageGrade: "",
     date: "",
+    bookTitle: "",
   });
+
 
   useEffect(() => {
     if (pages.length > 0 && pages[currentPage]) {
@@ -70,6 +82,7 @@ const BookEditor = () => {
         name: pages[currentPage]?.name || "",
         ageGrade: pages[currentPage]?.age || "",
         date: pages[currentPage]?.date || "",
+        bookTitle: data?.bookTitle || "",
       });
     }
   }, [pages, currentPage]);
@@ -106,16 +119,57 @@ const BookEditor = () => {
         console.error(err);
       }
       }, 500);
-    };
+  };
+
+  const handleBookTitleChange = async(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        await updateBookTitle(data.id!, value );
+        refetch();
+      } catch (err) {
+        console.error(err);
+      }
+      }, 500);
+  }
 
 
   const onCrop = () => {
     console.log("Crop/Rotate clicked");
   }
 
-  const onReplaceImage = () => {
-    console.log("Replace Image clicked");
+  const onReplaceImage = async (file: File) => {
+    if (!userId) return;
+
+  const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
+  const filePath = `user-uploads/${userId}/${Date.now()}-${safeFileName}`;
+
+  // 1. Upload new image
+  const { error } = await supabase.storage
+    .from("photos")
+    .upload(filePath, file, { upsert: false });
+
+  if (error) {
+    alert("Failed to upload replacement image");
+    return;
   }
+
+  // 2. Get public URL
+  const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+
+  // 3. Update DB record
+  await replaceCoverImage(coverPhotoId!, data.publicUrl);
+
+  // 4. Refresh UI
+  await refetch();
+};
 
   const onDownload = async () => {
     try {
@@ -207,8 +261,6 @@ const BookEditor = () => {
     }
   };
 
-
-
   return (
 
 <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
@@ -272,7 +324,11 @@ const BookEditor = () => {
             className={`px-3 py-1 border rounded flex cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isDrawer.isTextDrawer ? "border-blue-400 bg-blue-100" : "border-blue-100 hover:border-blue-200"}`}
             onClick={() => {
               setIsDrawer({...isDrawer,isImageDrawer: false, isTextDrawer: !isDrawer.isTextDrawer})
-              setBookImageId(pages[currentPage]?.id ?? null);
+              setBookImageId(
+                coverPage
+                  ? data?.coverPhotoUrl ?? null
+                  : pages[currentPage]?.id ?? null
+              );
             }}
           >
             <div className='mt-0.5'>
@@ -288,7 +344,11 @@ const BookEditor = () => {
             className={`px-3 py-1 border rounded flex cursor-pointer transform hover:scale-105 transition duration-150 shadow-md ${isDrawer.isImageDrawer ? "border-blue-400 bg-blue-100" : "border-blue-100 hover:border-blue-200"}`}
             onClick={() => {
               setIsDrawer({...isDrawer, isImageDrawer: !isDrawer.isImageDrawer, isTextDrawer: false})
-              setBookImageId(pages[currentPage]?.id ?? null);
+              setBookImageId(
+                coverPage
+                  ? data?.coverPhotoUrl ?? null
+                  : pages[currentPage]?.id ?? null
+              );
             }}
           >
             <div className='mt-0.5'>
@@ -299,8 +359,11 @@ const BookEditor = () => {
           </button>
         </div>
 
-        <div className="shadow-xl relative overflow-hidden transform transition-transform duration-500 ease-in-out">
-          <div className="relative bg-white p-4">
+        <div 
+          className="shadow-xl relative overflow-hidden transform transition-transform duration-500 ease-in-out"
+          // onClick={() => onReplaceImage()}
+          >
+          <div className={`relative bg-white ${coverPage ? 'p-0' : 'p-4'}`}>
             <div
               className={`text-center text-gray-500 text-sm cursor-pointer transition-all duration-200 ease-in-out border ${
                 isDrawer.isImageDrawer ? "border-[#009FFF]" : "border-transparent hover:border-[#009FFF]"
@@ -311,10 +374,22 @@ const BookEditor = () => {
                   isTextDrawer: false,
                   isImageDrawer: !isDrawer.isImageDrawer,
                 });
-                setBookImageId(pages[currentPage]?.id ?? null);
+                setBookImageId(
+                  coverPage
+                    ? data?.coverPhotoUrl ?? null
+                    : pages[currentPage]?.id ?? null
+                );
               }}
             >
-              {pages[currentPage]?.image?.url ? (
+              {coverPage ? (
+                <Image
+                  src={coverPhoto || ""}
+                  alt="cover photo"
+                  width={360}
+                  height={270}
+                  className="object-contain max-w-full max-h-full"
+                />
+              ) : pages[currentPage]?.image?.url ? (
                 <Image
                   src={pages[currentPage].image?.url}
                   alt="Page"
@@ -330,21 +405,29 @@ const BookEditor = () => {
             </div>
 
             <div
-              className={`p-1 text-center text-gray-500 cursor-pointer transition-all duration-200 ease-in-out border ${
-                isDrawer.isTextDrawer
-                  ? "border-[#009FFF]"
-                  : "border-transparent hover:border-[#009FFF]"
-              }`}
+              className={`${coverPage ? 'absolute bottom-10 left-0 right-0 py-1' : 'p-1'}  text-center bg-white cursor-pointer border ${
+            isDrawer.isTextDrawer
+              ? "border-[#009FFF]"
+              : "border-transparent hover:border-[#009FFF]"
+          }`}
               onClick={() =>{
                 setIsDrawer({
                   ...isDrawer,
                   isImageDrawer: false,
                   isTextDrawer: !isDrawer.isTextDrawer,
                 })
-                setBookImageId(pages[currentPage]?.id ?? null);
+                setBookImageId(
+                  coverPage
+                    ? data?.coverPhotoUrl ?? null
+                    : pages[currentPage]?.id ?? null
+                );
               }}
             >
-              <div className="flex flex-col items-center justify-center leading-none space-y-0.5">
+              {coverPage ? (<>
+                <span className="text-[12px] font-semibold">
+                  {data.bookTitle || "ADD COVER TITLE"}
+                </span>
+              </>) :(<div className="flex flex-col items-center justify-center leading-none space-y-0.5">
                 <span className="text-[10px]">
                   {pages[currentPage]?.caption || "ADD IMAGE TITLE"}
                 </span>
@@ -356,7 +439,7 @@ const BookEditor = () => {
                     {pages[currentPage]?.age || "ADD AGE"}
                   </span>
                 </div>
-              </div>
+              </div>)}
             </div>
           </div>
         </div>
@@ -423,6 +506,8 @@ const BookEditor = () => {
             onSelectPage={(index) => setCurrentPage(index)}
             setBookImageId={setBookImageId}
             refetch={refetch}
+            coverPhotoUrl={coverPhoto ?? ""}
+            setCoverPage={setCoverPage}
           />
         </div>
       </div>
@@ -437,56 +522,76 @@ const BookEditor = () => {
         <button className='cursor-pointer' onClick={() => setIsDrawer({...isDrawer, isTextDrawer: false})}>✕</button>
       </div>
 
-      <InputField
-        input={{
-          label: "Image Title",
-          type: "text",
-          name: "caption",
-          liveCountMax: 50,
-          value: formData.title || '',
-        }}
-        handleChange={handleChange}
-        formValues={formData}
-        tailwindClass=''
-        liveCount={true}
-      />
+        { coverPage != true ?(
+          <div>
+          <InputField
+            input={{
+              label: "Image Title",
+              type: "text",
+              name: "caption",
+              liveCountMax: 50,
+              value: formData.title || '',
+            }}
+            handleChange={handleChange}
+            formValues={formData}
+            tailwindClass=''
+            liveCount={true}
+          />
 
-      <InputField
-        input={{
-          label: "Name",
-          type: "text",
-          name: "name",
-          liveCountMax: 25,
-          value: formData.name || '',
-        }}
-        handleChange={handleChange}
-        formValues={formData}
-        liveCount={true}
-      />
+          <InputField
+            input={{
+              label: "Name",
+              type: "text",
+              name: "name",
+              liveCountMax: 25,
+              value: formData.name || '',
+            }}
+            handleChange={handleChange}
+            formValues={formData}
+            liveCount={true}
+          />
 
-      <InputField
-        input={{
-          label: "Age/Grade",
-          type: "text",
-          name: "age",
-          liveCountMax: 25,
-          value: formData.ageGrade || '',
-        }}
-        handleChange={handleChange}
-        formValues={formData}
-        liveCount={true}
-      />
+          <InputField
+            input={{
+              label: "Age/Grade",
+              type: "text",
+              name: "age",
+              liveCountMax: 25,
+              value: formData.ageGrade || '',
+            }}
+            handleChange={handleChange}
+            formValues={formData}
+            liveCount={true}
+          />
 
-      <InputField
-        input={{
-          label: "Date",
-          type: "date",
-          name: "date",
-          value: formData.date || '',
-        }}
-        handleChange={handleChange}
-        formValues={formData}
-      />
+          <InputField
+            input={{
+              label: "Date",
+              type: "date",
+              name: "date",
+              value: formData.date || '',
+            }}
+            handleChange={handleChange}
+            formValues={formData}
+          />
+        </div>):(
+          <div>
+            <InputField
+              input={{
+                label: "Book Title",
+                type: "text",
+                name: "bookTitle",
+                liveCountMax: 15,
+                value: data.bookTitle || '',
+              }}
+              handleChange={handleBookTitleChange}
+              formValues={formData}
+              tailwindClass=''
+              liveCount={true}
+            />
+          </div>
+        )}
+      
     </aside>
     
     <aside

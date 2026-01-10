@@ -21,6 +21,7 @@ export default function LoginPage() {
     setLoading(true);
 
     const { error } = await loginUser(email, password);
+    console.log(error);
 
     if (error) {
       alert(error.message);

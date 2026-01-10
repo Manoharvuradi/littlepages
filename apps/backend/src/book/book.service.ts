@@ -91,6 +91,13 @@ async createBook(book: IFormData) {
             }, 
         });
     }
+
+    async updateBookTitle(id: number, bookTitle: string) {
+      return this.prisma.book.update({
+        where: { id },
+        data: { bookTitle },
+      });
+    }
 }
 
 interface DisplayOptions {

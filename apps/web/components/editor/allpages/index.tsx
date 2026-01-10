@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { updatePageOrder } from '../../../server/bookimage';
 import UploadModal from '../previewuploads';
 
-type Props = {
+interface Props  {
   isExpanded: boolean;
   pages: Page[];
   bookId: number | null;
@@ -15,9 +15,11 @@ type Props = {
   onSelectPage?: (index: number) => void;
   setBookImageId: React.Dispatch<React.SetStateAction<number | null>>;
   refetch: () => Promise<Page[]>;
+  coverPhotoUrl: string;
+  setCoverPage: any
 };
 
-export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId, setBookImageId, refetch }: Props) {
+export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId, setBookImageId, refetch, coverPhotoUrl, setCoverPage }: Props) {
   const [hoveredContainer, setHoveredContainer] = useState<number | null>(null);
   const [hoveredGap, setHoveredGap] = useState<number | null>(null);
   const [position, setPosition] = useState<{ containerIndex: number | null; insertPosition: number | null }>({
@@ -155,150 +157,171 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
     }
   }
 
+  const handleCoverPhoto = async() => {
+
+  }
+
   return (
-  <>
-    <div  
-      className={`p-4 ${!isExpanded ? 'overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth' : ''}`}
-    >
-      <div 
-        className={`relative ${isExpanded ? 'grid lg:grid-cols-3 md:grid-cols-2 gap-6 place-items-center':'flex'}`}
-      >
-        {containers.map((container, cIndex) => {
-          const isFirstContainer = cIndex === 0;
-          const isLastContainer = cIndex === containers.length - 1;
-          
-          return (
-            <div 
-              key={cIndex} 
-              className="relative flex bg-white transition-all duration-300"
-            >
-              {/* Container */}
-              <div
-                className={`relative flex bg-white overflow-hidden transition-all duration-300 ${
-                  hoveredContainer === cIndex ? 'shadow-2xl gap-4' : 'shadow-lg gap-0'
-                }`}
-                style={{
-                  marginRight: hoveredGap === cIndex ? '1rem' : '0',
-                  marginLeft: hoveredGap === cIndex - 1 ? '1rem' : '0',
-                }}
-                onMouseEnter={() => setHoveredContainer(cIndex)}
-                onMouseLeave={() => setHoveredContainer(null)}
+    <>
+    <div className="p-4">
+      {/* Cover Photo - Separate Row */}
+      
+
+      {/* Pages Container */}
+      <div className={`${!isExpanded ? 'overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth flex' : ''}`}>
+        
+        {coverPhotoUrl && (
+          <div 
+            onClick={() => {setCoverPage(true);}}
+            className={`mb-6 ${isExpanded ? '' : 'flex'}`}
+          >
+            <Image 
+              src={coverPhotoUrl}
+              alt='coverphoto'
+              width={isExpanded ? 200 : 100}
+              height={isExpanded ? 200 : 100}
+              className={`${isExpanded ? 'w-[185px] h-[144px]' : 'w-[100px] h-[100px]'} object-cover rounded shadow-md`}
+            />
+          </div>
+        )}
+        <div 
+          className={`relative ${isExpanded ? 'grid lg:grid-cols-3 md:grid-cols-2 gap-6 place-items-center':'flex'}`}
+        >
+          {containers.map((container, cIndex) => {
+            const isFirstContainer = cIndex === 0;
+            const isLastContainer = cIndex === containers.length - 1;
+            
+            return (
+              <div 
+                key={cIndex} 
+                className="relative flex bg-white transition-all duration-300"
               >
-                {container.map((item, pIndex) => {
-                  const globalIndex = cIndex * 2 + pIndex - 1;
-                  
-                  // Check if this is an "inside cover" position
-                  if (item === 'inside-cover') {
-                    return (
-                      <div
-                        key={`inside-cover-${cIndex}-${pIndex}`}
-                        className={`relative overflow-hidden bg-white border border-gray-300 flex items-center justify-center
-                          ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-[185px] h-[144px] px-3 pt-3 pb-5' : 'w-[100px] h-[100px] px-2 pt-2 pb-3'}`}
-                      >
-                        <span className={`text-gray-400 font-medium text-center ${isExpanded ? 'text-xs' : 'text-[8px]'}`}>
-                          Inside Cover
-                        </span>
-                      </div>
-                    );
-                  }
-
-                  // Regular page rendering
-                  const page = item as Page | undefined;
-                  return (
-                    <div
-                      key={page?.id ?? `empty-${cIndex}-${pIndex}`}
-                      draggable
-                      onClick={() => {onSelectPage?.(globalIndex); setBookImageId(page?.id || null);}}
-                      onDragStart={() => setDragged({ containerIndex: cIndex, pageIndex: pIndex })}
-                      onDragEnter={() => (dragOver.current = { containerIndex: cIndex, pageIndex: pIndex })}
-                      onDragEnd={swapImages}
-                      className={`relative  overflow-hidden bg-white shadow-md hover:shadow-lg border border-gray-200 hover:border-blue-400 cursor-pointer
-                        ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-[185px] h-[144px] px-3 pt-3 pb-5' : 'w-[100px] h-[100px] px-2 pt-2 pb-3'}`}
-                    >
-                      {page?.image?.url ? (
-                        <Image
-                          src={page.image?.url}
-                          alt={`Page ${globalIndex + 1}`}
-                          width={100}
-                          height={100}
-                          className="object-contain w-full h-full"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded">
-                          Empty
-                        </div>
-                      )}
-                      <div className={`text-center text-gray-500 text-[3px] ${isExpanded ? 'pt-2' : ''} cursor-pointer`}>
-                          {page?.caption || "ADD IMAGE TITLE"}
-                        </div>
-                    </div>
-                  );
-                })}
-
-                {/* Center + button */}
+                {/* Container */}
                 <div
-                  className="absolute left-1/2 top-0 -translate-x-1/2 w-6 h-full cursor-pointer"
+                  className={`relative flex bg-white overflow-hidden transition-all duration-300 ${
+                    hoveredContainer === cIndex ? 'shadow-2xl gap-4' : 'shadow-lg gap-0'
+                  }`}
+                  style={{
+                    marginRight: hoveredGap === cIndex ? '1rem' : '0',
+                    marginLeft: hoveredGap === cIndex - 1 ? '1rem' : '0',
+                  }}
                   onMouseEnter={() => setHoveredContainer(cIndex)}
                   onMouseLeave={() => setHoveredContainer(null)}
                 >
-                  {/* <div className="absolute left-1/2 top-0 -translate-x-1/2 w-1 h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent opacity-30 pointer-events-none"></div> */}
+                  {container.map((item, pIndex) => {
+                    const globalIndex = cIndex * 2 + pIndex - 1;
+                    
+                    // Check if this is an "inside cover" position
+                    if (item === 'inside-cover') {
+                      return (
+                        <div
+                          key={`inside-cover-${cIndex}-${pIndex}`}
+                          className={`relative overflow-hidden bg-white border border-gray-300 flex items-center justify-center
+                            ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-[185px] h-[144px] px-3 pt-3 pb-5' : 'w-[100px] h-[100px] px-2 pt-2 pb-3'}`}
+                        >
+                          <span className={`text-gray-400 font-medium text-center ${isExpanded ? 'text-xs' : 'text-[8px]'}`}>
+                            Inside Cover
+                          </span>
+                        </div>
+                      );
+                    }
 
-                  {hoveredContainer === cIndex && (
-                    <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-blue-500 transition-all duration-300 pointer-events-auto"
-                      onClick={() => {
-                        // Calculate actual insert position accounting for inside covers
-                        let insertPosition;
-                        if (isFirstContainer) {
-                          insertPosition = 0; // Insert at position 0 (after inside cover, before pages[0])
-                        } else if (isLastContainer && isEvenPages) {
-                          insertPosition = pages.length - 1; // Insert before last position (before inside cover)
-                        } else {
-                          insertPosition = (cIndex - 1) * 2 + 2; // Middle containers
-                        }
-                        setPosition({ containerIndex: cIndex, insertPosition });
-                        setUploadModal(true);
-                      }}
-                    >
-                      +
-                    </button>
-                  )}
+                    // Regular page rendering
+                    const page = item as Page | undefined;
+                    return (
+                      <div
+                        key={page?.id ?? `empty-${cIndex}-${pIndex}`}
+                        draggable
+                        onClick={() => {onSelectPage?.(globalIndex); setBookImageId(page?.id || null); setCoverPage(false);}}
+                        onDragStart={() => setDragged({ containerIndex: cIndex, pageIndex: pIndex })}
+                        onDragEnter={() => (dragOver.current = { containerIndex: cIndex, pageIndex: pIndex })}
+                        onDragEnd={swapImages}
+                        className={`relative  overflow-hidden bg-white shadow-md hover:shadow-lg border border-gray-200 hover:border-blue-400 cursor-pointer
+                          ${isExpanded ? 'transition-[width,height] duration-500 ease-in-out w-[185px] h-[144px] px-3 pt-3 pb-5' : 'w-[100px] h-[100px] px-2 pt-2 pb-3'}`}
+                      >
+                        {page?.image?.url ? (
+                          <Image
+                            src={page.image?.url}
+                            alt={`Page ${globalIndex + 1}`}
+                            width={100}
+                            height={100}
+                            className="object-contain w-full h-full"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded">
+                            Empty
+                          </div>
+                        )}
+                        <div className={`text-center text-gray-500 text-[3px] ${isExpanded ? 'pt-2' : ''} cursor-pointer`}>
+                            {page?.caption || "ADD IMAGE TITLE"}
+                          </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Center + button */}
+                  <div
+                    className="absolute left-1/2 top-0 -translate-x-1/2 w-6 h-full cursor-pointer"
+                    onMouseEnter={() => setHoveredContainer(cIndex)}
+                    onMouseLeave={() => setHoveredContainer(null)}
+                  >
+                    {hoveredContainer === cIndex && (
+                      <button className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-blue-500 transition-all duration-300 pointer-events-auto"
+                        onClick={() => {
+                          // Calculate actual insert position accounting for inside covers
+                          let insertPosition;
+                          if (isFirstContainer) {
+                            insertPosition = 0; // Insert at position 0 (after inside cover, before pages[0])
+                          } else if (isLastContainer && isEvenPages) {
+                            insertPosition = pages.length - 1; // Insert before last position (before inside cover)
+                          } else {
+                            insertPosition = (cIndex - 1) * 2 + 2; // Middle containers
+                          }
+                          setPosition({ containerIndex: cIndex, insertPosition });
+                          setUploadModal(true);
+                        }}
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {/* Between containers hover area */}
+                {cIndex < containers.length - 1 && (
+                  <div
+                    className={`cursor-pointer ${
+                      isExpanded 
+                        ? 'absolute -right-8 top-1/2 -translate-y-1/2 w-16 h-full z-10' 
+                        : 'relative w-6 h-full'
+                    }`}
+                    onMouseEnter={() => setHoveredGap(cIndex)}
+                    onMouseLeave={() => setHoveredGap(null)}
+                  >
+                    {hoveredGap === cIndex && (
+                      <button
+                        className="z-50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-green-700 transition-all duration-300"
+                        onClick={() => {
+                          // Calculate insert position for between containers
+                          let insertPosition;
+                          if (cIndex === 0) {
+                            insertPosition = 1; // Between first and second container
+                          } else {
+                            insertPosition = cIndex * 2;
+                          }
+                          setPosition({ containerIndex: cIndex, insertPosition });
+                          setUploadModal(true);
+                        }}
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
-
-              {/* Between containers hover area */}
-              {cIndex < containers.length - 1 && (
-                <div
-                  className={`cursor-pointer ${
-                    isExpanded 
-                      ? 'absolute -right-8 top-1/2 -translate-y-1/2 w-16 h-full z-10' 
-                      : 'relative w-6 h-full'
-                  }`}
-                  onMouseEnter={() => setHoveredGap(cIndex)}
-                  onMouseLeave={() => setHoveredGap(null)}
-                >
-                  {hoveredGap === cIndex && (
-                    <button
-                      className="z-50 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg hover:bg-green-700 transition-all duration-300"
-                      onClick={() => {
-                        // Calculate insert position for between containers
-                        let insertPosition;
-                        if (cIndex === 0) {
-                          insertPosition = 1; // Between first and second container
-                        } else {
-                          insertPosition = cIndex * 2;
-                        }
-                        setPosition({ containerIndex: cIndex, insertPosition });
-                        setUploadModal(true);
-                      }}
-                    >
-                      +
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
     {uploadModal && 
