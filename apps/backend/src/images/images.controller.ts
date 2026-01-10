@@ -67,4 +67,13 @@ export class ImagesController {
     async coverPhotoImage(@Param("id") id: string) {
         return this.imageService.showImage(id);
     }
+
+    @Put("replaceCover/:id")
+  async replaceCoverImage(
+    @Param("id") id: string,
+    @Body("coverPhotoUrl") coverPhotoUrl: string | null
+  ) {
+    console.log("Replacing cover image:", id, coverPhotoUrl);
+    return this.imageService.replaceCoverImage(id, coverPhotoUrl);
+  }
 }

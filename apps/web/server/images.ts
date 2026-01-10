@@ -50,3 +50,15 @@ export const showCoverPhoto = async (bookId: string) => {
   });
   return res.json();
 };
+
+export const replaceCoverImage = async (bookId: string, coverPhotoUrl: string | null) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/images/replaceCover/${bookId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ coverPhotoUrl }),
+    });
+    return res.json();
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useEffect, useRef, useState } from 'react'
-import { getBook, replaceCoverImage, updateBookTitle } from '../../server/book';
+import { getBook, updateBookTitle } from '../../server/book';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AllPages from './allpages';
@@ -12,8 +12,9 @@ import Modal from '../model';
 import RotatingImage from './cropandrotate';
 import { supabase } from '../../lib/supabaseClient';
 import { getCurrentUser } from '../../server/user';
-import { showCoverPhoto } from '../../server/images';
+import { replaceCoverImage, showCoverPhoto } from '../../server/images';
 import BookTitle from '../booktitle';
+import ReplaceImageModal from './replaceImageModal';
 
 export type Page = {
   id: number;
@@ -46,6 +47,8 @@ const BookEditor = () => {
   const router = useRouter();
   const [userId, setUserId] = useState<number | null>(null);
   const [coverPhotoId, setCoverPhotoId] = useState<string | null>(null);
+  const [replaceImageModalOpen, setReplaceImageModalOpen] = useState(false);
+  const [textAlign, setTextAlign] = useState<"left" | "center" | "right">("left");
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -151,7 +154,7 @@ const BookEditor = () => {
   const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
   const filePath = `user-uploads/${userId}/${Date.now()}-${safeFileName}`;
 
-  // 1. Upload new image
+    // 1. Upload new image
   const { error } = await supabase.storage
     .from("photos")
     .upload(filePath, file, { upsert: false });
@@ -361,8 +364,7 @@ const BookEditor = () => {
 
         <div 
           className="shadow-xl relative overflow-hidden transform transition-transform duration-500 ease-in-out"
-          // onClick={() => onReplaceImage()}
-          >
+        >
           <div className={`relative bg-white ${coverPage ? 'p-0' : 'p-4'}`}>
             <div
               className={`text-center text-gray-500 text-sm cursor-pointer transition-all duration-200 ease-in-out border ${
@@ -424,7 +426,15 @@ const BookEditor = () => {
               }}
             >
               {coverPage ? (<>
-                <span className="text-[12px] font-semibold">
+                <span
+                  className={`block text-[12px] font-semibold
+                    ${textAlign === "left"
+                      ? "text-left pl-2"
+                      : textAlign === "center"
+                      ? "text-center"
+                      : "text-right pr-2"}
+                  `}
+                >
                   {data.bookTitle || "ADD COVER TITLE"}
                 </span>
               </>) :(<div className="flex flex-col items-center justify-center leading-none space-y-0.5">
@@ -576,19 +586,26 @@ const BookEditor = () => {
           />
         </div>):(
           <div>
-            <InputField
-              input={{
-                label: "Book Title",
-                type: "text",
-                name: "bookTitle",
-                liveCountMax: 15,
-                value: data.bookTitle || '',
-              }}
-              handleChange={handleBookTitleChange}
-              formValues={formData}
-              tailwindClass=''
-              liveCount={true}
-            />
+            <div>
+              <InputField
+                input={{
+                  label: "Book Title",
+                  type: "text",
+                  name: "bookTitle",
+                  liveCountMax: 15,
+                  value: data.bookTitle || '',
+                }}
+                handleChange={handleBookTitleChange}
+                formValues={formData}
+                tailwindClass=''
+                liveCount={true}
+              />
+            </div>
+            <div className="flex justify-between space-x-4">
+              <img src="/svg/text-left.svg" alt="left" className="w-6.5 h-6.5 cursor-pointer border-2 rounded-sm border-gray-500" onClick={() => setTextAlign("left")} />
+              <img src="/svg/text-center.svg" alt="center" className="w-6.5 h-6.5 cursor-pointer border-2 border-gray-500 rounded-sm" onClick={() => setTextAlign("center")} />
+              <img src="/svg/text-right.svg" alt="right" className="w-6.5 h-6.5 cursor-pointer border-2 border-gray-500 rounded-sm" onClick={() => setTextAlign("right")} />
+            </div>
           </div>
         )}
       
@@ -613,7 +630,8 @@ const BookEditor = () => {
           <button
             className="text-sm w-full px-4 py-2 bg-[#F5F9FA] border border-gray-100 text-gray-800 font-medium rounded-lg hover:bg-blue-100 transform transition-transform duration-500 ease-in-out cursor-pointer"
             onClick={()=>{
-              setIsDrawer({...isDrawer, isReplaceImage: true})
+              setIsDrawer({...isDrawer, isReplaceImage: true});
+              setReplaceImageModalOpen(true);
             }}
           >
             <div className="flex items-center justify-center">
@@ -651,6 +669,13 @@ const BookEditor = () => {
       </div>
     </aside>
   </div>
+
+  {replaceImageModalOpen && (
+    <ReplaceImageModal
+      setReplaceImageModalOpen={setReplaceImageModalOpen}
+      onReplaceImage={onReplaceImage}
+    />
+  )}
 </div>
   )
 }
