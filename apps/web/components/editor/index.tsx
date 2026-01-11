@@ -292,6 +292,7 @@ const BookEditor = () => {
       <SidebarWithPopup
         displaySettings={data?.displaySettings}
         bookSize={data?.bookSize}
+        bookId={bookId!}
       />
     </div>
     
@@ -387,17 +388,17 @@ const BookEditor = () => {
                 <Image
                   src={coverPhoto || ""}
                   alt="cover photo"
-                  width={360}
-                  height={270}
-                  className="object-contain max-w-full max-h-full"
+                  width={300}
+                  height={300}
+                  className="object-contain w-[300px] h-[300px]"
                 />
               ) : pages[currentPage]?.image?.url ? (
                 <Image
                   src={pages[currentPage].image?.url}
                   alt="Page"
-                  width={360}
-                  height={270}
-                  className="object-contain w-[360px] h-[270px]"
+                  width={ data.bookSize == "square" ? 332 : 360}
+                  height={ data.bookSize == "square" ? 300 : 270}
+                  className={`object-contain ${data.bookSize == "square" ? 'w-[332px] h-[300px]' : 'w-[360px] h-[270px]'}`}
                 />
               ) : (
                 <div className="w-[360px] h-[270px] bg-gray-100 flex items-center justify-center text-gray-400">
