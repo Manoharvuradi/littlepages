@@ -28,4 +28,9 @@ export class BookController {
   ) {
     return this.bookService.updateBookTitle(id, bookTitle);
   }
+
+  @Put("updateBookSize/:id")
+  async updateBookSize(@Param("id", ParseIntPipe) id: number, @Body("bookSize") bookSize: string) {
+    return this.bookService.updateBookSize(id, bookSize);
+  }
 }

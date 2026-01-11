@@ -51,3 +51,21 @@ export const updateBookTitle = async (bookId: number, bookTitle: string) => {
 
   return res.json();
 }
+
+export const updateBookSize = async (bookId: number, bookSize: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/book/updateBookSize/${bookId}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ bookSize }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to update book size: ${err}`);
+  }
+
+  return res.json();
+}
