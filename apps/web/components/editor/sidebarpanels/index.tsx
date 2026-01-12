@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Option } from "../../booksize";
-import { updateBookSize } from "../../../server/book";
+import { updateBookSize, updateDisplaySettings } from "../../../server/book";
 
 const options: Option[] = [
   {
@@ -9,7 +9,7 @@ const options: Option[] = [
     label: "11in x 8.5in",
     widthIn: 11,
     heightIn: 8.5,
-    src: "/images/book-horizontal.png",
+    src: "/images/finalbooksize.png",
     alt: "11 x 8.5 book preview",
   },
   {
@@ -17,7 +17,7 @@ const options: Option[] = [
     label: "8in x 8in",
     widthIn: 8,
     heightIn: 8,
-    src: "/images/book-square.png",
+    src: "/images/finalbooksize.png",
     alt: "8 x 8 book preview",
   },
 ];
@@ -27,18 +27,46 @@ export default function SidebarWithPopup({
   displaySettings,
   bookSize,
   bookId,
+  setSidebarOpen
 }: {
   displaySettings: any
-  bookSize?: string;
+  bookSize: string;
   bookId: number;
+  setSidebarOpen: (open: boolean) => void;
 }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [bookSizeChange, setBookSizeChange] = useState<string>(bookSize || "landscape");
+  const [bookSizeChange, setBookSizeChange] = useState<string>("");
   const [textDisplayPopupOpen, setTextDisplayPopupOpen] = useState(false);
+
+  const [localDisplaySettings, setLocalDisplaySettings] = useState({
+    showCaption: displaySettings?.showCaption,
+    showName: displaySettings?.showName,
+    showDate: displaySettings?.showDate,
+    showAge: displaySettings?.showAge,
+  });
+
 
   const handleSelect = (id: string) => {
     setBookSizeChange(id);
   };
+
+  useEffect(()=>{
+    setBookSizeChange(bookSize);
+    if(isPopupOpen || textDisplayPopupOpen){
+      setSidebarOpen(true);
+    }else{
+      setSidebarOpen(false);
+    }
+  }, [bookSize, isPopupOpen, textDisplayPopupOpen]);
+
+  // Add the handleChange function
+const handleDisplaySettingChange = (setting: 'showCaption' | 'showName' | 'showDate') => {
+  setLocalDisplaySettings(prev => ({
+    ...prev,
+    [setting]: !prev[setting]
+  }));
+};
+
 
   const handleBookSize = async () => {
     try{
@@ -47,6 +75,17 @@ export default function SidebarWithPopup({
       console.error("Error updating book size:", err);
     }
     setIsPopupOpen(false);
+  }
+
+  const handleSaveDisplaySettings = async () => {
+    try{
+      // Assuming you have an API function to update display settings
+      // await updateDisplaySettings(bookId!, localDisplaySettings);
+      await updateDisplaySettings(bookId!, localDisplaySettings);
+    }catch(err){
+      console.error("Error updating display settings:", err);
+    }
+    setTextDisplayPopupOpen(false);
   }
 
   return (
@@ -94,27 +133,26 @@ export default function SidebarWithPopup({
 
             <div className="grid grid-cols-2 gap-2 mb-10 items-start">
               {options.map((opt) => {
-                const isSelected = bookSizeChange === opt.id; {/* Changed from bookSize to bookSizeChange */}
+                const isSelected = bookSizeChange === opt.id;
                 const displayWidth = Math.round(opt.widthIn * SCALE);
                 const displayHeight = Math.round(opt.heightIn * SCALE);
 
                 return (
                   <div
                     key={opt.id}
-                    className="flex flex-col items-center cursor-pointer"
+                    className="flex flex-col items-center cursor-pointer transition-transform hover:scale-[1.02]"
                     onClick={() => handleSelect(opt.id)}
                   >
                     <div
-                      className={`relative rounded-lg flex items-center justify-center ${
-                        isSelected
-                          ? "border-2 bg-[#009FFF] border-[#009FFF]"
-                          : "border border-gray-200"
-                      }`}
+                      className={`relative rounded-lg flex items-center justify-center overflow-hidden transition-all duration-200
+                        ${isSelected ? "border-3 border-[#009FFF] shadow-xl" : "hover:shadow-lg"}
+                      `}
                       style={{
                         width: `${displayWidth}px`,
                         height: `${displayHeight}px`,
                       }}
                     >
+                      {/* Floating checkbox */}
                       <div
                         className={`absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200
                           ${isSelected ? "bg-[#009FFF] border-[#009FFF]" : "bg-transparent border-white"}
@@ -125,17 +163,19 @@ export default function SidebarWithPopup({
                         )}
                       </div>
 
+                      {/* IMAGE */}
                       <Image
                         src={opt.src}
                         alt={opt.alt || opt.label}
                         width={displayWidth}
                         height={displayHeight}
                         draggable={false}
-                        className="object-cover"
+                        className="object-cover w-full h-full"
                       />
                     </div>
 
-                    <div className="mt-3 text-center text-sm font-medium">
+                    {/* LABEL */}
+                    <div className="mt-3 text-center text-sm font-medium text-gray-700">
                       {opt.label}
                     </div>
                   </div>
@@ -146,9 +186,13 @@ export default function SidebarWithPopup({
             <div className="mt-6 flex justify-end">
               <button
                 onClick={handleBookSize}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className={` mt-2 px-18 py-2 rounded-md font-semibold ${
+                  bookSizeChange
+                    ? "bg-[#009FFF] text-white hover:bg-[#009FFF]"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
               >
-                Done
+                Save
               </button>
             </div>
           </div>
@@ -176,49 +220,64 @@ export default function SidebarWithPopup({
                 <span className="text-sm font-medium text-gray-700">Image Title</span>
                 <button
                   type="button"
+                  onClick={() => handleDisplaySettingChange('showCaption')}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                    displaySettings.showCaption ? "bg-indigo-600" : "bg-gray-300"
+                    localDisplaySettings.showCaption ? "bg-indigo-600" : "bg-gray-300"
                   }`}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      displaySettings.showCaption ? "translate-x-6" : "translate-x-1"
+                      localDisplaySettings.showCaption ? "translate-x-6" : "translate-x-1"
                     }`}
                   />
                 </button>
               </div>
-      
+
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">Name</span>
                 <button
                   type="button"
+                  onClick={() => handleDisplaySettingChange('showName')}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                    displaySettings.showName ? "bg-indigo-600" : "bg-gray-300"
+                    localDisplaySettings.showName ? "bg-indigo-600" : "bg-gray-300"
                   }`}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      displaySettings.showName ? "translate-x-6" : "translate-x-1"
+                      localDisplaySettings.showName ? "translate-x-6" : "translate-x-1"
                     }`}
                   />
                 </button>
               </div>
-      
+
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">Date</span>
                 <button
                   type="button"
+                  onClick={() => handleDisplaySettingChange('showDate')}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                    displaySettings.showDate ? "bg-indigo-600" : "bg-gray-300"
+                    localDisplaySettings.showDate ? "bg-indigo-600" : "bg-gray-300"
                   }`}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      displaySettings.showDate ? "translate-x-6" : "translate-x-1"
+                      localDisplaySettings.showDate ? "translate-x-6" : "translate-x-1"
                     }`}
                   />
                 </button>
               </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={handleSaveDisplaySettings}
+                className={` mt-2 px-18 py-2 rounded-md font-semibold ${
+                  bookSizeChange
+                    ? "bg-[#009FFF] text-white hover:bg-[#009FFF]"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>

@@ -49,6 +49,7 @@ const BookEditor = () => {
   const [coverPhotoId, setCoverPhotoId] = useState<string | null>(null);
   const [replaceImageModalOpen, setReplaceImageModalOpen] = useState(false);
   const [textAlign, setTextAlign] = useState<"left" | "center" | "right">("left");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -123,6 +124,8 @@ const BookEditor = () => {
       }
       }, 500);
   };
+
+  console.log("sidebarOpen:", sidebarOpen);
 
   const handleBookTitleChange = async(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -291,8 +294,9 @@ const BookEditor = () => {
     <div className='hidden lg:block'>
       <SidebarWithPopup
         displaySettings={data?.displaySettings}
-        bookSize={data?.bookSize}
+        bookSize={data?.bookSize!}
         bookId={bookId!}
+        setSidebarOpen={setSidebarOpen}
       />
     </div>
     
@@ -439,16 +443,16 @@ const BookEditor = () => {
                   {data.bookTitle || "ADD COVER TITLE"}
                 </span>
               </>) :(<div className="flex flex-col items-center justify-center leading-none space-y-0.5">
-                <span className="text-[10px]">
+                {data.displaySettings?.showCaption && <span className="text-[10px]">
                   {pages[currentPage]?.caption || "ADD IMAGE TITLE"}
-                </span>
+                </span>}
                 <div className="flex items-center justify-center gap-[2px] leading-none">
-                  <span className="text-[10px]">
+                  {data.displaySettings?.showName && <span className="text-[10px]">
                     {pages[currentPage]?.name || "ADD NAME"}
-                  </span>
-                  <span className="text-[10px]">
+                  </span>}
+                  {data.displaySettings?.showAge && <span className="text-[10px]">
                     {pages[currentPage]?.age || "ADD AGE"}
-                  </span>
+                  </span>}
                 </div>
               </div>)}
             </div>
@@ -481,7 +485,7 @@ const BookEditor = () => {
   : "opacity-100 translate-y-0 pointer-events-auto duration-500 ease-in-out"}
           absolute bottom-0 left-0 w-full bg-white z-50 
           transition-all duration-500 ease-in-out shadow-2xl
-          ${isExpanded ? "h-[95%]" : "h-34"}
+          ${isExpanded ? "h-[95%]" : "h-34"} ${sidebarOpen ? "hidden" : "block"}
         `}
       >
         <div

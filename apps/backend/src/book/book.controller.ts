@@ -33,4 +33,12 @@ export class BookController {
   async updateBookSize(@Param("id", ParseIntPipe) id: number, @Body("bookSize") bookSize: string) {
     return this.bookService.updateBookSize(id, bookSize);
   }
+
+  @Put("updateDisplaySettings/:id")
+  async updateDisplaySettings(
+    @Param("id", ParseIntPipe) id: number,
+    @Body("displaySettings") displaySettings: any
+  ) {
+    return this.bookService.updateDisplaySettings(id, displaySettings);
+  }
 }

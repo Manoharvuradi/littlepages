@@ -69,3 +69,22 @@ export const updateBookSize = async (bookId: number, bookSize: string) => {
 
   return res.json();
 }
+
+export const updateDisplaySettings = async (bookId: number, displaySettings: any) => {
+  console.log("Updating display settings:", displaySettings);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/book/updateDisplaySettings/${bookId}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ displaySettings }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to update display settings: ${err}`);
+  }
+
+  return res.json();
+}
