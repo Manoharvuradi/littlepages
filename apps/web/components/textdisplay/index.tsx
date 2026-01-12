@@ -33,9 +33,10 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
         bookTitle: formData.bookTitle,
         userId: user.sub,
         displaySettings: {
-          showCaption: true,
+          showCaption: formData.displaySettings.showCaption,
           showName: formData.displaySettings.showName,
           showDate: formData.displaySettings.showDate,
+          showAge: formData.displaySettings.showAge
         }
       }
 

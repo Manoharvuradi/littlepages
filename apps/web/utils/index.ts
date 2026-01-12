@@ -125,6 +125,7 @@ interface DisplaySettings {
   showCaption: boolean;
   showName: boolean;
   showDate: boolean;
+  showAge: boolean;
 }
 
 export interface IFormData {
