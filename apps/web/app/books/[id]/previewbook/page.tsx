@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { getBook } from '../../../../server/book';
 import { getCurrentUser } from '../../../../server/user';
+import { showCoverPhoto } from '../../../../server/images';
 
 interface BookImage {
   id: number;
@@ -23,6 +24,12 @@ interface Book {
   };
 }
 
+interface BookData {
+  bookTitle?: string;
+  coverPhotoUrl: string;
+  bookImages?: Book[];
+}
+
 const PreviewBook = () => {
   const params = useParams();
   const [bookId, setBookId] = useState<number | null>(null);
@@ -31,6 +38,9 @@ const PreviewBook = () => {
   const [pagesFlipped, setPagesFlipped] = useState<Record<number, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [coverPhoto, setCoverPhoto] = useState<string | null>();
+  const [bookTitle, setBookTitle] = useState<string>("");
+  const [textAlign] = useState<string>("center");
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -38,7 +48,14 @@ const PreviewBook = () => {
         setIsLoading(true);
         setBookId(Number(params.id));
         const user = await getCurrentUser();
-        const data = await getBook(Number(params.id), user?.sub);
+        const data: BookData = await getBook(Number(params.id), user?.sub);
+
+        // Fetch cover photo URL
+        const url = await showCoverPhoto(data.coverPhotoUrl);
+        setCoverPhoto(url?.url);
+        
+        // Set book title
+        setBookTitle(data?.bookTitle || "");
         
         const transformed = data?.bookImages?.map((item: Book) => ({
           id: item.id,
@@ -48,7 +65,37 @@ const PreviewBook = () => {
           age: item.age || null
         })) || [];
         
-        setPages(transformed);
+        // Add final pages based on array length
+        const finalPages = [...transformed];
+        
+        if (finalPages.length % 2 === 0) {
+          // Even length - add both images
+          finalPages.push({
+            id: finalPages.length + 1,
+            url: "/images/finalpage.png",
+            name: "",
+            caption: "",
+            age: null
+          });
+          finalPages.push({
+            id: finalPages.length + 2,
+            url: "/images/endcover.png",
+            name: "",
+            caption: "",
+            age: null
+          });
+        } else {
+          // Odd length - add only endcover
+          finalPages.push({
+            id: finalPages.length + 1,
+            url: "/images/endcover.png",
+            name: "",
+            caption: "",
+            age: null
+          });
+        }
+        
+        setPages(finalPages);
       } catch (error) {
         console.error("Error fetching book:", error);
       } finally {
@@ -82,7 +129,7 @@ const bookDimensions =
       };
 
   // Calculate total number of pages dynamically
-  const totalPages = pages.length > 2 ? Math.floor((pages.length - 2) / 2) : 0;
+  const totalPages = pages.length > 0 ? Math.floor(pages.length / 2) : 0;
 
   // Show loading state
   if (isLoading) {
@@ -93,11 +140,11 @@ const bookDimensions =
     );
   }
 
-  // Show error state if no pages
-  if (!pages || pages.length < 2) {
+  // Show error state if no cover photo
+  if (!coverPhoto) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p className="text-lg">No pages available for this book.</p>
+        <p className="text-lg">No cover photo available for this book.</p>
       </div>
     );
   }
@@ -190,6 +237,20 @@ const bookDimensions =
           box-shadow: 0 0 4px rgba(0,0,0,0.2);
           z-index: 10;
         }
+
+        .last-page {
+          box-shadow: inset 0 -1px 2px rgba(50, 50, 50, 0.1),
+                      inset -1px 0 1px rgba(150, 150, 150, 0.2),
+                      2px 0 5px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .cover-front {
+          padding: 0 !important;
+        }
+
+        .cover-back {
+          padding: 0 !important;
+        }
       `}</style>
 
       <div
@@ -219,54 +280,48 @@ const bookDimensions =
                   }}
                   onClick={() => setCoverOpen(!coverOpen)}
                 >
-                  <div className="front">
-                    <div className="image-container">
-                      <img
-                        src={pages[0]?.url || ""}
-                        alt={pages[0]?.caption || "Cover front"}
-                        title={pages[0]?.name || ""}
-                        className="w-full h-full object-contain rounded-r-[5px]"
-                      />
-                    </div>
-                    <div className="text-container">
-                      <span className="lg:text-[10px] text-[5px] font-semibold">
-                        {pages[0]?.caption || "ADD IMAGE TITLE"}
-                      </span>
-                      <span className="lg:text-[10px] text-[5px] text-gray-600">
-                        {pages[0]?.name || "ADD NAME"}
+                  <div className="front cover-front relative">
+                    <img
+                      src={coverPhoto || ""}
+                      alt="Book Cover"
+                      className="w-full h-full object-cover rounded-r-[5px]"
+                    />
+                    <div
+                      className="absolute bottom-10 left-0 right-0 py-1 text-center bg-white cursor-pointer"
+                    >
+                      <span
+                        className={`block text-[12px] font-semibold
+                          ${textAlign === "left"
+                            ? "text-left pl-2"
+                            : textAlign === "center"
+                            ? "text-center"
+                            : "text-right pr-2"}
+                        `}
+                      >
+                        {bookTitle || "ADD COVER TITLE"}
                       </span>
                     </div>
                   </div>
-                  <div className="back">
-                    <div className="image-container">
-                      <img
-                        src={pages[1]?.url || ""}
-                        alt={pages[1]?.caption || "Cover back"}
-                        title={pages[1]?.name || ""}
-                        className="w-full h-full object-contain rounded-l-[5px]"
-                      />
-                    </div>
-                    <div className="text-container">
-                      <span className="lg:text-[10px] text-[5px] font-semibold">
-                        {pages[1]?.caption || "ADD IMAGE TITLE"}
-                      </span>
-                      <span className="lg:text-[10px] text-[5px] text-gray-600">
-                        {pages[1]?.name || "ADD NAME"}
-                      </span>
-                    </div>
+                  <div className="back cover-back">
+                    <img
+                      src="/images/finalpage.png"
+                      alt="Back Cover"
+                      className="w-full h-full object-cover rounded-l-[5px]"
+                    />
                   </div>
                 </div>
 
                 {/* Pages */}
                 {Array.from({ length: totalPages }, (_, i) => {
-                  const frontImg = pages[2 + i * 2];
-                  const backImg = pages[3 + i * 2] || pages[2 + i * 2];
+                  const frontImg = pages[i * 2];
+                  const backImg = pages[1 + i * 2] || pages[i * 2];
                   const zIndexFront = totalPages - i;
+                  const isLastPage = i === totalPages - 1;
                   
                   return (
                     <div
                       key={i}
-                      className="page w-full h-full cursor-pointer"
+                      className={`page w-full h-full cursor-pointer ${isLastPage ? 'last-page' : ''}`}
                       style={{
                         transform: pagesFlipped[i]
                           ? "rotateY(-180deg)"
@@ -286,14 +341,16 @@ const bookDimensions =
                             className="w-full h-full object-contain rounded-r-[5px]"
                           />
                         </div>
-                        <div className="text-container">
-                          <span className="lg:text-[10px] text-[5px] font-semibold">
-                            {frontImg?.caption || "ADD IMAGE TITLE"}
-                          </span>
-                          <span className="lg:text-[10px] text-[5px] text-gray-600">
-                            {frontImg?.name || "ADD NAME"} <span className='lg:text-[10px] text-[5px] text-gray-600'>{backImg?.age}</span>
-                          </span>
-                        </div>
+                        {frontImg?.url !== "/images/finalpage.png" && frontImg?.url !== "/images/endcover.png" && (
+                          <div className="text-container">
+                            <span className="lg:text-[10px] text-[5px] font-semibold">
+                              {frontImg?.caption || "ADD IMAGE TITLE"}
+                            </span>
+                            <span className="lg:text-[10px] text-[5px] text-gray-600">
+                              {frontImg?.name || "ADD NAME"} <span className='lg:text-[10px] text-[5px] text-gray-600'>{frontImg?.age}</span>
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="back">
                         <div className="image-container">
@@ -304,14 +361,16 @@ const bookDimensions =
                             className="w-full h-full object-contain rounded-l-[5px]"
                           />
                         </div>
-                        <div className="text-container">
-                          <span className="lg:text-[10px] text-[5px] font-semibold">
-                            {backImg?.caption || "ADD IMAGE TITLE"}
-                          </span>
-                          <span className="lg:text-[10px] text-[5px] text-gray-600">
-                            {backImg?.name || "ADD NAME"} <span className='lg:text-[10px] text-[5px] text-gray-600'>{backImg?.age}</span>
-                          </span>
-                        </div>
+                        {backImg?.url !== "/images/finalpage.png" && backImg?.url !== "/images/endcover.png" && (
+                          <div className="text-container">
+                            <span className="lg:text-[10px] text-[5px] font-semibold">
+                              {backImg?.caption || "ADD IMAGE TITLE"}
+                            </span>
+                            <span className="lg:text-[10px] text-[5px] text-gray-600">
+                              {backImg?.name || "ADD NAME"} <span className='lg:text-[10px] text-[5px] text-gray-600'>{backImg?.age}</span>
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

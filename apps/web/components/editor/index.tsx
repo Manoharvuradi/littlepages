@@ -125,7 +125,6 @@ const BookEditor = () => {
       }, 500);
   };
 
-  console.log("sidebarOpen:", sidebarOpen);
 
   const handleBookTitleChange = async(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
