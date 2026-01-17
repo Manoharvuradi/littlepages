@@ -15,6 +15,7 @@ import { getCurrentUser } from '../../server/user';
 import { replaceCoverImage, showCoverPhoto } from '../../server/images';
 import BookTitle from '../booktitle';
 import ReplaceImageModal from './replaceImageModal';
+import { useSelectedImages } from '../../context';
 
 export type Page = {
   id: number;
@@ -51,6 +52,8 @@ const BookEditor = () => {
   const [textAlign, setTextAlign] = useState<"left" | "center" | "right">("left");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const { setCoverPagePicture } = useSelectedImages();
+
   useEffect(() => {
     const fetchBook = async () => {
       setBookId(Number(params.id));
@@ -59,7 +62,8 @@ const BookEditor = () => {
       const res: any = await getBook(Number(params.id), user?.sub);
       setCoverPhotoId(res.coverPhotoUrl);
       const url = await showCoverPhoto(res.coverPhotoUrl);
-      setCoverPhoto(url?.url)
+      setCoverPhoto(url?.url);
+      setCoverPagePicture(url?.url);
       setData(res);
       setPages(res.bookImages);
     };

@@ -42,7 +42,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({ onBack, onConfirm, 
         />
 
         <Button
-          text={`Confirm and Place Order ($${totalAmount.toFixed(2)})`}
+          text={`Confirm and Place Order (₹${totalAmount.toFixed(2)})`}
           className="bg-blue-600 text-white hover:bg-blue-700"
           onClick={onConfirm}
         />

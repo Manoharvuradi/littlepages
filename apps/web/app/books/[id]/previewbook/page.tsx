@@ -269,7 +269,7 @@ const bookDimensions =
     <div className="flex items-center gap-4">
   {/* Back to Editor */}
   <button
-    onClick={() => router.push(`/books/${bookId}/previewbook`)}
+    onClick={() => router.push(`/books/${bookId}/bookeditor`)}
     className="
       flex items-center
       text-[#009FFF] text-sm font-semibold
@@ -285,7 +285,7 @@ const bookDimensions =
 
   {/* Preview Book */}
   <button
-    onClick={() => router.push(`/books/${bookId}/bookeditor`)}
+    onClick={() => router.push(`/books/${bookId}/checkout`)}
     className="
       flex items-center gap-2
       px-4 py-2
@@ -442,37 +442,42 @@ const bookDimensions =
         </div>
 
 <div className="mt-6">
-        <p className="text-lg md:text-xl font-semibold text-center">
-          {(() => {
-            const flippedCount = Object.values(pagesFlipped).filter(Boolean).length;
-            
-            // If cover is not open, show "Cover"
-            if (!coverOpen) {
-              return "Cover";
-            }
-            
-            // If cover is open but no pages flipped, show "1" (first page)
-            if (flippedCount === 0) {
-              return totalPages > 0 ? "1" : "1";
-            }
-            
-            // Calculate current page numbers (starting from 1)
-            const leftPage = 1 + (flippedCount * 2);
-            const rightPage = leftPage + 1;
-            
-            // Calculate total content pages (excluding cover)
-            const totalContentPages = totalPages * 2;
-            
-            // If we're at the last spread and right page exceeds total, show only left page
-            if (rightPage > totalContentPages) {
-              return `${leftPage}`;
-            }
-            
-            // Show both pages
-            return `${leftPage}-${rightPage}`;
-          })()}
-        </p>
-      </div>
+  <p className="text-lg md:text-xl font-semibold text-center">
+    {(() => {
+      const flippedCount = Object.values(pagesFlipped).filter(Boolean).length;
+      
+      // If cover is not open, show "Cover"
+      if (!coverOpen) {
+        return "Cover";
+      }
+      
+      // If cover is open but no pages flipped, show "1" (first page alone)
+      if (flippedCount === 0) {
+        if (bookLength === 0) {
+          return "";
+        }
+        return "1";
+      }
+      
+      // Calculate current page numbers (starting from page 2 after first flip)
+      const leftPage = (flippedCount * 2);
+      const rightPage = leftPage + 1;
+      
+      // Check if we're viewing empty final pages (beyond bookLength)
+      if (leftPage > bookLength) {
+        return ""; // No page number for empty pages
+      }
+      
+      // If left page is within bookLength but right page exceeds it
+      if (leftPage <= bookLength && rightPage > bookLength) {
+        return `${leftPage}`; // Show only left page number
+      }
+      
+      // Both pages are within bookLength
+      return `${leftPage}-${rightPage}`;
+    })()}
+  </p>
+</div>
       </div>
     </>
   );
