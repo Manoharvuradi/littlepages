@@ -284,7 +284,7 @@ const BookEditor = () => {
       onClick={() => router.push(`/books/${bookId}/previewbook`)}
       className="flex px-4 py-2 bg-[#009FFF] rounded-lg hover:bg-blue-700 transition trasition-300"
     >
-      <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      <img src="/svg/eye.svg" alt="Preview Icon" className="w-5 h-5" />
       <span className='text-white font-semibold text-sm ml-2'>Preview Book</span>
     </button>
   </nav>
