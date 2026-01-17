@@ -7,13 +7,15 @@ import AddressStep from '../addressstep';
 import ShippingStep from '../shippingstep';
 import ConfirmationStep from '../conformationstep/page';
 import OrderSuccess from '../ordersuccess';
+import { useSelectedImages } from '../../context';
 
 export default function CheckoutPage() {
   const [step, setStep] = useState(0); // 0 = book quantity, 1..4 = checkout steps
   const [quantity, setQuantity] = useState(1);
   const [flowData, setFlowData] = useState<any>({});
-  const pricePerBook = 27.5;
+  const pricePerBook = 999.00;
   const total = (pricePerBook * quantity).toFixed(2);
+  const { coverPagePicture } = useSelectedImages();
 
   const increment = () => setQuantity(q => q + 1);
   const decrement = () => setQuantity(q => (q > 1 ? q - 1 : 1));
@@ -53,13 +55,12 @@ export default function CheckoutPage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
                 <div className="relative w-[320px] h-[220px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/finalDesign.png"
+                    src={coverPagePicture!}
                     alt="Book Preview"
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/70 to-transparent text-white text-sm py-3 font-semibold backdrop-blur-sm">
-                    Your Art Book
+                  <div className="absolute top-0 w-full bg-gradient-to-b from-black/20 to-transparent text-white text-sm py-3 font-semibold backdrop-blur-xxs">
                   </div>
                 </div>
               </div>
@@ -101,7 +102,7 @@ export default function CheckoutPage() {
                 
                 <div className="flex items-center justify-center gap-2 text-gray-700">
                   <span className="text-sm font-medium">Price per book:</span>
-                  <span className="text-xl font-bold text-indigo-600">${pricePerBook.toFixed(2)}</span>
+                  <span className="text-xl font-bold text-indigo-600">₹{pricePerBook.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -109,7 +110,7 @@ export default function CheckoutPage() {
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 mb-6 w-full max-w-md border border-indigo-100">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-700 font-semibold text-lg">Total Amount:</span>
-                  <span className="text-3xl font-bold text-gray-900">${total}</span>
+                  <span className="text-3xl font-bold text-gray-900">₹{total}</span>
                 </div>
               </div>
 
@@ -141,7 +142,7 @@ export default function CheckoutPage() {
                   totalAmount={parseFloat(total)}
                 />
               )} */}
-              {step === 3 && <OrderSuccess flowData={flowData} setFlowData={setFlowData} onBack={prevStep} />}
+              {step === 4 && <OrderSuccess flowData={flowData} setFlowData={setFlowData} onBack={prevStep} />}
             </div>
           )}
         </div>
@@ -161,7 +162,7 @@ export default function CheckoutPage() {
             <div className="flex items-center gap-4">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-gray-200 to-gray-300">
                 <Image
-                  src="/book-preview.jpg"
+                  src={coverPagePicture!}
                   alt="Book Thumbnail"
                   fill
                   className="object-cover"
@@ -198,11 +199,11 @@ export default function CheckoutPage() {
           <div className="space-y-3 mb-4">
             <div className="flex items-center justify-between text-gray-700">
               <span>Subtotal</span>
-              <span className="font-semibold">${(pricePerBook * quantity).toFixed(2)}</span>
+              <span className="font-semibold">₹{(pricePerBook * quantity).toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between text-gray-700">
               <span>Estimated Tax</span>
-              <span className="font-semibold">$0.00</span>
+              <span className="font-semibold">₹0.00</span>
             </div>
             <div className="flex items-center justify-between text-gray-700">
               <span>Shipping</span>
@@ -214,7 +215,7 @@ export default function CheckoutPage() {
 
           <div className="flex items-center justify-between mb-6">
             <span className="text-xl font-bold text-gray-900">Total</span>
-            <span className="text-3xl font-bold text-gray-900">${total}</span>
+            <span className="text-3xl font-bold text-gray-900">₹{total}</span>
           </div>
 
           {/* Trust Badges */}

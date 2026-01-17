@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import PayButton from './paybutton';
 
 interface ShippingPageProps {
@@ -18,6 +17,8 @@ export default function ShippingStep({ onNext, onBack, flowData, setFlowData }: 
   const quantity = 2;
   const subtotal = pricePerBook * quantity;
   const total = (subtotal + shippingCost).toFixed(2);
+
+  console.log('flowData in ShippingStep:', flowData);
 
   const handleSelect = (method: string, cost: number) => {
     setSelectedMethod(method);
@@ -39,24 +40,28 @@ export default function ShippingStep({ onNext, onBack, flowData, setFlowData }: 
           {/* Shipping Address */}
           <h2 className="text-xl font-bold text-gray-800 mb-4">Shipping Address</h2>
           <div className="border border-gray-200 rounded-md p-4 mb-6">
-            <p className="font-semibold text-gray-900">John Doe</p>
-            <p className="text-gray-700 text-sm">2-71/4-3</p>
-            <p className="text-gray-700 text-sm">Fort Wayne, Indiana 46774</p>
-            <p className="text-gray-700 text-sm">United States</p>
+            <p className="font-semibold text-gray-900">{flowData?.address?.name}</p>
+            <p className="text-gray-700 text-sm">{flowData?.address?.street}</p>
+            <p className="text-gray-700 text-sm">{flowData?.address?.city}</p>
+            <p className="text-gray-700 text-sm">{flowData?.address?.state}</p>
+            <p className="text-gray-700 text-sm">{flowData?.address?.zip}</p>
             <button className="text-blue-600 text-sm mt-2 font-medium hover:underline">Edit</button>
           </div>
 
           {/* Shipping Method */}
           <h2 className="text-xl font-bold text-gray-800 mb-3">Shipping Method</h2>
-          <div className="bg-indigo-50 border border-indigo-100 text-indigo-700 p-4 rounded-md mb-5">
-            <p className="font-semibold">📘 Book Printing Time</p>
-            <p className="text-sm">
-              Your book will take 3–5 business days to print and dry before it is shipped.
+          <div className="bg-[#F5F9FA] border border-indigo-100 text-black p-4 rounded-md mb-5">
+            <p className="font-semibold"> 
+              <img src="/svg/exclamation.svg" alt="Info" className="inline w-6 h-6 mr-2 mb-1" />
+              Book Printing Time
+            </p>
+            <p className="text-sm text-gray-400">
+              Your book will take 3-5 business days to print and dry before it is shipped. Please keep this in mind when choosing a shipping method.
             </p>
           </div>
 
           {/* Methods */}
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <label
               className={`flex justify-between items-center border rounded-md p-3 cursor-pointer ${
                 selectedMethod === 'ground' ? 'border-[#102371] bg-blue-50' : 'border-gray-200'
@@ -93,7 +98,7 @@ export default function ShippingStep({ onNext, onBack, flowData, setFlowData }: 
               </div>
               <p className="font-semibold text-gray-800">$62.30</p>
             </label>
-          </div>
+          </div> */}
 
           {/* Continue Button */}
           {/* <button
