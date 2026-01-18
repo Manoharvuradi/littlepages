@@ -52,7 +52,6 @@ const BookEditor = () => {
   const [textAlign, setTextAlign] = useState<"left" | "center" | "right">("left");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { setCoverPagePicture } = useSelectedImages();
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -63,7 +62,6 @@ const BookEditor = () => {
       setCoverPhotoId(res.coverPhotoUrl);
       const url = await showCoverPhoto(res.coverPhotoUrl);
       setCoverPhoto(url?.url);
-      setCoverPagePicture(url?.url);
       setData(res);
       setPages(res.bookImages);
     };
