@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { getBook } from '../../../../server/book';
 import { getCurrentUser } from '../../../../server/user';
 import { showCoverPhoto } from '../../../../server/images';
+import { useSelectedImages } from '../../../../context';
 
 interface BookImage {
   id: number;
@@ -42,6 +43,7 @@ const PreviewBook = () => {
   const [bookTitle, setBookTitle] = useState<string>("");
   const [textAlign] = useState<string>("center");
   const [bookLength, setBookLength] = useState<number>(0);
+    const { setCoverPagePicture } = useSelectedImages();
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -54,7 +56,7 @@ const PreviewBook = () => {
         // Fetch cover photo URL
         const url = await showCoverPhoto(data.coverPhotoUrl);
         setCoverPhoto(url?.url);
-        
+        setCoverPagePicture(url?.url);
         // Set book title
         setBookTitle(data?.bookTitle || "");
         setBookLength(data?.bookImages ? data.bookImages.length : 0);
