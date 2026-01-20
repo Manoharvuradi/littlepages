@@ -18,7 +18,6 @@ export default function ShippingStep({ onNext, onBack, flowData, setFlowData }: 
   const subtotal = pricePerBook * quantity;
   const total = (subtotal + shippingCost).toFixed(2);
 
-  console.log('flowData in ShippingStep:', flowData);
 
   const handleSelect = (method: string, cost: number) => {
     setSelectedMethod(method);

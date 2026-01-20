@@ -32,7 +32,7 @@ export default function PayButton({ amount, setFlowData, onNext }: { amount: num
         );
 
         const result = await verifyRes.json();
-        console.log('Payment verification result:', result);
+        // console.log('Payment verification result:', result);
         if (result.status === 'success') {
           setFlowData((prev : any) => ({ ...prev, payment: result }));
           onNext(); // 👉 ONLY after payment success

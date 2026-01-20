@@ -43,7 +43,7 @@ export class AuthService {
   }
 
   async showUserBooks(userId: number) {
-    console.log("userId: ", userId);
+    // console.log("userId: ", userId);
     const userWithBooks = await this.prisma.users.findUnique({
       where: { id: userId },
       include: {

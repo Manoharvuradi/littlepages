@@ -71,7 +71,6 @@ export const updateBookSize = async (bookId: number, bookSize: string) => {
 }
 
 export const updateDisplaySettings = async (bookId: number, displaySettings: any) => {
-  console.log("Updating display settings:", displaySettings);
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/book/updateDisplaySettings/${bookId}`, {
     method: 'PUT',
     credentials: 'include',

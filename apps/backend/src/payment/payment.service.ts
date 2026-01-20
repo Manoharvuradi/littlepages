@@ -5,12 +5,29 @@ import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PaymentService {
-  private razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_TEST_API_KEY!,
-    key_secret: process.env.RAZORPAY_TEST_SECRET_KEY!,
-  });
+  private razorpay: Razorpay;
 
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {
+    const keyId = process.env.RAZORPAY_TEST_API_KEY;
+    const keySecret = process.env.RAZORPAY_TEST_SECRET_KEY;
+
+    if (!keyId || !keySecret) {
+      console.warn('⚠️ Razorpay keys not found. Payments disabled.');
+      return;
+    }
+
+    this.razorpay = new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret,
+    });
+  }
+
+  getClient() {
+    if (!this.razorpay) {
+      throw new Error('Razorpay not initialized');
+    }
+    return this.razorpay;
+  }
 
   async createOrder(userId: number, amount: number) {
     const order = await this.razorpay.orders.create({
@@ -18,21 +35,21 @@ export class PaymentService {
       currency: 'INR',
     });
 
-    console.log('Creating order in DB for user:', order);
+    // console.log('Creating order in DB for user:', order);
 
     const shippingAddressId = await this.prisma.address.findFirst({
       where: { userId },
       select: { id: true },
     }).then(addr => addr?.id || 1);
 
-    console.log('Shipping Address ID:', shippingAddressId);
+    // console.log('Shipping Address ID:', shippingAddressId);
 
     const billingAddressId = await this.prisma.address.findFirst({
       where: { userId },
       select: { id: true },
     }).then(addr => addr?.id || 1);
 
-    console.log('Billing Address ID:', billingAddressId);
+    // console.log('Billing Address ID:', billingAddressId);
 
     const dbOrder = await this.prisma.order.create({
       data: {
@@ -51,7 +68,7 @@ export class PaymentService {
       },
     });
 
-    console.log('Order created in DB:', dbOrder);
+    // console.log('Order created in DB:', dbOrder);
 
     await this.prisma.payment.create({
         data: {
