@@ -69,7 +69,6 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
       const user = await getCurrentUser();
       const response = await createAddress({ ...form, user });
       if(response && response.id){
-        console.log('Address created:', response);
         setFlowData((prev: any) => ({ ...prev, address: response }));
         onNext();
       }else{
