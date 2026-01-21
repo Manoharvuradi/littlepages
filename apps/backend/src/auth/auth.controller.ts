@@ -19,13 +19,24 @@ export class AuthController {
   @Post("login")
   @HttpCode(HttpStatus.OK)
   async login(
-    @Body() body: { email: string; password: string },
-    @Res({ passthrough: true }) res: Response
-  ) {
-    const token = await this.authService.login(body.email, body.password);
-    res.cookie('jwt', token.access_token, { httpOnly: true });
-    return token;
-  }
+  @Body() body: { email: string; password: string },
+  @Res({ passthrough: true }) res: Response
+) {
+  const { access_token, user } = await this.authService.login(
+    body.email,
+    body.password
+  );
+
+  res.cookie('jwt', access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/',
+  });
+
+  // 👇 DO NOT send token
+  return { user };
+}
 
   @Get('me')
   @UseGuards(JwtAuthGuard)

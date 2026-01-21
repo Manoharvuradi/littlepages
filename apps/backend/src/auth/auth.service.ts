@@ -19,17 +19,41 @@ export class AuthService {
     });
   }
 
-  async login(email: string, pass: string) : Promise<{ access_token: string }>{
-    const user = await this.usersService.findOne(email);
-    const isPasswordValid = await bcrypt.compare(pass, user?.password || '');
-    if (!isPasswordValid) {
-      throw new UnauthorizedException();
-    }
-        const payload = { email: user?.email || '', sub: user?.id || null };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+  async login(email: string, pass: string): Promise<{
+  access_token: string;
+  user: {
+    id: number;
+    email: string;
+    name?: string | null;
+  };
+}> {
+  const user = await this.usersService.findOne(email);
+
+  if (!user) {
+    throw new UnauthorizedException('Invalid credentials');
   }
+
+  const isPasswordValid = await bcrypt.compare(pass, user.password);
+  if (!isPasswordValid) {
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  const payload = {
+    sub: user.id,       // ✅ never null
+    email: user.email,
+  };
+
+  const access_token = this.jwtService.sign(payload);
+
+  return {
+    access_token,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name ?? null,
+    },
+  };
+}
 
   async findAllUsers() {
     return this.prisma.users.findMany({
