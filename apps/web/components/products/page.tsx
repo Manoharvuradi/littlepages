@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import styles from './products.module.scss';
+import { useRouter } from 'next/navigation';
 
 const ProductsPage = () => {
+  const router = useRouter();
   return (
     <>
       <div className="text-center my-12" data-aos="fade-up">
@@ -59,7 +61,9 @@ const ProductsPage = () => {
           </p>
 
           <div className="flex justify-center md:justify-start mt-6">
-            <button className={`bg-[#009FFF] hover:bg-[#007acc] text-white font-bold py-3 px-8 rounded-full text-lg transition shadow-md ${styles.button}`}>
+            <button className="bg-[#009FFF] hover:bg-[#007acc] hover:scale-105 hover:shadow-xl text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 ease-in-out shadow-md active:scale-95"
+                    onClick={() => router.push('/auth/login')}
+            >
               Create Book
             </button>
           </div>

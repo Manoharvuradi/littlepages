@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Get, UseGuards, Req, HttpCode, HttpStatus, Put } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, UseGuards, Req, HttpCode, HttpStatus, Put, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -53,10 +53,13 @@ async login(
 }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
-  getMe(@CurrentUser() user: any) {
-    return user;
+@UseGuards(JwtAuthGuard)
+getMe(@CurrentUser() user: any) {
+  if (!user) {
+    throw new UnauthorizedException('User not authenticated');
   }
+  return user;
+}
 
 @Post('logout')
 @HttpCode(HttpStatus.OK)

@@ -17,11 +17,11 @@ export default function Page() {
       <LandingPage />
       <ProductsPage />
       <HowItWorksHomePage />
-      <GetStartedWithUploads />
+      {/* <GetStartedWithUploads /> */}
       {/* <ReviewsPage /> */}
       {/* <FetaturedInPage /> */}
-      <AboutUsPage />
-      <GetMyBoxHomePage />
+      {/* <AboutUsPage /> */}
+      {/* <GetMyBoxHomePage /> */}
       <FooterPage />
     </div>
   );
