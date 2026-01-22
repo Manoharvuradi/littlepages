@@ -60,7 +60,7 @@ const StaticNavbar: React.FC<StaticNavbarProps> = ({
         </button>
 
         <Image
-          src="/images/logo.png"
+          src="/images/Image-Photoroom.png"
           alt="Little Pages Logo"
           width={50}
           height={20}

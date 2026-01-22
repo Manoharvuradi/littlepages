@@ -32,8 +32,8 @@ useEffect(() => {
           Curated boxes delivered to your door. Experience the joy of surprise!
         </p>
         <button 
-            className="bg-[#009FFF] hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-colors shadow-lg hover:shadow-xl"
-            onClick={() => console.log('Create Book clicked')}
+            className="bg-[#009FFF] hover:bg-[#007acc] hover:scale-105 hover:shadow-xl text-white font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 ease-in-out shadow-md"
+            onClick={() => router.push('/auth/login')}
         >
           Create Book
         </button>
