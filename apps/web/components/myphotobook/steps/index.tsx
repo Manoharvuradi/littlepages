@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 interface Step { name: string; }
@@ -7,7 +8,14 @@ const SideSteps: React.FC<SideStepsProps> = ({ steps, currentStep }) => {
   return (
     <aside className="">
       <div>
-        <h1 className="text-2xl font-bold mb-4 text-center">Little Pages</h1>
+        <Image
+          src="/images/Image-Photoroom.png"
+          alt="Little Pages Logo"
+          width={100}
+          height={100}
+          className="cursor-pointer object-center"
+          // onClick={() => router.push("/")}
+        />
         <hr className="my-4 text-gray-300" />
         <h2 className="text-lg font-bold mb-4 text-center">Book Wizard</h2>
         <p className="text-sm text-gray-500 mb-6 text-center">

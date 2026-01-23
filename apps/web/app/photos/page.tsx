@@ -122,7 +122,7 @@ const PhotosPage = () => {
           <span className="mx-2 text-gray-400">•</span>
           <span className="text-sm text-gray-500">{previewUrls.length} Images</span>
         </h1>
-        <div className={`flex items-center gap-3 ${styles.actionsRow}`}>
+        <div className={`flex flex-end gap-3 ${styles.actionsRow}`}>
           <button
             onClick={() => {
               const allSelected = selected.every(Boolean);

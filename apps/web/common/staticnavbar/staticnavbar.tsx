@@ -14,6 +14,7 @@ interface StaticNavbarProps {
   onDelete?: () => void;
   onClickMenu?: () => void;
   isMobile?: boolean;
+  sidebar?: boolean;
 }
 
 const StaticNavbar: React.FC<StaticNavbarProps> = ({
@@ -22,6 +23,7 @@ const StaticNavbar: React.FC<StaticNavbarProps> = ({
   onDelete,
   onClickMenu,
   isMobile,
+  sidebar,
 }) => {
   const { selected, setSelected } = useSelectedImages();
   const selectedCount = selected.filter(Boolean).length;
@@ -32,38 +34,16 @@ const StaticNavbar: React.FC<StaticNavbarProps> = ({
   };
   return (
     <nav
-      className={`${styles.navbar} fixed top-0 left-0 w-full z-50 px-6 py-3 flex items-center justify-between transition-colors duration-400 shadow-md ${
+      className={`${styles.navbar} fixed top-0 left-0 w-full z-50 px-3 py-2 flex items-center justify-between transition-colors duration-400 shadow-md ${
         hasSelection ? "bg-[rgb(16,35,113)] text-white shadow-lg" : "bg-white text-gray-800"
       }`}
     >
       <div className={`${hasSelection ? "hidden" : "flex"}`}>
-
-        <button
-            onClick={onClickMenu}
-            className="p-2 rounded-md hover:bg-gray-100 transition active:bg-gray-200"
-            aria-label="Toggle menu"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-        </button>
-
         <Image
           src="/images/Image-Photoroom.png"
           alt="Little Pages Logo"
-          width={50}
-          height={20}
+          width={100}
+          height={100}
           className="cursor-pointer object-center"
           // onClick={() => router.push("/")}
         />
@@ -123,11 +103,17 @@ const StaticNavbar: React.FC<StaticNavbarProps> = ({
           </button>
         </div>
       ) : (
-        <div className={`${styles.rightSection} flex items-center space-x-3`}>
-          <div className={`${styles.userAvatar} w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold cursor-pointer`}>
-            LP
-          </div>
-        </div>
+        <button
+          onClick={onClickMenu}
+          className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition active:bg-gray-200"
+          aria-label="Toggle menu"
+        >
+          {sidebar ? (
+          <img src="/svg/cancel.svg" alt="Close Menu" className="w-6 h-6 text-black hover:text-gray-600 focus:outline-none transition-colors" />
+          ) : (
+            <img src="/svg/menu.svg" alt="Open Menu" className="w-6 h-6 text-black hover:text-gray-600 focus:outline-none transition-colors" />
+          )}
+        </button>
       )}
     </nav>
   );

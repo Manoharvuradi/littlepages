@@ -13,7 +13,7 @@ const MyPhotoBook = () => {
     bookSize: null,
     coverPhotoUrl: null,
     bookTitle: "",
-    displaySettings: { showCaption: false, showName: false, showDate: false },
+    displaySettings: { showCaption: false, showName: false, showDate: false, showAge: false },
   });
 
   const router = useRouter();
@@ -24,36 +24,39 @@ const MyPhotoBook = () => {
   const handleCancel = () => router.push("/photos");
 
   return (
-    <div className="flex h-screen overflow-hidden p-6 bg-gray-100">
-      {/* Sidebar */}
+    <div className="flex h-screen overflow-hidden p-3 bg-gray-100">
       <div className={`${styles.steps} w-64 bg-white shadow-md p-6 flex flex-col overflow-auto `}>
         <SideSteps steps={createBookSteps} currentStep={currentStep} />
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col p-6 overflow-hidden">
-        {/* Top Navigation (Back + Cancel) */}
+      <main className="flex-1 flex flex-col overflow-hidden">
         <div className="flex justify-between items-center mb-6 flex-shrink-0">
           {currentStep > 0 ? (
             <button
               onClick={handleBack}
-              className="px-6 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 transition-colors duration-300"
+              className="p-1 ml-2 rounded-lg hover:bg-gray-200 transition-colors duration-300"
             >
-              Back
+              <span className="font-semibold text-gray-600">{'< Back'}</span>
             </button>
           ) : <div />}
-
+          <div className="flex gap-1">
+            {[...Array(4)].map((_, index) => (
+              <div 
+                key={index}
+                className={`rounded-md transition-colors duration-300 ${
+                  index <= currentStep ? 'bg-[#009FFF] h-1 w-2' : 'bg-gray-300 h-1 w-1 '
+                }`}
+              />
+            ))}
+          </div>
           <button
             onClick={handleCancel}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-400 transition-all duration-300 flex items-center justify-center"
+            className="hover:bg-gray-200 rounded-full p-0.5 transition-all duration-300 flex items-center justify-center"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-gray-700">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <img src="/svg/cancel.svg" alt="Close Menu" className="w-6 h-6 text-black hover:text-gray-600 focus:outline-none transition-colors" />
           </button>
         </div>
 
-        {/* Scrollable Step Component */}
         <div className="flex-1 rounded-lg overflow-auto">
           <StepComponent formData={formData} setFormData={setFormData} onNext={handleNext} />
         </div>
