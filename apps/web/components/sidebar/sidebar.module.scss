@@ -1,76 +1,63 @@
-// withsidebar.module.scss
-// Only media queries - all other styling is done with Tailwind
-
-.sidebar {
-  // Mobile: sidebar becomes a slide-in menu from right
-
-   @media (max-width: 1280px){
-    
-  }
 
 
-  @media (max-width: 1024px){
-    
-  }
+// .sidebar {
+//   @media (max-width: 1024px) {
+//     top: 0 !important;
+//     height: 100% !important;
+//     right: 0 !important;
+//     left: auto !important;
+//     border-right: none !important;
+//     border-left: 1px solid #bfdbfe !important;
+//     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1) !important;
 
+//     &.expanded {
+//       width: 100% !important;
+//       max-width: 20rem !important;
+//     }
 
-  @media (max-width: 1024px) {
-    top: 0 !important;
-    height: 100% !important;
-    right: 0 !important;
-    left: auto !important;
-    border-right: none !important;
-    border-left: 1px solid #bfdbfe !important;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1) !important;
+//     &.collapsed {
+//       width: 0 !important;
+//       border: none !important;
+//     }
+//   }
+// }
 
-    &.expanded {
-      width: 100% !important;
-      max-width: 20rem !important;
-    }
+// .toggleButton {
+//   // Hide default toggle on mobile
+//   @media (max-width: 1024px) {
+//     display: none !important;
+//   }
+// }
 
-    &.collapsed {
-      width: 0 !important;
-      border: none !important;
-    }
-  }
-}
+// .signOutSection {
+//   @media (max-width: 1024px) {
+//     padding: 1rem !important;
+//   }
+// }
 
-.toggleButton {
-  // Hide default toggle on mobile
-  @media (max-width: 1024px) {
-    display: none !important;
-  }
-}
+// .signOutButton {
+//   @media (max-width: 1024px) {
+//     font-size: 1rem !important;
+//     padding: 0.75rem 1rem !important;
+//   }
+// }
 
-.signOutSection {
-  @media (max-width: 1024px) {
-    padding: 1rem !important;
-  }
-}
+// .mainContent {
+//   // Mobile: no margin, full width
+//   @media (max-width: 1024px) {
+//     margin-left: 0 !important;
+//   }
+// }
 
-.signOutButton {
-  @media (max-width: 1024px) {
-    font-size: 1rem !important;
-    padding: 0.75rem 1rem !important;
-  }
-}
+// // Mobile overlay
+// .overlay {
+//   @media (max-width: 1024px) {
+//     display: block !important;
+//   }
+// }
 
-.mainContent {
-  // Mobile: no margin, full width
-  @media (max-width: 1024px) {
-    margin-left: 0 !important;
-  }
-}
-
-// Mobile overlay
-.overlay {
-  @media (max-width: 1024px) {
-    display: block !important;
-  }
-}
-
-.mobileHeader {
-  @media (max-width: 1024px) {
-    display: flex !important;
-  }
-}
+// .mobileHeader {
+//   @media (max-width: 1024px) {
+//     display: flex !important;
+//   }
+// }

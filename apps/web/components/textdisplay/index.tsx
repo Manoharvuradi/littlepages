@@ -80,7 +80,7 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
   };
 
   return (
-    <div className="lg:max-w-md mx-auto rounded-lg">
+    <div className="lg:max-w-md mx-auto rounded-lg min-h-[85vh]">
       <div className="mx-auto min-w-[32%]">
         <h2 className="text-xl text-center font-bold mb-2">
           What Text Do You Want to Display on the Pages?
@@ -92,62 +92,62 @@ const TextDisplay = ({ formData, setFormData, onNext }: Props) => {
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Image Title</span>
-          <button
-            type="button"
-            onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showCaption: !formData.displaySettings.showCaption } })}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              formData.displaySettings.showCaption ? "bg-indigo-600" : "bg-gray-300"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                formData.displaySettings.showCaption ? "translate-x-6" : "translate-x-1"
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">Image Title</span>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showCaption: !formData.displaySettings.showCaption } })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                formData.displaySettings.showCaption ? "bg-[#009FFF]" : "bg-gray-300"
               }`}
-            />
-          </button>
-        </div>
-        <div className="flex items-center justify-between border-b border-t border-blue-200 py-4">
-          <span className="text-sm font-medium text-gray-700">Name</span>
-          <button
-            type="button"
-            onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showName: !formData.displaySettings.showName } })}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              formData.displaySettings.showName ? "bg-indigo-600" : "bg-gray-300"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                formData.displaySettings.showName ? "translate-x-6" : "translate-x-1"
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                  formData.displaySettings.showCaption ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center justify-between border-b border-t border-blue-200 py-4">
+            <span className="text-sm font-medium text-gray-700">Name</span>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showName: !formData.displaySettings.showName } })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                formData.displaySettings.showName ? "bg-[#009FFF]" : "bg-gray-300"
               }`}
-            />
-          </button>
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                  formData.displaySettings.showName ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">Date</span>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showDate: !formData.displaySettings.showDate } })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                formData.displaySettings.showDate ? "bg-[#009FFF]" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                  formData.displaySettings.showDate ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Date</span>
-          <button
-            type="button"
-            onClick={() => setFormData({ ...formData, displaySettings: { ...formData.displaySettings, showDate: !formData.displaySettings.showDate } })}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-              formData.displaySettings.showDate ? "bg-indigo-600" : "bg-gray-300"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                formData.displaySettings.showDate ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-        </div>
-
-      <Button 
-        text={"Generate Book"}
-        onClick={handleGenerate}
-        loading={result.loading}
-        className={`mt-2 font-semibold w-full rounded-md ${result.loading ? `bg-white border border-blue-500` : `bg-blue-500`} px-14 py-2 text-white`}
-      />
+          <Button 
+            text={"Generate Book"}
+            onClick={handleGenerate}
+            loading={result.loading}
+            className={`cursor-pointer mt-2 font-semibold w-full rounded-md ${result.loading ? `bg-white border border-[#009FFF]` : `bg-[#009FFF]`} px-14 py-2 text-white`}
+          />
       </div>
 
       {result.success && (

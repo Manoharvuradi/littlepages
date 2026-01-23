@@ -1,11 +1,7 @@
 // staticNavbar.module.scss
 // Only media queries - all other styling is done with Tailwind
 
-.navbar {
-  @media (max-width: 768px) {
-    padding: 0.75rem 1rem !important;
-  }
-}
+
 
 .leftSection {
   @media (max-width: 768px) {
@@ -30,7 +26,6 @@
     gap: 0.5rem !important;
   }
 }
-
 .actionButton {
   @media (max-width: 640px) {
     padding: 0.25rem 0.5rem !important;
