@@ -127,7 +127,7 @@ const bookDimensions =
         desktop: { width: 700, height: 350 },
       }
     : {
-        mobile: { width: 390, height: 150 },
+        mobile: { width: 320, height: 150 },
         tablet: { width: 800, height: 300 },
         desktop: { width: 900, height: 350 },
       };
@@ -162,29 +162,62 @@ const bookDimensions =
           transition: box-shadow 0.6s ease-in-out;
         }
 
-        @media (max-width: 640px) {
-          .book {
-            width: ${bookDimensions.mobile.width}px;
-            height: ${bookDimensions.mobile.height}px;
-          }
+@media (max-width: 359px) {
+  .book {
+    width: 280px;
+    height: 140px;
+  }
 
-          .text-container {
-            gap: 2px;
-            padding-top: 4px !important;
-          }
-        }
-        @media (min-width: 641px) and (max-width: 1024px) {
-          .book {
-            width: ${bookDimensions.tablet.width}px;
-            height: ${bookDimensions.tablet.height}px;
-          }
-        }
-        @media (min-width: 1025px) {
-          .book {
-            width: ${bookDimensions.desktop.width}px;
-            height: ${bookDimensions.desktop.height}px;
-          }
-        }
+  .text-container {
+    gap: 1px;
+    padding-top: 2px !important;
+  }
+}
+
+@media (min-width: 360px) and (max-width: 480px) {
+  .book {
+    width: ${bookDimensions.mobile.width}px;
+    height: ${bookDimensions.mobile.height}px;
+  }
+
+  .text-container {
+    gap: 2px;
+    padding-top: 4px !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+  .book {
+    width: 380px;
+    height: 180px;
+  }
+
+  .text-container {
+    gap: 2px;
+    padding-top: 4px !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .book {
+    width: 500px;
+    height: 240px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .book {
+    width: ${bookDimensions.tablet.width}px;
+    height: ${bookDimensions.tablet.height}px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .book {
+    width: ${bookDimensions.desktop.width}px;
+    height: ${bookDimensions.desktop.height}px;
+  }
+}
 
         .pages, .pages > div {
           position: absolute;
@@ -318,7 +351,7 @@ const bookDimensions =
           </div>
         </div>
         <div className={` transition-transform duration-700 ease-in-out ${
-          coverOpen ? "translate-x-40" : "-translate-x-10"
+          coverOpen ? "xs:translate-x-10 sm:translate-x-20 md:translate-x-35 lg:translate-x-25 xl:translate-x-50 2xl:translate-x-60" : "-translate-x-10"
         }`}>
           {(() => {
             const flippedPagesCount = Object.values(pagesFlipped).filter(Boolean).length;
