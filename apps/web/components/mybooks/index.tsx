@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import BookCard from './bookcard';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, showUserBooks } from '../../server/user';
+import { deleteBook } from '../../server/book';
 
 export interface IBook {
   id: number;
@@ -49,7 +50,8 @@ const MyBooks: React.FC = () => {
   const handleDeleteBook = async (id: number) => {
     // placeholder: call your delete API, then remove from state
     // await deleteBookApi(id);
-    setBooks(prev => prev.filter(b => b.id !== id));
+    // setBooks(prev => prev.filter(b => b.id !== id));
+    await deleteBook(id);
   };
 
   const handlePreview = (id: number) => {

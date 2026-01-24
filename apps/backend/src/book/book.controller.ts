@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, Get, Param, ParseIntPipe, Put } from '@nestjs/common';
+import { Controller, Post, Body, Req, Get, Param, ParseIntPipe, Put, Delete } from '@nestjs/common';
 import type { IFormData } from './book.service';
 import { BookService } from './book.service';
 
@@ -40,5 +40,10 @@ export class BookController {
     @Body("displaySettings") displaySettings: any
   ) {
     return this.bookService.updateDisplaySettings(id, displaySettings);
+  }
+
+  @Delete("delete/:id")
+  async deleteBook(@Param("id", ParseIntPipe) id: number) {
+    return this.bookService.deleteBook(id);
   }
 }

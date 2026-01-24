@@ -112,6 +112,31 @@ async createBook(book: IFormData) {
         data: { displaySettings },
       });
     }
+
+// Service
+  async deleteBook(id: number) {
+    try {
+      // First, delete all related records
+      await this.prisma.$transaction([
+        // Delete related records first (adjust based on your schema)
+        this.prisma.bookImage.deleteMany({
+          where: { bookId: id },
+        }),
+        // Add other related deletions here
+        // this.prisma.otherRelatedTable.deleteMany({ where: { bookId: id } }),
+        
+        // Finally delete the book
+        this.prisma.book.delete({
+          where: { id },
+        }),
+      ]);
+
+      return { success: true, message: 'Book deleted successfully' };
+    } catch (error) {
+      console.error('Delete book error:', error);
+      throw new Error(`Failed to delete book: ${error.message}`);
+    }
+  }
 }
 
 interface DisplayOptions {

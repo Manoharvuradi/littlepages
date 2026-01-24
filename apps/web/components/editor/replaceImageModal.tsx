@@ -1,11 +1,17 @@
 import React, { useRef, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient';
+import { getCurrentUser } from '../../server/user';
+import { addImageToBook, updateBookImage } from '../../server/bookimage';
+import { Page } from '.';
 
 interface IReplaceProps {
     setReplaceImageModalOpen: (isOpen: boolean) => void;
     onReplaceImage: (files: File) => Promise<void>;
+    bookImageId: number | null;
+    coverPage?: boolean;
+    refetch: () => Promise<Page[]>;
 }
-const ReplaceImageModal = ({ setReplaceImageModalOpen, onReplaceImage }: IReplaceProps) => {
+const ReplaceImageModal = ({ setReplaceImageModalOpen, onReplaceImage, bookImageId, coverPage, refetch }: IReplaceProps) => {
 
     const [uploading, setUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
@@ -24,8 +30,11 @@ const ReplaceImageModal = ({ setReplaceImageModalOpen, onReplaceImage }: IReplac
         const file = e.target.files?.[0];
 
         if (!file) return;
-
-        await onReplaceImage(file);
+        if(coverPage){
+          await onReplaceImage(file);
+        }else{
+          await uploadFilesToSupabase(file);
+        }
     };
 
   // 🧠 Handle upload via drag & drop
@@ -55,54 +64,53 @@ const ReplaceImageModal = ({ setReplaceImageModalOpen, onReplaceImage }: IReplac
     fileInputRef.current?.click();
   };
 
-    // const uploadFilesToSupabase = async (files: File[]) => {
-    //   const userId = await getCurrentUser();
-    //   if (!userId) {
-    //     alert("User not logged in");
-    //     return;
-    //   }
-    //   setUploading(true);
-    //   try {
-    //     for (const file of files) {
-    //           // ✅ sanitize file name: remove spaces and special chars
-    //       const safeFileName = file.name
-    //         .replace(/[^\w.-]+/g, "_") // replaces spaces, colons, etc with underscores
-    //         .toLowerCase();
+    const uploadFilesToSupabase = async (file: File) => {
+      const userId = await getCurrentUser();
+      if (!userId) {
+        alert("User not logged in");
+        return;
+      }
+      setUploading(true);
+      try {
+        // ✅ sanitize file name: remove spaces and special chars
+        const safeFileName = file.name
+          .replace(/[^\w.-]+/g, "_") // replaces spaces, colons, etc with underscores
+          .toLowerCase();
+
+          const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
+          const { error } = await supabase.storage
+            .from("photos")
+            .upload(filePath, file, { upsert: false });
   
-    //       const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
-    //       const { error } = await supabase.storage
-    //         .from("photos")
-    //         .upload(filePath, file, { upsert: false });
+          if (error) throw error;
   
-    //       if (error) throw error;
+          const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+          const publicUrl = data.publicUrl;
   
-    //       const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
-    //       const publicUrl = data.publicUrl;
+          const req = {
+            fileUrl: publicUrl,
+            userId: userId.sub,
+            filename: file.name,
+          }
+          // Save to DB
+          await updateBookImage(bookImageId!, req);
+
+        
   
-    //       const req = {
-    //         bookId: bookId!,
-    //         fileUrl: publicUrl,
-    //         userId: userId.sub,
-    //         filename: file.name,
-    //       }
-    //       // Save to DB
-    //     //   await addImageToBook(req);
+        // onUploadComplete();
   
-    //     }
+        // Close the modal
+        setReplaceImageModalOpen(false);
   
-    //     // onUploadComplete();
-  
-    //     // Close the modal
-    //     // setUploadModal(false);
-  
-    //     // ✅ Redirect back to book page after upload
-    //     // router.push(`/books/${bookId}/bookeditor`);
-    //   } catch (err: any) {
-    //     alert(`Upload failed: ${err.message}`);
-    //   } finally {
-    //     setUploading(false);
-    //   }
-    // };
+        // ✅ Redirect back to book page after upload
+        // router.push(`/books/${bookId}/bookeditor`);
+      } catch (err: any) {
+        alert(`Upload failed: ${err.message}`);
+      } finally {
+        setUploading(false);
+        refetch();
+      }
+    };
 
   return (
     
