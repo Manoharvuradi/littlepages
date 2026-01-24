@@ -73,7 +73,6 @@ export class ImagesController {
     @Param("id") id: string,
     @Body("coverPhotoUrl") coverPhotoUrl: string | null
   ) {
-    console.log("Replacing cover image:", id, coverPhotoUrl);
     return this.imageService.replaceCoverImage(id, coverPhotoUrl);
   }
 }
