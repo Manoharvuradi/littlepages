@@ -13,6 +13,7 @@ import { ImageUpdateInput } from "@repo/types";
 import SecondaryButton from "../../common/buttons/secondarybutton";
 import { useSelectedImages } from "../../context";
 import styles from "./useruploads.module.scss";
+import UploadModal from "../editor/previewuploads";
 
 const UserUploads = ({ 
     previewUrls, 
@@ -23,6 +24,7 @@ const UserUploads = ({
   const [startIndex, setStartIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [imageId, setImageId] = useState<string | null>(null);
+  const [uploadModal, setUploadModal] = useState(false);
   const [result, setResult] = useState({
     success: false,
     loading: false,
@@ -95,6 +97,10 @@ const UserUploads = ({
     }
   };
 
+  const handleUploadComplete = async() => {
+    console.log("Upload complete, refresh images if needed.");
+  }
+
   return (
     <>
       {previewUrls.length > 0 && (
@@ -108,7 +114,6 @@ const UserUploads = ({
                 setIsOpen(true);
               }}
             >
-              {/* Rounded image wrapper */}
               <div className="relative rounded-md">
                 <Image
                   src={img.url}
@@ -118,18 +123,18 @@ const UserUploads = ({
                   height={128}
                 />
 
-                {/* Fixed height for text area */}
                 <div className="">
-                  <p className="text-sm font-semibold leading-tight">
-                    {img.caption || <span className="invisible">placeholder</span>}
+                  <p className="text-sm text-black leading-tight truncate">
+                    {img.caption && (img.caption.length > 20 ? img.caption.substring(0, 20) + '...' : img.caption)}
                   </p>
                   <div className="flex gap-2 text-xs text-[#B1B1B1] mt-0.5 metadata">
-                    <span>{img.age || <span className="invisible">.</span>}</span>
-                    <span>{img.name || <span className="invisible">.</span>}</span>
+                    <span>{img.age}</span>
+                    <span>
+                      {img.name && (img.name.length > 15 ? img.name.substring(0, 15) + '...' : img.name)}
+                    </span>
                   </div>
                 </div>
 
-                {/* Checkmark Overlay */}
                 <div
                   className={`${styles.checkmark} group absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 cursor-pointer ${
                     selected[idx]
@@ -175,142 +180,104 @@ const UserUploads = ({
           className="fixed inset-0 z-[2000]"
           onClose={() => setIsOpen(false)}
         >
-          {/* Backdrop */}
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
 
-          {/* Content */}
           <div className="fixed inset-0 flex items-center justify-center">
-            <Dialog.Panel className={`${styles.dialogPanel} relative w-full max-w-5xl mx-auto`}>
-              {/* Toolbar */}
-              <div
-                className={`${styles.toolbar} absolute top-4 left-50 z-20 flex space-x-4 text-white`}
-                style={{
-                  top: "calc(-10% + 20px)",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                }}
-              >
-                <button className="hover:text-indigo-400">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+            <Dialog.Panel className={`${styles.dialogPanel} relative w-full max-w-5xl mx-auto h-full flex flex-col`}>
+              <div className="flex-1 relative">
+                <div
+                  className={`h-full transition-transform duration-300 ease-in-out ${
+                    drawerOpen ? "-translate-x-20" : "translate-x-0"
+                  }`}
+                >
+                  <Swiper 
+                    modules={[Navigation]} 
+                    navigation 
+                    initialSlide={startIndex}
+                    className="h-full"
                   >
-                    <polyline points="1 4 1 10 7 10"></polyline>
-                    <polyline points="23 20 23 14 17 14"></polyline>
-                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
-                  </svg>
-                </button>
-                <button className="hover:text-indigo-400">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                </button>
-                <button className="hover:text-indigo-400">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                  </svg>
-                </button>
-                <button onClick={() => setIsOpen(false)} className="hover:text-indigo-400">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="15" y1="9" x2="9" y2="15"></line>
-                    <line x1="9" y1="9" x2="15" y2="15"></line>
-                  </svg>
-                </button>
-              </div>
-
-              <div
-                className={`transition-transform duration-300 ease-in-out ${
-                  drawerOpen ? "-translate-x-20" : "translate-x-0"
-                }`}
-              >
-                <Swiper modules={[Navigation]} navigation initialSlide={startIndex}>
-                  {previewUrls.map((img: any, idx: number) => (
-                    <SwiperSlide key={idx}>
-                      <div className={`${styles.swiperContainer} flex flex-col justify-center items-center p-8`}>
-                        <Image
-                          src={img.url}
-                          alt=""
-                          width={600}
-                          height={400}
-                          className="object-contain"
-                        />
-                        <button
-                          onClick={() => {
-                            setDrawerOpen(true);
-                            setImageId(img.id);
-                          }}
-                          className={`${styles.editButton} mt-6 px-4 py-2 font-bold text-blue-600 flex gap-2`}
-                        >
-                          <svg
-                            viewBox="0 0 24 24"
-                            width="24"
-                            height="24"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                    {previewUrls.map((img: any, idx: number) => (
+                      <SwiperSlide key={idx}>
+                        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 flex space-x-4">
+                          <button 
+                            className="p-1 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300"
+                            onClick={() => {
+                              setImageId(img.id);
+                              setUploadModal(true);
+                              setIsOpen(false);
+                            }}
                           >
-                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                          </svg>
-                          Edit Label
-                        </button>
-                      </div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
+                            <img src="/svg/replace.svg" alt="Replace" className="w-6 h-6" />
+                          </button>
+                          <button 
+                            className="p-1 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300"
+                            onClick={() => {
+                              console.log('Download image:', img.id);
+                            }}
+                          >
+                            <img src="/svg/download.svg" alt="Download" className="w-6 h-6" />
+                          </button>
+                          <button 
+                            className="p-1 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300"
+                            onClick={() => {
+                              console.log('Delete image:', img.id);
+                            }}
+                          >
+                            <img src="/svg/delete.svg" alt="Delete" className="w-6 h-6" />
+                          </button>
+                          <button 
+                            onClick={() => setIsOpen(false)} 
+                            className="p-1 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300"
+                          >
+                            <img src="/svg/xcircle.svg" alt="Close" className="w-6 h-6" />
+                          </button>
+                        </div>
+
+                        <div className={`${styles.swiperContainer} flex flex-col justify-center items-center h-full p-8`}>
+                          <Image
+                            src={img.url}
+                            alt=""
+                            width={400}
+                            height={200}
+                            className="object-contain max-h-[70vh]"
+                          />
+                          <button
+                            onClick={() => {
+                              setDrawerOpen(true);
+                              setImageId(img.id);
+                            }}
+                            className={`${styles.editButton} cursor-pointer mt-6 px-4 py-2 bg-[#009FFF] hover:bg-[#0A65C7]  rounded-lg font-semibold text-white flex items-center gap-2 transition-all duration-300 shadow-lg`}
+                          >
+                            <img src="/svg/edit.svg" alt="Edit" className="w-5 h-5" />
+                            <span className="text-xs">Edit Label</span>
+                          </button>
+                        </div>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
               </div>
 
               <div
-                className={`${styles.drawer} fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 z-[3000] ${
+                className={`${styles.drawer} fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 z-[3000] ${
                   drawerOpen ? "translate-x-0" : "translate-x-full"
                 }`}
               >
                 <form onSubmit={handleSave}>
-                  <div className={`${styles.drawerHeader} flex justify-between items-center px-4 py-3 border-b`}>
-                    <h3 className="text-lg font-semibold">Edit Labels</h3>
+                  <div className={`${styles.drawerHeader} flex justify-between items-center px-4 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50`}>
+                    <h3 className="text-lg font-semibold text-gray-900">Edit Labels</h3>
+                    <button
+                      type="button"
+                      onClick={() => setDrawerOpen(false)}
+                      className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
 
-                  <div className={`${styles.drawerContent} p-4 space-y-4`}>
+                  <div className={`${styles.drawerContent} p-4 space-y-4 overflow-y-auto h-[calc(100%-80px)]`}>
                     <div>
                       <InputField
                         input={nameInput}
@@ -349,28 +316,32 @@ const UserUploads = ({
 
                     <Button
                       type="submit"
-                      className={`mt-2 w-full rounded-md ${
-                        result.loading ? `bg-white border border-blue-500` : `bg-blue-500`
-                      } px-14 py-2 text-white`}
+                      className={`mt-4 w-full rounded-lg ${
+                        result.loading ? `bg-white border-2 border-blue-500` : `bg-blue-600 hover:bg-blue-700`
+                      } px-6 py-3 text-white font-semibold transition-colors shadow-md`}
                       text={"Save"}
                       loading={result.loading}
                     />
 
                     <SecondaryButton
                       text={"Close"}
-                      className="mt-2 w-full rounded-md bg-white-500 px-14 py-2 text-blue-600"
+                      className="w-full rounded-lg bg-white border-2 border-gray-300 hover:border-gray-400 px-6 py-3 text-gray-700 font-semibold transition-colors"
                       onClick={() => setDrawerOpen(false)}
                     />
 
                     {result.success && (
-                      <span className="text-green-600 font-bold text-sm mt-2">
-                        Name updated successfully!
-                      </span>
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <span className="text-green-700 font-medium text-sm">
+                          ✓ Name updated successfully!
+                        </span>
+                      </div>
                     )}
                     {result.error && (
-                      <span className="text-red-600 font-bold text-sm mt-2">
-                        Something went wrong!
-                      </span>
+                      <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <span className="text-red-700 font-medium text-sm">
+                          ✗ Something went wrong!
+                        </span>
+                      </div>
                     )}
                   </div>
                 </form>
@@ -379,6 +350,14 @@ const UserUploads = ({
           </div>
         </Dialog>
       </Transition>
+
+      {uploadModal && 
+        <UploadModal 
+          imageid={imageId}
+          setUploadModal={setUploadModal}
+          onUploadComplete={handleUploadComplete}
+        />
+      }
     </>
   );
 }

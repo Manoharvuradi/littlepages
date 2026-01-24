@@ -87,3 +87,20 @@ export const updateDisplaySettings = async (bookId: number, displaySettings: any
 
   return res.json();
 }
+
+export const deleteBook = async (bookId: number) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/book/delete/${bookId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to delete book: ${err}`);
+  }
+
+  return res.json();
+}

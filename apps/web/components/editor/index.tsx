@@ -680,6 +680,9 @@ const BookEditor = () => {
     <ReplaceImageModal
       setReplaceImageModalOpen={setReplaceImageModalOpen}
       onReplaceImage={onReplaceImage}
+      bookImageId={bookImageId}
+      coverPage={coverPage}
+      refetch={refetch}
     />
   )}
 </div>

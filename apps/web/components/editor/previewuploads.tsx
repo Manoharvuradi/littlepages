@@ -6,13 +6,14 @@ import { getCurrentUser } from "../../server/user";
 import { addImageToBook } from "../../server/bookimage";
 
 type UploadModalProps = {
-  bookId: number | null;
-  position: { containerIndex: number | null; insertPosition: number | null };
+  bookId?: number | null;
+  position?: { containerIndex: number | null; insertPosition: number | null };
   setUploadModal: (value: boolean) => void;
   onUploadComplete: () => void; // Add this callback
+  imageid?: string | null;
 };
 
-export default function UploadModal({ bookId, position, setUploadModal,onUploadComplete }: UploadModalProps) {
+export default function UploadModal({ bookId, position, setUploadModal,onUploadComplete, imageid }: UploadModalProps) {
 
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
