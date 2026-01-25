@@ -122,18 +122,21 @@ let bookSize: string = "rectangle";
 const bookDimensions =
   bookSize === "square"
     ? {
-        mobile: { width: 300, height: 150 },
+        mobile: { width: 350, height: 150 },
         tablet: { width: 450, height: 225 },
         desktop: { width: 700, height: 350 },
       }
     : {
-        mobile: { width: 320, height: 150 },
+        mobile: { width: 330, height: 550 },
         tablet: { width: 800, height: 300 },
-        desktop: { width: 900, height: 350 },
+        desktop: { width: 900, height: 550 },
       };
 
   // Calculate total number of pages dynamically
   const totalPages = pages.length > 0 ? Math.floor(pages.length / 2) : 0;
+
+  console.log("height",bookDimensions.mobile.height);
+
 
   // Show loading state
   if (isLoading) {
@@ -162,10 +165,10 @@ const bookDimensions =
           transition: box-shadow 0.6s ease-in-out;
         }
 
-// @media (max-width: 359px) {
+// @media (min-width: 319px) {
 //   .book {
-//     width: 280px;
-//     height: 140px;
+//     width: 400px;
+//     height: 150px;
 //   }
 
 //   .text-container {
@@ -174,21 +177,90 @@ const bookDimensions =
 //   }
 // }
 
-// @media (min-width: 360px) and (max-width: 480px) {
-//   .book {
-//     width: ${bookDimensions.mobile.width}px;
-//     height: ${bookDimensions.mobile.height}px;
-//   }
+// @media (min-width: 319px) {
 
-//   .text-container {
-//     gap: 2px;
-//     padding-top: 4px !important;
+//   .book {
+//     width: 300px;
+//     height: 130px;
+//   }
+//   .translate-x-custom-xs {
+//     transform: translateX(1.5rem); /* 40px */
 //   }
 // }
 
+// @media (min-width: 320px) {
+//   .book {
+//     min-width: 100%;
+//     min-width: 100px;
+//     min-height: 550px;
+//   }
+
+
+// }
+
+/* Extra small devices (< 360px) */
+@media (max-width: 359px) {
+  .book {
+    width: 280px;
+    height: 420px;
+  }
+}
+
+/* Small mobile devices (360px - 480px) */
+@media (min-width: 360px) and (max-width: 480px) {
+  .book {
+    width: ${bookDimensions.mobile.width}px;
+    height: ${bookDimensions.mobile.height}px;
+  }
+}
+
+/* Large mobile devices (481px - 640px) */
+@media (min-width: 481px) and (max-width: 640px) {
+  .book {
+    width: 400px;
+    height: 200px;
+  }
+}
+
+/* Small tablets (641px - 768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+  .book {
+    width: 560px;
+    height: 280px;
+  }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .book {
+    width: ${bookDimensions.tablet.width}px;
+    height: ${bookDimensions.tablet.height}px;
+  }
+}
+
+/* Desktop (1025px - 1280px) */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .book {
+    width: ${bookDimensions.desktop.width}px;
+    height: ${bookDimensions.desktop.height}px;
+  }
+}
+
+/* Large desktop (1281px+) */
+@media (min-width: 1281px) {
+  .book {
+    width: ${bookDimensions.desktop.width}px;
+    height: ${bookDimensions.desktop.height}px;
+  }
+}
+
+  // .translate-x-custom-xs {
+  //   transform: translateX(1.0rem); /* 24px */
+  // }
+
 // @media (min-width: 481px) and (max-width: 640px) {
 //   .book {
-//     width: 380px;
+//     width: 500px;
 //     height: 180px;
 //   }
 
@@ -200,112 +272,10 @@ const bookDimensions =
 
 // @media (min-width: 641px) and (max-width: 768px) {
 //   .book {
-//     width: 500px;
+//     width: 600px;
 //     height: 240px;
 //   }
 // }
-
-@media (max-width: 1440px) {
-  .book {
-    max-width: 900px;
-    height: 350px;
-  }
-}
-
-// @media (max-width: 1024px) {
-//   .book {
-//     // max-width: 750px;
-//     height: 300px;
-//   }
-// }
-
-// @media (max-width: 786px) {
-//   .book {
-//     // width: 650px;
-//     height: 250px;
-//   }
-// }
-
-// @media (max-width: 640px) {
-//   .book {
-//     // width: 500px;
-//     height: 200px;
-//   }
-// }
-
-
-/* Desktop and above (1440px+) */
-@media (min-width: 1440px) {
-  .book {
-    width: 900px;
-    height: 350px;
-  }
-}
-
-/* Laptop (1024px - 1439px) */
-@media (min-width: 1024px) and (max-width: 1439px) {
-  .book {
-    width: 750px;
-    height: 300px;
-  }
-}
-
-/* Tablet (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .book {
-    width: 650px;
-    height: 250px;
-  }
-}
-
-/* Mobile (640px - 767px) */
-@media (min-width: 640px) and (max-width: 767px) {
-  .book {
-    width: 500px;
-    height: 200px;
-  }
-}
-
-/* Small mobile (< 640px) */
-@media (max-width: 639px) {
-  .book {
-    width: 500px;
-    height: 200px;
-  }
-
-  .translate-x-custom-xs {
-    transform: translateX(4rem);
-  }
-    .translate-x-custom-xs-cover{
-      transform: translateX(-12rem);
-    }
-}
-
-@media (max-width: 584px) {
-  .book {
-    width: 380px;
-    height: 140px;
-  }
-  .translate-x-custom-xs {
-    transform: translateX(1.5rem);
-  }
-    .translate-x-custom-xs-cover{
-      transform: translateX(-8rem);
-    }
-}
-
-@media (max-width: 420px) {
-  .book {
-    width: 300px;
-    height: 120px;
-  }
-  .translate-x-custom-xs {
-    transform: translateX(4.0rem);
-  }
-    .translate-x-custom-xs-cover{
-      transform: translateX(-6rem);
-    }
-}
 
 // @media (min-width: 769px) and (max-width: 1024px) {
 //   .book {
@@ -453,7 +423,7 @@ const bookDimensions =
           </div>
         </div>
         <div className={` transition-transform duration-700 ease-in-out ${
-          coverOpen ? "translate-x-custom-xs sm:translate-x-20 md:translate-x-15 lg:translate-x-40 xl:translate-x-65" : "translate-x-custom-xs-cover sm:translate-x-0 md:translate-x-15 lg:translate-x-40 xl:translate-x-20 translate-x-20"
+          coverOpen ? "translate-x-custom-xs  2xl:translate-x-60" : "-translate-x-10"
         }`}>
           {(() => {
             const flippedPagesCount = Object.values(pagesFlipped).filter(Boolean).length;
