@@ -135,7 +135,6 @@ const bookDimensions =
   // Calculate total number of pages dynamically
   const totalPages = pages.length > 0 ? Math.floor(pages.length / 2) : 0;
 
-  console.log("height",bookDimensions.mobile.height);
 
 
   // Show loading state
