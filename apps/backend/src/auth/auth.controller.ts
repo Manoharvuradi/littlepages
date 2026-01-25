@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Get, UseGuards, Req, HttpCode, HttpStatus, Put, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, UseGuards, Req, HttpCode, HttpStatus, Put, UnauthorizedException, Param, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -11,8 +11,8 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  signup(@Body() body: { email: string; password: string; name?: string }) {
-    return this.authService.signup(body.email, body.password, body.name);
+  signup(@Body() body: { email: string; password: string; name?: string, role?: string }) {
+    return this.authService.signup(body.email, body.password, body.name, body.role);
   }
 
 @Public()
@@ -87,5 +87,24 @@ async logout(@Res({ passthrough: true }) res: Response) {
   async getUserBooks(@Req() req: any) {
     const userId = req.user.sub;
     return this.authService.showUserBooks(userId);
+  }
+
+
+  @Get('customers/:id')
+  async getCustomer(@Param('id') id: number) {
+    return this.authService.findCustomerById(id);
+  }
+
+    @Get('admin/customers')
+  async getAllCustomers(
+    @Query('search') search?: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+  ) {
+    return this.authService.getAllCustomers({
+      search,
+      page: Number(page),
+      limit: Number(limit),
+    });
   }
 }
