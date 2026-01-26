@@ -4,7 +4,8 @@ export type OrderStatus =
   | 'SHIPPED' 
   | 'DELIVERED' 
   | 'CANCELLED' 
-  | 'REFUNDED';
+  | 'REFUNDED'
+  | 'PENDING';
 
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
