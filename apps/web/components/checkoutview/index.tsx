@@ -8,6 +8,7 @@ import ShippingStep from '../shippingstep';
 import ConfirmationStep from '../conformationstep/page';
 import OrderSuccess from '../ordersuccess';
 import { useSelectedImages } from '../../context';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
   const [step, setStep] = useState(0); // 0 = book quantity, 1..4 = checkout steps
@@ -15,6 +16,9 @@ export default function CheckoutPage() {
   const [flowData, setFlowData] = useState<any>({});
   const pricePerBook = 999.00;
   const total = (pricePerBook * quantity).toFixed(2);
+  const params = useParams();
+  const { id } = params;
+  const router = useRouter();
   const { coverPagePicture } = useSelectedImages();
 
   const increment = () => setQuantity(q => q + 1);
@@ -27,7 +31,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
       {/* Header */}
       <nav className="bg-gradient-to-r from-[#102371] to-[#1a2d6b] text-white py-4 px-6 font-semibold text-lg flex items-center justify-between shadow-md">
-        <button className="text-sm hover:text-gray-200 transition-colors flex items-center gap-2">
+        <button className="text-sm hover:text-gray-200 transition-colors flex items-center gap-2" onClick={()=>router.push(`/books/${id}/previewbook`)}>
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
