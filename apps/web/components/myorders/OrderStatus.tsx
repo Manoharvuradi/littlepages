@@ -5,9 +5,9 @@ export default function OrderStatus({
 }: {
   status: string;
   trackingNumber?: string;
-  statusHistory: Array<{ status: string; date: string; description: string }>;
+  statusHistory?: Array<{ status: string; date: string; description: string }>;
 }) {
-  const statuses = ['Confirmed', 'Processing', 'Shipped', 'Delivered'];
+  const statuses = ['Confirmed', 'Processing', 'Shipped', 'Delivered', 'Pending'];
   const currentIndex = statuses.findIndex(s => s.toLowerCase() === status.toLowerCase());
 
   return (

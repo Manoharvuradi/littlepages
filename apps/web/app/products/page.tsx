@@ -3,12 +3,14 @@
 import Image from 'next/image'
 import React, { useState } from 'react'
 import FooterPage from '../../components/footer';
+import { useRouter } from 'next/navigation';
 
 const ProductsPage = () => {
     const [pieces, setPieces] = useState(20);
     const basePrice = 999;
     const extraPiecePrice = 49.99;
     const totalPrice = pieces <= 20 ? basePrice : basePrice + (pieces - 20) * extraPiecePrice;
+    const router = useRouter();
          
   return (
 <div className='relative bg-gradient-to-b from-gray-50 via-white to-gray-50 pt-20 overflow-hidden'>
@@ -103,7 +105,7 @@ const ProductsPage = () => {
 
       {/* CTA Button */}
       <div className="flex justify-center xl:justify-start">
-        <button className="group relative bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95 overflow-hidden">
+        <button className="group relative bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 active:scale-95 overflow-hidden" onClick={()=>router.push('/auth/login')}>
           <span className="relative z-10 flex items-center gap-2">
             Create Book
             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

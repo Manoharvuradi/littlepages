@@ -4,7 +4,7 @@ const FooterPage = () => {
   return (
     <footer className="bg-gray-900 text-white py-16">
         <div className="container mx-auto px-6">
-            <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 <div>
                     <h3 className="text-2xl font-bold mb-4">Little Pages</h3>
                     <p className="text-gray-400 mb-4">
@@ -26,8 +26,6 @@ const FooterPage = () => {
                     <h4 className="font-bold mb-4">Products</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li><a href="#" className="hover:text-white transition-colors">Art Books</a></li>
-                        <li><a href="#" className="hover:text-white transition-colors">Framed Mosaics</a></li>
-                        <li><a href="#" className="hover:text-white transition-colors">Gift Cards</a></li>
                     </ul>
                 </div>
                 <div>
@@ -36,10 +34,10 @@ const FooterPage = () => {
                         <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
                         <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
                         <li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li>
-                        <li><a href="#" className="hover:text-white transition-colors">Returns</a></li>
+                        {/* <li><a href="#" className="hover:text-white transition-colors">Returns</a></li> */}
                     </ul>
                 </div>
-                <div>
+                {/* <div>
                     <h4 className="font-bold mb-4">Company</h4>
                     <ul className="space-y-2 text-gray-400">
                         <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
@@ -47,7 +45,7 @@ const FooterPage = () => {
                         <li><a href="#" className="hover:text-white transition-colors">Press</a></li>
                         <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
                     </ul>
-                </div>
+                </div> */}
             </div>
             <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
                 <p>&copy; 2026 Little Pages. All rights reserved.</p>

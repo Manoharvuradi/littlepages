@@ -26,6 +26,7 @@ export default function CheckoutPage() {
 
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => Math.max(prev - 1, 0));
+  console.log("step:", step);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
@@ -139,14 +140,7 @@ export default function CheckoutPage() {
               <ProgressBar step={step} />
               {step === 1 && <AddressStep onNext={nextStep} flowData={flowData} setFlowData={setFlowData} />}
               {step === 2 && <ShippingStep onNext={nextStep} onBack={prevStep} flowData={flowData} setFlowData={setFlowData} />}
-              {/* {step === 3 && (
-                <ConfirmationStep
-                  onConfirm={nextStep}
-                  onBack={prevStep}
-                  totalAmount={parseFloat(total)}
-                />
-              )} */}
-              {step === 4 && <OrderSuccess flowData={flowData} setFlowData={setFlowData} onBack={prevStep} />}
+              {step === 3 && <OrderSuccess flowData={flowData} setFlowData={setFlowData} onBack={prevStep} />}
             </div>
           )}
         </div>

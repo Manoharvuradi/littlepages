@@ -25,7 +25,7 @@ const GetStartedWithUploads = () => {
                             </li>
                             <li className="flex items-start">
                                 <span className="text-green-600 mr-3 mt-1 flex-shrink-0">✓</span>
-                                <span className="text-gray-800">Order form to select your Art Books and/or Framed Mosaics, plus tips and tricks to organize your art</span>
+                                <span className="text-gray-800">Order form to select your Art Books, plus tips and tricks to organize your art</span>
                             </li>
                             <li className="flex items-start">
                                 <span className="text-green-600 mr-3 mt-1 flex-shrink-0">✓</span>
