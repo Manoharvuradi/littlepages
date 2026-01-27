@@ -133,7 +133,6 @@ async createBook(book: IFormData) {
 
       return { success: true, message: 'Book deleted successfully' };
     } catch (error) {
-      console.error('Delete book error:', error);
       throw new Error(`Failed to delete book: ${error.message}`);
     }
   }

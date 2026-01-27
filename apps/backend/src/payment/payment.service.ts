@@ -94,7 +94,7 @@ export class PaymentService {
     //     order: { connect: { id: order.id } },
     //   },
     // });
-
+    console.log('Razorpay order created:', order);
     return order;
   }
 
@@ -109,18 +109,21 @@ export class PaymentService {
 
     if (expectedSign !== razorpay_signature) {
       throw new BadRequestException('Invalid payment signature');
+    }else{
+      await this.prisma.payment.update({
+        where: { razorpayOrderId: razorpay_order_id },
+        data: {
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+          status: 'SUCCESS',
+        },
+      });
+      return { status: 'success', paymentId: razorpay_payment_id, orderId: razorpay_order_id };
     }
 
-    await this.prisma.payment.update({
-      where: { razorpayOrderId: razorpay_order_id },
-      data: {
-        razorpayPaymentId: razorpay_payment_id,
-        razorpaySignature: razorpay_signature,
-        status: 'SUCCESS',
-      },
-    });
+    
 
-    return { status: 'success' };
+    // return { status: 'success' };
   }
 
   async handleWebhook(req: any, signature: string) {

@@ -20,7 +20,7 @@ const ReviewsPage = () => {
             id: 3,
             name: "Emily Rodriguez",
             rating: 5,
-            comment: "I was amazed by the attention to detail in both the artbooks and framed mosaics. The packaging was secure and the products arrived in perfect condition. Highly recommend!",
+            comment: "I was amazed by the attention to detail in both the artbooks. The packaging was secure and the products arrived in perfect condition. Highly recommend!",
             image: "http://static.photos/people/80x80/3"
         }
     ];

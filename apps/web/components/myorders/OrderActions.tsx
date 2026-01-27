@@ -4,7 +4,7 @@ export default function OrderActions({
   status,
   trackingUrl
 }: {
-  orderId: string;
+  orderId?: string;
   orderNumber: string;
   status: string;
   trackingUrl?: string;

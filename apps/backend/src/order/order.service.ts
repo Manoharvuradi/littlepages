@@ -11,4 +11,11 @@ export class OrderService {
             data: orderData,
         });
     }
+
+    async fetchAllOrders(userId: number) {
+        return this.prisma.order.findMany({
+            where: { userId: Number(userId) },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
 }

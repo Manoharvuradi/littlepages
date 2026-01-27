@@ -56,7 +56,6 @@ export default function WithSidebar(Component: React.ComponentType) {
     
 
     const handleLogout = async () => {
-      // console.log("Logout clicked");
       const res = await logout();
       if (res) {
         setUserId(null);

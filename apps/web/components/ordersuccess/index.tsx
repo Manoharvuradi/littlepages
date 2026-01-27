@@ -45,16 +45,15 @@ export default function OrderSuccess({ flowData, setFlowData, onBack }: OrderSuc
           <h2 className="text-xl font-semibold text-gray-800 mb-3">
             Payment Details
           </h2>
-
           <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-2">
             <p className="text-gray-700">
-              <span className="font-medium text-gray-900">Status:</span> Paid
+              <span className="font-medium text-gray-900">Status:</span> {flowData?.payment?.status}
             </p>
             <p className="text-gray-700">
               <span className="font-medium text-gray-900">Amount:</span> ₹{flowData?.total}
             </p>
             <p className="text-gray-700">
-              <span className="font-medium text-gray-900">Payment ID:</span> {flowData?.paymentId}
+              <span className="font-medium text-gray-900">Payment ID:</span> {flowData?.payment.paymentId}
             </p>
           </div>
         </div>
@@ -66,16 +65,16 @@ export default function OrderSuccess({ flowData, setFlowData, onBack }: OrderSuc
           </h2>
 
           <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-gray-700 leading-relaxed">
-            <p className="font-medium text-gray-900">{flowData?.shippingAddress?.name}</p>
-            <p>{flowData?.shippingAddress?.street}</p>
-            {flowData?.shippingAddress?.apartment && <p>{flowData?.shippingAddress?.apartment}</p>}
+            <p className="font-medium text-gray-900">{flowData?.address?.name}</p>
+            <p>{flowData?.address?.street}</p>
+            {flowData?.address?.apartment && <p>{flowData?.address?.apartment}</p>}
             <p>
-              {flowData?.shippingAddress?.city}, {flowData?.shippingAddress?.state}{" "}
-              {flowData?.shippingAddress?.zip}
+              {flowData?.address?.city}, {flowData?.address?.state}{" "}
+              {flowData?.address?.zip}
             </p>
-            <p>{flowData?.shippingAddress?.country}</p>
-            {flowData?.shippingAddress?.phone && (
-              <p className="mt-1">Phone: {flowData?.shippingAddress?.phone}</p>
+            <p>{flowData?.address?.country}</p>
+            {flowData?.address?.phone && (
+              <p className="mt-1">Phone: {flowData?.address?.phone}</p>
             )}
           </div>
         </div>
@@ -86,11 +85,12 @@ export default function OrderSuccess({ flowData, setFlowData, onBack }: OrderSuc
             Estimated Delivery
           </h2>
           <p className="text-gray-900 font-medium">
-            {new Date(flowData?.estimatedDelivery).toLocaleDateString("en-IN", {
+            {/* {new Date(flowData?.estimatedDelivery).toLocaleDateString("en-IN", {
               day: "numeric",
               month: "long",
               year: "numeric",
-            })}
+            })} */}
+            7 Workding days from now
           </p>
         </div>
 
