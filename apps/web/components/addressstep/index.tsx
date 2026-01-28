@@ -13,6 +13,7 @@ interface AddressStepProps {
 export interface IFormAddress {
   country: string;
   name: string;
+  phone: string;
   street: string;
   apartment: string;
   city: string;
@@ -34,6 +35,7 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
   const [form, setForm] = useState<IFormAddress>({
     country: 'India',
     name: '',
+    phone: '',
     street: '',
     apartment: '',
     city: '',
@@ -57,6 +59,7 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
     if (!form.city.trim()) newErrors.city = 'City/Town is required';
     if (!form.state.trim()) newErrors.state = 'State/Province/Region is required';
     if (!form.zip.trim()) newErrors.zip = 'ZIP/Postal code is required';
+    if (!form.phone.trim()) newErrors.phone = 'Phone number is required';
     return newErrors;
   };
 
@@ -117,23 +120,25 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
               <p className="text-xs text-red-500 mt-1">{errors.name}</p>
             )}
           </div>
+        </div>
 
-          {/* <div>
-            <label className="text-sm font-medium text-gray-700">Last Name</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700">Phone</label>
             <input
-              name="lastName"
-              value={form.lastName}
+              name="phone"
+              value={form.phone}
               onChange={handleChange}
-              placeholder="Enter last name"
+              placeholder="Enter phone number"
               className={`${inputBaseClasses} ${
-                errors.lastName ? 'border-red-500' : 'border-gray-300'
+                errors.phone ? 'border-red-500' : 'border-gray-300'
               }`}
-              aria-invalid={errors.lastName ? true : false}
+              aria-invalid={errors.phone ? true : false}
             />
-            {errors.lastName && (
-              <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
+            {errors.phone && (
+              <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
             )}
-          </div> */}
+          </div>
         </div>
 
         <h3 className="text-lg font-semibold text-gray-700 mt-6">Address Details</h3>

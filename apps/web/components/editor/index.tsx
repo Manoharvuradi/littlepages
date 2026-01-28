@@ -275,7 +275,7 @@ const BookEditor = () => {
     className="w-full fixed top-0 left-0 z-50 bg-white shadow px-6 py-2 flex items-center justify-between"
   >
     <div>
-      <span className='font-semibold text-gray-600'>&lt; My Books </span> / <span className="text-xs font-semibold text-gray-400">{data.bookTitle || "Untitled"}</span>
+      <span className='font-semibold text-gray-600 cursor-pointer' onClick={() => router.push(`/books`)}>&lt; </span><span className="text-sm font-semibold text-gray-500">My Books</span> / <span className="text-xs font-semibold text-gray-400">{data.bookTitle || "Untitled"}</span>
     </div>
 
     <span className="hidden lg:block text-sm font-semibold text-gray-600">
@@ -524,6 +524,9 @@ const BookEditor = () => {
             refetch={refetch}
             coverPhotoUrl={coverPhoto ?? ""}
             setCoverPage={setCoverPage}
+            showCaption={data.displaySettings?.showCaption}
+            showName={data.displaySettings?.showName}
+            showAge={data.displaySettings?.showAge}
           />
         </div>
       </div>

@@ -16,10 +16,13 @@ interface Props  {
   setBookImageId: React.Dispatch<React.SetStateAction<number | null>>;
   refetch: () => Promise<Page[]>;
   coverPhotoUrl: string;
-  setCoverPage: any
+  setCoverPage: any;
+  showCaption?: boolean;
+  showName?: boolean;
+  showAge?: boolean;
 };
 
-export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId, setBookImageId, refetch, coverPhotoUrl, setCoverPage }: Props) {
+export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bookId, setBookImageId, refetch, coverPhotoUrl, setCoverPage, showCaption, showName, showAge }: Props) {
   const [hoveredContainer, setHoveredContainer] = useState<number | null>(null);
   const [hoveredGap, setHoveredGap] = useState<number | null>(null);
   const [position, setPosition] = useState<{ containerIndex: number | null; insertPosition: number | null }>({
@@ -252,9 +255,9 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
                             Empty
                           </div>
                         )}
-                        <div className={`text-center text-gray-500 text-[3px] ${isExpanded ? 'pt-2' : ''} cursor-pointer`}>
+                        {showCaption &&<div className={`text-center text-gray-500 text-[3px] ${isExpanded ? 'pt-2' : ''} cursor-pointer`}>
                             {page?.caption || "ADD IMAGE TITLE"}
-                          </div>
+                          </div>}
                       </div>
                     );
                   })}

@@ -104,7 +104,7 @@ export default function OrderSuccess({ flowData, setFlowData, onBack }: OrderSuc
           </button>
 
           <button
-            onClick={() => (window.location.href = "/book/create")}
+            onClick={() => (window.location.href = "/books")}
             className="w-full py-3 bg-gray-200 text-gray-800 font-semibold rounded-xl hover:bg-gray-300 transition"
           >
             Create Another Book
