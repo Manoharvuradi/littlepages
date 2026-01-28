@@ -56,7 +56,12 @@ const ReplaceImageModal = ({ setReplaceImageModalOpen, onReplaceImage, bookImage
         const file = e.dataTransfer.files?.[0];
         if (!file) return;
 
-        await onReplaceImage(file);
+        if(coverPage){
+          await onReplaceImage(file);
+          return;
+        }
+        await uploadFilesToSupabase(file);
+        // await onReplaceImage(file);
     };
 
   // 🧠 Function to trigger hidden input

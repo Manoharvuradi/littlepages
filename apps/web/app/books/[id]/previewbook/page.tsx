@@ -29,6 +29,11 @@ interface BookData {
   bookTitle?: string;
   coverPhotoUrl: string;
   bookImages?: Book[];
+  displaySettings?: {
+    showCaption?: boolean;
+    showName?: boolean;
+    showAge?: boolean;
+  };
 }
 
 const PreviewBook = () => {
@@ -44,6 +49,11 @@ const PreviewBook = () => {
   const [textAlign] = useState<string>("center");
   const [bookLength, setBookLength] = useState<number>(0);
     const { setCoverPagePicture } = useSelectedImages();
+    const [displaySettings, setDisplaySettings] = useState<{
+      showCaption?: boolean;
+      showName?: boolean;
+      showAge?: boolean;
+    }>();
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -53,6 +63,7 @@ const PreviewBook = () => {
         const user = await getCurrentUser();
         const data: BookData = await getBook(Number(params.id), user?.sub);
 
+        setDisplaySettings(data?.displaySettings!);
         // Fetch cover photo URL
         const url = await showCoverPhoto(data.coverPhotoUrl);
         setCoverPhoto(url?.url);
@@ -396,7 +407,7 @@ const bookDimensions =
     className="w-full fixed top-0 left-0 z-50 bg-white shadow px-6 py-2 flex items-center justify-between"
   >
     <div>
-      <span className='font-semibold text-gray-600'>&lt; My Books </span> / <span className="text-xs font-semibold text-gray-400">{bookTitle || "Untitled"}</span>
+      <span className='font-semibold text-gray-600 cursor-pointer' onClick={() => router.push(`/books/${bookId}/bookeditor`)}>&lt; </span><span className="text-sm font-semibold text-gray-500">My Books</span> / <span className="text-xs font-semibold text-gray-400">{bookTitle || "Untitled"}</span>
     </div>
 
     <span className="hidden lg:block text-sm font-semibold text-gray-600">
@@ -540,12 +551,12 @@ const bookDimensions =
                           </div>
                           {frontImg?.url !== "/images/finalpage.png" && frontImg?.url !== "/images/endcover.png" && (
                             <div className="text-container">
-                              <span className="lg:text-[10px] text-[5px] font-semibold">
+                              {displaySettings?.showCaption && <span className="lg:text-[10px] text-[5px] font-semibold">
                                 {frontImg?.caption || "ADD IMAGE TITLE"}
-                              </span>
-                              <span className="lg:text-[10px] text-[5px] text-gray-600">
+                              </span>}
+                              {displaySettings?.showName && <span className="lg:text-[10px] text-[5px] text-gray-600">
                                 {frontImg?.name || "ADD NAME"} <span className='lg:text-[10px] text-[5px] text-gray-600'>{frontImg?.age}</span>
-                              </span>
+                              </span>}
                             </div>
                           )}
                         </div>
@@ -560,12 +571,12 @@ const bookDimensions =
                           </div>
                           {backImg?.url !== "/images/finalpage.png" && backImg?.url !== "/images/endcover.png" && (
                             <div className="text-container">
-                              <span className="lg:text-[10px] text-[5px] font-semibold">
+                              {displaySettings?.showCaption && <span className="lg:text-[10px] text-[5px] font-semibold">
                                 {backImg?.caption || "ADD IMAGE TITLE"}
-                              </span>
-                              <span className="lg:text-[10px] text-[5px] text-gray-600">
-                                {backImg?.name || "ADD NAME"} <span className='lg:text-[10px] text-[5px] text-gray-600'>{backImg?.age}</span>
-                              </span>
+                              </span>}
+                                {displaySettings?.showName && <span className="lg:text-[10px] text-[5px] text-gray-600">
+                                  {backImg?.name || "ADD NAME"} <span className='lg:text-[10px] text-[5px] text-gray-600'>{backImg?.age}</span>
+                                </span>}
                             </div>
                           )}
                         </div>
