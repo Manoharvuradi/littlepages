@@ -29,102 +29,100 @@ export class PaymentService {
     return this.razorpay;
   }
 
-  async createOrder(userId: number, amount: number) {
-    const order = await this.razorpay.orders.create({
-      amount: amount * 100,
-      currency: 'INR',
-    });
+async createOrder(userId: number, amount: number) {
+  // Only create Razorpay order, NOT database order
+  const order = await this.razorpay.orders.create({
+    amount: amount * 100,
+    currency: 'INR',
+  });
 
-    // console.log('Creating order in DB for user:', order);
+  // Store temporary payment record with Razorpay order ID
+  await this.prisma.payment.create({
+    data: {
+      razorpayOrderId: order.id,
+      amount,
+      currency: "INR",
+      status: "PENDING",
+      user: { connect: { id: userId } },
+      // No order connection yet - will connect after payment success
+    },
+  });
 
-    const shippingAddressId = await this.prisma.address.findFirst({
-      where: { userId },
-      select: { id: true },
-    }).then(addr => addr?.id || 1);
+  return order;
+}
 
-    // console.log('Shipping Address ID:', shippingAddressId);
+async verifyPayment(userId: number, body: any) {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body.response;
+  const { amount } = body;
 
-    const billingAddressId = await this.prisma.address.findFirst({
-      where: { userId },
-      select: { id: true },
-    }).then(addr => addr?.id || 1);
+  const sign = razorpay_order_id + '|' + razorpay_payment_id;
+  const expectedSign = crypto
+    .createHmac('sha256', process.env.RAZORPAY_TEST_SECRET_KEY!)
+    .update(sign)
+    .digest('hex');
 
-    // console.log('Billing Address ID:', billingAddressId);
+  if (expectedSign !== razorpay_signature) {
+    throw new BadRequestException('Invalid payment signature');
+  }else{
 
-    const dbOrder = await this.prisma.order.create({
-      data: {
-        userId,
-        email: '',
-        subtotal: amount,
-        total: amount,
-        shipping: 0,
-        tax: 0,
-        shippingAddressId: shippingAddressId.toString(),
-        billingAddressId: billingAddressId.toString(),
-        orderNumber: `ORD-${Date.now()}`,
-        status: 'PENDING',
-        shippingMethod: "Standard",
-        estimatedDelivery: new Date(),
-      },
-    });
+  // Payment verified successfully - NOW create the order
+  const shippingAddressId = await this.prisma.address.findFirst({
+    where: { userId },
+    select: { id: true },
+  }).then(addr => addr?.id);
 
-    // console.log('Order created in DB:', dbOrder);
+  const billingAddressId = await this.prisma.address.findFirst({
+    where: { userId },
+    select: { id: true },
+  }).then(addr => addr?.id);
 
-    await this.prisma.payment.create({
-        data: {
-        razorpayOrderId: order.id,
-        amount,
-        currency: "INR",
-        status: "PENDING",
-
-        user: { connect: { id: userId } },
-        order: { connect: { id: dbOrder.id } },
-      },
-    });
-
-    // await this.prisma.payment.create({
-    //   data: {
-    //     userId,
-    //     orderId: order.id,
-    //     razorpayOrderId: order.id,
-    //     amount,
-    //     currency: 'INR',
-    //     status: 'PENDING',
-    //     user: { connect: { id: userId } },
-    //     order: { connect: { id: order.id } },
-    //   },
-    // });
-    console.log('Razorpay order created:', order);
-    return order;
+  if (!shippingAddressId || !billingAddressId) {
+    throw new BadRequestException('Shipping or billing address not found');
   }
 
-  async verifyPayment(body: any) {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+  // Get user email
+  const user = await this.prisma.users.findUnique({
+    where: { id: userId },
+    select: { email: true },
+  });
 
-    const sign = razorpay_order_id + '|' + razorpay_payment_id;
-    const expectedSign = crypto
-      .createHmac('sha256', process.env.RAZORPAY_TEST_SECRET_KEY!)
-      .update(sign)
-      .digest('hex');
+  // Create order in database AFTER payment success
+  const dbOrder = await this.prisma.order.create({
+    data: {
+      userId,
+      email: user?.email || '',
+      subtotal: amount,
+      total: amount,
+      shipping: 0,
+      tax: 0,
+      shippingAddressId: shippingAddressId.toString(),
+      billingAddressId: billingAddressId.toString(),
+      orderNumber: `ORD-${Date.now()}`,
+      status: 'CONFIRMED', // Set as CONFIRMED since payment is successful
+      shippingMethod: "Standard",
+      estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+    },
+  });
 
-    if (expectedSign !== razorpay_signature) {
-      throw new BadRequestException('Invalid payment signature');
-    }else{
-      await this.prisma.payment.update({
-        where: { razorpayOrderId: razorpay_order_id },
-        data: {
-          razorpayPaymentId: razorpay_payment_id,
-          razorpaySignature: razorpay_signature,
-          status: 'SUCCESS',
-        },
-      });
-      return { status: 'success', paymentId: razorpay_payment_id, orderId: razorpay_order_id };
-    }
+  // Update payment record with order connection and success status
+  await this.prisma.payment.update({
+    where: { razorpayOrderId: razorpay_order_id },
+    data: {
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
+      status: 'SUCCESS',
+      order: { connect: { id: dbOrder.id } },
+    },
+  });
 
-    
-
-    // return { status: 'success' };
+  return { 
+    status: 'success', 
+    paymentId: razorpay_payment_id, 
+    orderId: dbOrder.id,
+    orderNumber: dbOrder.orderNumber 
+  };
   }
+}
 
   async handleWebhook(req: any, signature: string) {
     const expected = crypto

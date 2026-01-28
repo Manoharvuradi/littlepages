@@ -175,7 +175,7 @@ model Address {
 model Payment {
   id                String   @id @default(cuid())
   userId            Int
-  orderId           String
+  orderId           String?
   razorpayOrderId   String    @unique
   razorpayPaymentId String?
   razorpaySignature String?
@@ -188,7 +188,7 @@ model Payment {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  order   Order  @relation(fields: [orderId], references: [id])
+  order   Order?  @relation(fields: [orderId], references: [id])
   user    Users  @relation(fields: [userId], references: [id])
 
   @@index([orderId])

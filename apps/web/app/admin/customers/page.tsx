@@ -27,7 +27,6 @@ const loadCustomers = async () => {
   }
 };
 
-  console.log('Rendering CustomersPage with customers:', customers);
 
   return (
     <div className="min-h-screen bg-gray-50">

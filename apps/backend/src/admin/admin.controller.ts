@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, Patch, Query, Res, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { OrderStatus } from '@prisma/client';
 
@@ -39,11 +39,36 @@ export class AdminController {
   async updateOrderStatus(@Param('id') id: string, @Body() data) { }
   
   @Get('orders/export')
-  async exportOrders(@Query() query) { }
+  @Header('Content-Type', 'text/csv')
+  @Header(
+    'Content-Disposition',
+    `attachment; filename="orders-${Date.now()}.csv"`
+  )
+async exportOrders(
+  @Query('status') status?: OrderStatus,
+  @Query('fromDate') fromDate?: string,
+  @Query('toDate') toDate?: string,
+) {
+  return this.adminService.exportOrders({
+    status,
+    fromDate,
+    toDate,
+  });
+}
 
   // Customers
-  @Get('customers')
-  async getCustomers(@Query() query) { }
+    @Get('customers')
+  async getAllCustomers(
+    @Query('search') search?: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+  ) {
+    return this.adminService.getAllCustomers({
+      search,
+      page: Number(page),
+      limit: Number(limit),
+    });
+  }
   
   @Get('customers/:id')
   async getCustomer(@Param('id') id: number) { }

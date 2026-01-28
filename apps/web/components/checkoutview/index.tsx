@@ -26,7 +26,6 @@ export default function CheckoutPage() {
 
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => Math.max(prev - 1, 0));
-  console.log("step:", step);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
