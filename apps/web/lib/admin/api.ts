@@ -69,7 +69,7 @@ export async function fetchCustomers(params?: {
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.limit) queryParams.append('limit', params.limit.toString());
 
-  const res = await fetch(`${API_URL}/auth/admin/customers?${queryParams}`, {
+  const res = await fetch(`${API_URL}/admin/customers?${queryParams}`, {
     credentials: 'include',
   });
   

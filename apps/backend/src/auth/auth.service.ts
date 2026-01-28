@@ -116,59 +116,5 @@ async login(email: string, pass: string) {
   }
 
 
-async getAllCustomers(params: {
-  search?: string;
-  page: number;
-  limit: number;
-}) {
-  const { search, page, limit } = params;
-  const skip = (page - 1) * limit;
 
-  const where: any = {
-    role: 'USER',
-  };
-
-  if (search) {
-    where.OR = [
-      { email: { contains: search, mode: 'insensitive' } },
-      { name: { contains: search, mode: 'insensitive' } },
-    ];
-  }
-
-  const [users, total] = await Promise.all([
-    this.prisma.users.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        orders: {
-          select: {
-            total: true,
-          },
-        },
-      },
-    }),
-    this.prisma.users.count({ where }),
-  ]);
-
-  const customers = users.map((user) => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    totalOrders: user.orders.length,
-    totalSpent: user.orders.reduce((sum, o) => sum + o.total, 0),
-    createdAt: user.createdAt,
-  }));
-
-  return {
-    data: customers,
-    meta: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  };
-}
 }

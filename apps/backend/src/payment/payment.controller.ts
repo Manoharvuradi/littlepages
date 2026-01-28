@@ -16,8 +16,8 @@ export class PaymentController {
   }
 
   @Post('verify')
-  async verify(@Body() body: any) {
-    return this.paymentService.verifyPayment(body);
+  async verify(@Req() req,@Body() body: any) {
+    return this.paymentService.verifyPayment(req.user.sub, body);
   }
 
   @Post('webhook')

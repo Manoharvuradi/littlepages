@@ -43,8 +43,8 @@ async login(
   
   res.cookie('jwt', access_token, cookieOptions);
   
-  console.log("Cookie set with options:", cookieOptions);
-  console.log("Response headers:", res.getHeaders());
+  // console.log("Cookie set with options:", cookieOptions);
+  // console.log("Response headers:", res.getHeaders());
   
   return {
     user,
@@ -93,18 +93,5 @@ async logout(@Res({ passthrough: true }) res: Response) {
   @Get('customers/:id')
   async getCustomer(@Param('id') id: number) {
     return this.authService.findCustomerById(id);
-  }
-
-    @Get('admin/customers')
-  async getAllCustomers(
-    @Query('search') search?: string,
-    @Query('page') page = '1',
-    @Query('limit') limit = '10',
-  ) {
-    return this.authService.getAllCustomers({
-      search,
-      page: Number(page),
-      limit: Number(limit),
-    });
   }
 }
