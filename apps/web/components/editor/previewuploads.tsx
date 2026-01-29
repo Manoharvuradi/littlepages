@@ -172,7 +172,7 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
           <input
             type="file"
             accept="image/*"
-            multiple
+            multiple={false}
             ref={fileInputRef}
             onChange={handleFileChange}
             className="hidden"

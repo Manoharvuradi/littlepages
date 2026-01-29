@@ -216,6 +216,7 @@ const PhotosPage = () => {
 
           <UserUploads 
             previewUrls={previewUrls}
+            fetchImages={fetchImages}
           />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -8,17 +8,27 @@ import { ageInput, captionInput, dateInput, nameInput, PreviewItem } from "../..
 import Image from "next/image";
 import InputField from "../../common/form/input";
 import Button from "../../common/buttons/filledbuttons";
-import { updateImageFormData } from "../../server/images";
+import { deleteImage, updateImageFormData } from "../../server/images";
 import { ImageUpdateInput } from "@repo/types";
 import SecondaryButton from "../../common/buttons/secondarybutton";
 import { useSelectedImages } from "../../context";
 import styles from "./useruploads.module.scss";
 import UploadModal from "../editor/previewuploads";
 
+export interface FormItem {
+  id: string;
+  name: string;
+  caption: string;
+  age: string;
+  date: string;
+}
+
 const UserUploads = ({ 
     previewUrls, 
+    fetchImages
 }: { 
     previewUrls: PreviewItem[], 
+    fetchImages: () => Promise<void>
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
@@ -30,19 +40,74 @@ const UserUploads = ({
     loading: false,
     error: false
   });
-  const [formData, setFormData] = useState({ 
-    name: "",
-    caption: "",
-    date: "",
-    age: "",
-  });
+  const [formData, setFormData] = useState<FormItem[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(startIndex);
+
+useEffect(() => {
+  setFormData(
+    previewUrls.map((url) => ({
+      id: url.id,                 // ✅ REQUIRED
+      name: url.name ?? "",
+      caption: url.caption ?? "",
+      age: url.age ?? "",
+      date: url.date ?? "",
+    }))
+  );
+}, [previewUrls]);
+
 
   const {selected, setSelected} = useSelectedImages();
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+const handleChange = (e: any) => {
+  const { name, value } = e.target;
+  setFormData((prev) => {
+    const updated = [...prev];
+    const currentItem = updated[selectedIndex];
+    
+    // Guard against undefined
+    if (currentItem) {
+      updated[selectedIndex] = {
+        ...currentItem,
+        [name]: value
+      };
+    }
+    
+    return updated;
+  });
+};
+
+    const onDownload = async (image: string) => {
+    try {
+      const imageUrl = image;
+      if (!imageUrl) {
+        console.warn("No image URL to download");
+        return;
+      }
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error("Failed to fetch image for download");
+      }
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      // Try to extract a filename from URL or fallback
+      const urlParts = imageUrl.split("/");
+      let filename =
+        urlParts[urlParts.length - 1] ||
+        `image-${Date.now()}.jpg`;
+      if (!filename.includes(".")) filename += ".jpg";
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+      }, 1000);
+    } catch (err) {
+      console.error("Error downloading image:", err);
+    }
+  }
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,16 +115,19 @@ const UserUploads = ({
       ...prev, 
       loading: true
     }));
+    const currentForm = formData[selectedIndex];
+    const currentImage = previewUrls[selectedIndex];
+
+    if (!currentImage || !currentForm) return;
+
     const req: ImageUpdateInput = {
-      id: imageId as string,
-      // url: formData.url,
-      // filename: formData.filename,
-      displayOptions :{
-        name: formData.name,
-        age: formData.age,
-        caption: formData.caption,
-        date: new Date(formData.date as string),
-      }
+      id: currentImage.id,
+      displayOptions: {
+        name: currentForm.name,
+        age: currentForm.age,
+        caption: currentForm.caption,
+        date: currentForm.date ? new Date(currentForm.date) : undefined,
+      },
     };
     // Here you can handle the form submission, e.g., send data to the server
     try{
@@ -94,12 +162,23 @@ const UserUploads = ({
           error: false
         }));
       }, 5000);
+      await fetchImages();
     }
   };
 
   const handleUploadComplete = async() => {
     console.log("Upload complete, refresh images if needed.");
   }
+
+  const handleDeleteImage = async(imageId: string) => {
+    try{
+      await deleteImage(imageId);
+      await fetchImages();
+    }catch(err){
+      console.error("Error deleting image:", err);
+    }
+  };
+
 
   return (
     <>
@@ -195,11 +274,14 @@ const UserUploads = ({
                     navigation 
                     initialSlide={startIndex}
                     className="h-full"
+                    onSlideChange={(swiper) => {
+                      setSelectedIndex(swiper.activeIndex);
+                    }}
                   >
                     {previewUrls.map((img: any, idx: number) => (
                       <SwiperSlide key={idx}>
                         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 flex space-x-4">
-                          <button 
+                          {/* <button 
                             className="p-1 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300"
                             onClick={() => {
                               setImageId(img.id);
@@ -208,20 +290,18 @@ const UserUploads = ({
                             }}
                           >
                             <img src="/svg/replace.svg" alt="Replace" className="w-6 h-6" />
-                          </button>
+                          </button> */}
                           <button 
                             className="p-1 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300"
                             onClick={() => {
-                              console.log('Download image:', img.id);
+                              onDownload(img.url);
                             }}
                           >
                             <img src="/svg/download.svg" alt="Download" className="w-6 h-6" />
                           </button>
                           <button 
                             className="p-1 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300"
-                            onClick={() => {
-                              console.log('Delete image:', img.id);
-                            }}
+                            onClick={() =>handleDeleteImage(img.id)}
                           >
                             <img src="/svg/delete.svg" alt="Delete" className="w-6 h-6" />
                           </button>
@@ -279,20 +359,20 @@ const UserUploads = ({
 
                   <div className={`${styles.drawerContent} p-4 space-y-4 overflow-y-auto h-[calc(100%-80px)]`}>
                     <div>
-                      <InputField
-                        input={nameInput}
-                        handleChange={handleChange}
-                        formValues={{ name: formData?.name }}
-                        value={formData?.name}
-                      />
+                     <InputField
+                      input={nameInput}
+                      handleChange={handleChange}
+                      // value={formData[selectedIndex]?.name || ""}
+                      formValues={{ name: formData[selectedIndex]?.name }}
+                    />
                     </div>
 
                     <div>
                       <InputField
                         input={ageInput}
                         handleChange={handleChange}
-                        formValues={{ age: formData?.age }}
-                        value={formData?.age}
+                        formValues={{ age: formData[selectedIndex]?.age }}
+                        // value={formData?.age}
                       />
                     </div>
 
@@ -300,8 +380,8 @@ const UserUploads = ({
                       <InputField
                         input={captionInput}
                         handleChange={handleChange}
-                        formValues={{ caption: formData?.caption }}
-                        value={formData?.caption}
+                        formValues={{ caption: formData[selectedIndex]?.caption }}
+                        // value={formData?.caption}
                       />
                     </div>
 
@@ -309,8 +389,8 @@ const UserUploads = ({
                       <InputField
                         input={dateInput}
                         handleChange={handleChange}
-                        formValues={{ date: formData?.date }}
-                        value={formData?.date}
+                        formValues={{ date: formData[selectedIndex]?.date }}
+                        // value={formData?.date}
                       />
                     </div>
 

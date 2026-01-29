@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "../../../server/user";
 import { images, users } from "@repo/types";
+import { useAuth } from "../../providers/AuthProvider";
 
 export default function LoginPage() {
   // const [user, setUser] = useState< | null>(null);
@@ -12,24 +13,28 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   // const [showSignup, setShowSignup] = useState(false);
 
-
+// Inside your component
+const { refreshUser } = useAuth();
 
   const router = useRouter();
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
+async function handleLogin(e: React.FormEvent) {
+  e.preventDefault();
+  setLoading(true);
 
-    const { error } = await loginUser(email, password);
-    console.log(error);
+  const { error } = await loginUser(email, password);
+  console.log(error);
 
-    if (error) {
-      alert(error.message);
-    } else {
-      router.push("/photos");
-    }
+  if (error) {
+    alert(error.message);
+    setLoading(false);
+  } else {
+    // Refresh user data to hide Navigation immediately
+    await refreshUser();
+    router.push("/photos");
     setLoading(false);
   }
+}
 
   return (
 <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden py-8">
