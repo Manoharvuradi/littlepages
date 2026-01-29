@@ -18,9 +18,9 @@ export class ImagesController {
         return this.imageService.addImage(this.createImageInput(req.user.sub, body));
     }
 
-    @Delete('delete')
-    async deleteImage(@Req() req, @Body() body: { id: string }) {
-        return this.imageService.deleteImage(body.id);
+    @Delete('delete/:id')
+    async deleteImage( @Param('id') id: string) {
+        return this.imageService.deleteImage(id);
     }
 
     @Put('update/:id')

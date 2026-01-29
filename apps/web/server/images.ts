@@ -62,3 +62,11 @@ export const replaceCoverImage = async (bookId: string, coverPhotoUrl: string | 
     });
     return res.json();
 }
+
+export const deleteImage = async (imageId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/images/delete/${imageId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  return res.json();
+}

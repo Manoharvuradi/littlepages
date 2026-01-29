@@ -14,21 +14,30 @@ const InputField = ({
         key={name}
         className={`flex flex-col mb-4 ${tailwindClass ? tailwindClass : ''}`}
       >
-        <label htmlFor={label} className="mb-2 text-xs font-medium text-gray-700 capitalize">
+        <label htmlFor={label} className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
           {label.replace(/_/g, ' ')} {liveCount && formValues[name] ? `(${formValues[name].length}/${input.liveCountMax})` : ''}
         </label>
         <input
-  id={id || name}
-  name={name}
-  type={type}
-  value={formValues[name] || value || ''}
-  onChange={(e) => {
-    e.target.value = e.target.value.trimStart();
-    handleChange(e);
-  }}
-  maxLength={liveCount ? liveCountMax : undefined}
-  className='shadow border border-gray-300 rounded-lg px-1.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 transition'
-/>
+          id={id || name}
+          name={name}
+          type={type}
+          value={formValues[name] || value || ''}
+          onChange={(e) => {
+            // Create a new event with trimmed value
+            const trimmedValue = e.target.value.trimStart();
+            const modifiedEvent = {
+              ...e,
+              target: {
+                ...e.target,
+                name: e.target.name,
+                value: trimmedValue,
+              },
+            };
+            handleChange(modifiedEvent as React.ChangeEvent<HTMLInputElement>);
+          }}
+          maxLength={liveCount ? liveCountMax : undefined}
+          className='w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium'
+        />
     </div>
   )
 }

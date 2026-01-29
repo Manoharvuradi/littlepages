@@ -28,7 +28,13 @@ export class ImagesService {
     }
 
     async deleteImage(id: string) {
-        return this.prisma.images.delete({ where: { id } });
+        await this.prisma.bookImage.deleteMany({
+            where: { imageId: id },
+        });
+
+        return this.prisma.images.delete({
+            where: { id },
+        });
     }
 
     async updateImage(id: string, imageInput: Partial<ImageUpdateInput>) {

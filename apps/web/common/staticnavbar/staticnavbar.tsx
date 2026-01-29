@@ -82,26 +82,27 @@ const StaticNavbar: React.FC<StaticNavbarProps> = ({
 
       {/* Right Section */}
       {hasSelection ? (
-        <div className={`${styles.rightSection} flex items-center space-x-3`}>
-          <button
-            onClick={onEdit}
-            className={`${styles.actionButton} ${styles.edit} px-3 py-1.5 rounded-md bg-white text-[rgb(16,35,113)] font-semibold hover:bg-gray-100 transition`}
-          >
-            <span>Edit</span>
-          </button>
-          <button
-            onClick={onDownload}
-            className={`${styles.actionButton} ${styles.download} px-3 py-1.5 rounded-md bg-white text-[rgb(16,35,113)] font-semibold hover:bg-gray-100 transition`}
-          >
-            <span>Download</span>
-          </button>
-          <button
-            onClick={onDelete}
-            className={`${styles.actionButton} ${styles.delete} px-3 py-1.5 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition`}
-          >
-            <span>Delete</span>
-          </button>
-        </div>
+        // <div className={`${styles.rightSection} flex items-center space-x-3`}>
+        //   <button
+        //     onClick={onEdit}
+        //     className={`${styles.actionButton} ${styles.edit} px-3 py-1.5 rounded-md bg-white text-[rgb(16,35,113)] font-semibold hover:bg-gray-100 transition`}
+        //   >
+        //     <span>Edit</span>
+        //   </button>
+        //   <button
+        //     onClick={onDownload}
+        //     className={`${styles.actionButton} ${styles.download} px-3 py-1.5 rounded-md bg-white text-[rgb(16,35,113)] font-semibold hover:bg-gray-100 transition`}
+        //   >
+        //     <span>Download</span>
+        //   </button>
+        //   <button
+        //     onClick={onDelete}
+        //     className={`${styles.actionButton} ${styles.delete} px-3 py-1.5 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition`}
+        //   >
+        //     <span>Delete</span>
+        //   </button>
+        // </div>
+        <></>
       ) : (
         <button
           onClick={onClickMenu}

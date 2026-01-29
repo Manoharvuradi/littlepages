@@ -44,6 +44,7 @@ export type PreviewItem = {
   name?: string;
   caption?: string;
   age?: string;
+  date?: string;
 };
 
 export interface IInputProps {
