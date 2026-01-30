@@ -1,6 +1,8 @@
 "use client";
 import Script from "next/script";
 import { useState } from "react";
+import OrderFailure from "../../checkoutview/orderfailure";
+import { on } from "events";
 
 export default function PayButton({ 
   amount, 
@@ -64,7 +66,6 @@ export default function PayButton({
             }
 
             const result = await verifyRes.json();
-            
             if (result.status === 'success') {
               // Payment successful - order created in DB
               setFlowData((prev: any) => ({ 
@@ -75,6 +76,13 @@ export default function PayButton({
               }));
               onNext(); // Move to next step
             } else {
+              setFlowData((prev: any) => ({ 
+                ...prev, 
+                payment: result,
+                orderId: result.orderId,
+                orderNumber: result.orderNumber
+              }));
+              onNext(); // Move to next step
               throw new Error('Payment verification failed');
             }
           } catch (err: any) {
@@ -98,11 +106,16 @@ export default function PayButton({
 
       const razor = new (window as any).Razorpay(options);
       razor.on('payment.failed', function (response: any) {
-        console.error('Payment failed:', response.error);
+        setFlowData((prev: any) => ({
+          ...prev, 
+          payment: response,
+          orderId: null,
+          orderNumber: null
+        }))
         setError('Payment failed. Please try again.');
+        onNext(); // Move to next step
         setLoading(false);
       });
-      
       razor.open();
     } catch (err: any) {
       console.error('Payment error:', err);
@@ -120,6 +133,7 @@ export default function PayButton({
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700 text-sm">{error}</p>
         </div>
+        // <OrderFailure errorDetails={error} onRetry={payNow} onSupport={() => {}} />
       )}
       <button 
         onClick={payNow}

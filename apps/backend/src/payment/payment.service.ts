@@ -45,7 +45,6 @@ export class PaymentService {
         currency: 'INR',
       });
 
-      console.log('Razorpay order created:', order);
     
       // Store temporary payment record with Razorpay order ID
       await this.prisma.payment.create({
