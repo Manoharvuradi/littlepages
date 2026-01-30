@@ -12,7 +12,13 @@ export class PaymentController {
     @Req() req,
     @Body() body: { amount: number }
   ) {
-    return this.paymentService.createOrder(req.user.sub, body.amount);
+    try{
+      console.log("Create order called with body:", body, "and user:", req.user);
+      return this.paymentService.createOrder(req.user.sub, body.amount);
+    }catch(e){
+      console.log("Error in createOrder:", e);
+      console.log(e);
+    }
   }
 
   @Post('verify')
