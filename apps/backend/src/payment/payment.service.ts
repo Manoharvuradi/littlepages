@@ -31,24 +31,32 @@ export class PaymentService {
 
 async createOrder(userId: number, amount: number) {
   // Only create Razorpay order, NOT database order
-  const order = await this.razorpay.orders.create({
-    amount: amount * 100,
-    currency: 'INR',
-  });
+  try{
 
-  // Store temporary payment record with Razorpay order ID
-  await this.prisma.payment.create({
-    data: {
-      razorpayOrderId: order.id,
-      amount,
-      currency: "INR",
-      status: "PENDING",
-      user: { connect: { id: userId } },
-      // No order connection yet - will connect after payment success
-    },
-  });
+    const order = await this.razorpay.orders.create({
+      amount: amount * 100,
+      currency: 'INR',
+    });
 
-  return order;
+    console.log('Razorpay order created:', order);
+  
+    // Store temporary payment record with Razorpay order ID
+    await this.prisma.payment.create({
+      data: {
+        razorpayOrderId: order.id,
+        amount,
+        currency: "INR",
+        status: "PENDING",
+        user: { connect: { id: userId } },
+        // No order connection yet - will connect after payment success
+      },
+    });
+  
+    return order;
+  }catch(error){
+    console.error('Error creating Razorpay order:', error);
+    throw error;
+  }
 }
 
 async verifyPayment(userId: number, body: any) {
