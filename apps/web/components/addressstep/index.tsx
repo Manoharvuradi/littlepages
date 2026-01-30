@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createAddress } from '../../server/address';
 import { getCurrentUser } from '../../server/user';
 
@@ -47,6 +47,21 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
   const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (flowData) {
+      setForm(prev => ({ ...prev, 
+        name: flowData.name || '',
+        phone: flowData.phone || '',
+        street: flowData.street || '',
+        apartment: flowData.apartment || '',
+        city: flowData.city || '',
+        state: flowData.state || '',
+        zip: flowData.zip || '',
+       }));
+    }
+  }, [flowData]);
+
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -68,7 +83,11 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
     setIsSubmitting(true);
     const newErrors = validate();
     setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
+    if(flowData != null && flowData != undefined){
+      setFlowData((prev: any) => ({ ...prev, address: form }));
+      onNext();
+    }
+    else if (Object.keys(newErrors).length === 0) {
       const user = await getCurrentUser();
       const response = await createAddress({ ...form, user });
       if(response && response.id){
@@ -76,11 +95,11 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
         onNext();
       }else{
         alert('Failed to create address. Please try again.');
-        // setIsSubmitting(false);
+        setIsSubmitting(false);
         return;
       }
     }
-    // setIsSubmitting(false);
+    setIsSubmitting(false);
   };
 
   return (
@@ -88,31 +107,29 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">Shipping Address</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Country */}
         <div>
-          <label className="text-sm font-medium text-gray-700">Country</label>
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Country</label>
           <input
             name="country"
             value={form.country}
             readOnly
-            className={`${inputBaseClasses} bg-gray-100 text-gray-600 border border-gray-300`}
+            className={`${inputBaseClasses} w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium`}
             aria-invalid={false}
           />
         </div>
 
         <h3 className="text-lg font-semibold text-gray-700 mt-6">Your Name</h3>
 
-        {/* Name Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Full Name</label>
             <input
               name="name"
               value={form.name}
               onChange={handleChange}
               placeholder="Enter full name"
               className={`${inputBaseClasses} ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
+                errors.name ? 'border-red-500' : 'w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium'
               }`}
               aria-invalid={errors.name ? true : false}
             />
@@ -124,14 +141,14 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">Phone</label>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Phone</label>
             <input
               name="phone"
               value={form.phone}
               onChange={handleChange}
               placeholder="Enter phone number"
               className={`${inputBaseClasses} ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
+                errors.phone ? 'border-red-500' : 'w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium'
               }`}
               aria-invalid={errors.phone ? true : false}
             />
@@ -143,16 +160,15 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
 
         <h3 className="text-lg font-semibold text-gray-700 mt-6">Address Details</h3>
 
-        {/* Address */}
         <div>
-          <label className="text-sm font-medium text-gray-700">Street Address</label>
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Street Address</label>
           <input
             name="street"
             value={form.street}
             onChange={handleChange}
             placeholder="1234 Main St"
             className={`${inputBaseClasses} ${
-              errors.street ? 'border-red-500' : 'border-gray-300'
+              errors.street ? 'border-red-500' : 'w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium'
             }`}
             aria-invalid={errors.street ? true : false}
           />
@@ -162,7 +178,7 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
             Apartment, Suite, Locality (optional)
           </label>
           <input
@@ -170,22 +186,21 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
             value={form.apartment}
             onChange={handleChange}
             placeholder="Apt, Suite, etc."
-            className={`${inputBaseClasses} border-gray-300`}
+            className={`${inputBaseClasses} w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium`}
             aria-invalid={false}
           />
         </div>
 
-        {/* City, State, ZIP */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-700">City/Town</label>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">City/Town</label>
             <input
               name="city"
               value={form.city}
               onChange={handleChange}
               placeholder="City"
               className={`${inputBaseClasses} ${
-                errors.city ? 'border-red-500' : 'border-gray-300'
+                errors.city ? 'border-red-500' : 'w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium'
               }`}
               aria-invalid={errors.city ? true : false}
             />
@@ -195,13 +210,13 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700">State/Province/Region</label>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">State/Province/Region</label>
             <select
               name="state"
               value={form.state}
               onChange={handleChange}
               className={`${inputBaseClasses} bg-white ${
-                errors.state ? 'border-red-500' : 'border-gray-300'
+                errors.state ? 'border-red-500' : 'w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium'
               }`}
               aria-invalid={errors.state ? true : false}
             >
@@ -242,14 +257,14 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
           </div>
 
           <div>
-            <label className="text-sm font-medium text-gray-700">ZIP/Postal Code</label>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">ZIP/Postal Code</label>
             <input
               name="zip"
               value={form.zip}
               onChange={handleChange}
               placeholder="ZIP Code"
               className={`${inputBaseClasses} ${
-                errors.zip ? 'border-red-500' : 'border-gray-300'
+                errors.zip ? 'border-red-500' : 'w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#009FFF] focus:bg-white focus:border-transparent outline-none transition-all text-sm font-medium'
               }`}
               aria-invalid={errors.zip ? true : false}
             />
@@ -259,18 +274,16 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
           </div>
         </div>
 
-        {/* Default Checkbox */}
         <div className="flex items-center mt-4">
           <input type="checkbox" className="mr-2" />
-          <label className="text-sm text-gray-600">Set as default</label>
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Set as default</label>
         </div>
 
-        {/* Submit */}
         <div className="flex justify-end pt-6">
           <button
             type="submit"
             className="bg-[#009FFF] text-white px-6 py-2 rounded-lg hover:bg-[#0A65C7] transition disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm"
-            disabled={false}
+            disabled={isSubmitting}
           >
             Continue to Shipping
           </button>

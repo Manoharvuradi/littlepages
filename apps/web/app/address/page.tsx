@@ -52,7 +52,6 @@ const Address = () => {
     load();
   }, []);
 
-  console.log('Addresses:', addresses);
 
   // 🔹 Save edited address
   const handleSave = async () => {
