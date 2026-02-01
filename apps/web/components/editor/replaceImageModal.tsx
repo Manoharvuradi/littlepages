@@ -82,14 +82,14 @@ const ReplaceImageModal = ({ setReplaceImageModalOpen, onReplaceImage, bookImage
           .replace(/[^\w.-]+/g, "_") // replaces spaces, colons, etc with underscores
           .toLowerCase();
 
-          const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
+          const filePath = `${process.env.NEXT_PUBLIC_S3_PATH}/${userId.sub}/${Date.now()}-${safeFileName}`;
           const { error } = await supabase.storage
-            .from("photos")
+            .from(process.env.NEXT_PUBLIC_S3_BUCKET!)
             .upload(filePath, file, { upsert: false });
   
           if (error) throw error;
   
-          const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+          const { data } = supabase.storage.from(process.env.NEXT_PUBLIC_S3_BUCKET!).getPublicUrl(filePath);
           const publicUrl = data.publicUrl;
   
           const req = {

@@ -55,14 +55,14 @@ const PhotosPage = () => {
 
     for (const file of files) {
       const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
-      const filePath = `user-uploads/${userId}/${Date.now()}-${safeFileName}`;
+      const filePath = `${process.env.NEXT_PUBLIC_S3_PATH}/${userId}/${Date.now()}-${safeFileName}`;
 
       const { error } = await supabase.storage
-        .from('photos')
+        .from(process.env.NEXT_PUBLIC_S3_BUCKET!)
         .upload(filePath, file, { upsert: false });
 
       if (!error) {
-        const { data } = supabase.storage.from('photos').getPublicUrl(filePath);
+        const { data } = supabase.storage.from(process.env.NEXT_PUBLIC_S3_BUCKET!).getPublicUrl(filePath);
         await addImage(data.publicUrl, file.name, userId);
         await fetchImages();
         setSelectedFiles(prev => [...prev, file]);
