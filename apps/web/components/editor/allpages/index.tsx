@@ -261,8 +261,9 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
                       </div>
                     );
                   })}
-
+                  {!isExpanded && <div className='space-y-2 w-5 h-5'></div>}
                   {/* Center + button */}
+                  {isExpanded &&
                   <div
                     className="absolute left-1/2 top-0 -translate-x-1/2 w-6 h-full cursor-pointer"
                     onMouseEnter={() => setHoveredContainer(cIndex)}
@@ -287,11 +288,11 @@ export default function AllPages({ isExpanded, pages, setPages, onSelectPage, bo
                         +
                       </button>
                     )}
-                  </div>
+                  </div>}
                 </div>
 
                 {/* Between containers hover area */}
-                {cIndex < containers.length - 1 && (
+                {cIndex < containers.length - 1 && isExpanded &&  (
                   <div
                     className={`cursor-pointer ${
                       isExpanded 

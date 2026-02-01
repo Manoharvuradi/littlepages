@@ -51,10 +51,12 @@ const BookEditor = () => {
   const [replaceImageModalOpen, setReplaceImageModalOpen] = useState(false);
   const [textAlign, setTextAlign] = useState<"left" | "center" | "right">("left");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loader, setLoader] = useState(false);
 
 
   useEffect(() => {
     const fetchBook = async () => {
+      setLoader(true);
       setBookId(Number(params.id));
       const user = await getCurrentUser();
       setUserId(user?.sub ?? null);
@@ -64,6 +66,7 @@ const BookEditor = () => {
       setCoverPhoto(url?.url);
       setData(res);
       setPages(res.bookImages);
+      setLoader(false);
     };
     fetchBook();
   }, [params.id]);
@@ -156,11 +159,11 @@ const BookEditor = () => {
     if (!userId) return;
 
   const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
-  const filePath = `user-uploads/${userId}/${Date.now()}-${safeFileName}`;
+  const filePath = `${process.env.NEXT_PUBLIC_S3_PATH}/${userId}/${Date.now()}-${safeFileName}`;
 
     // 1. Upload new image
   const { error } = await supabase.storage
-    .from("photos")
+    .from(process.env.NEXT_PUBLIC_S3_BUCKET!)
     .upload(filePath, file, { upsert: false });
 
   if (error) {
@@ -169,7 +172,7 @@ const BookEditor = () => {
   }
 
   // 2. Get public URL
-  const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+  const { data } = supabase.storage.from(process.env.NEXT_PUBLIC_S3_BUCKET!).getPublicUrl(filePath);
 
   // 3. Update DB record
   await replaceCoverImage(coverPhotoId!, data.publicUrl);
@@ -242,14 +245,14 @@ const BookEditor = () => {
 
       // Step 4: Prepare file path
       const safeFileName = file.name.replace(/[^\w.-]+/g, "_").toLowerCase();
-      const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
+      const filePath = `${process.env.NEXT_PUBLIC_S3_PATH}/${userId.sub}/${Date.now()}-${safeFileName}`;
 
       // Step 5: Upload to Supabase
-      const { error } = await supabase.storage.from("photos").upload(filePath, file, { upsert: false });
+      const { error } = await supabase.storage.from(process.env.NEXT_PUBLIC_S3_BUCKET!).upload(filePath, file, { upsert: false });
       if (error) throw error;
 
       // Step 6: Get public URL
-      const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+      const { data } = supabase.storage.from(process.env.NEXT_PUBLIC_S3_BUCKET!).getPublicUrl(filePath);
       const publicUrl = data.publicUrl;
 
       // Step 7: Update DB with the new URL
@@ -268,6 +271,16 @@ const BookEditor = () => {
     }
   };
 
+  if(loader){
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          {/* <p className="text-gray-600">Loading...</p> */}
+        </div>
+      </div>
+    )
+  }
   return (
 
 <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">

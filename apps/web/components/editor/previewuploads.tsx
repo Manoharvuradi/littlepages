@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { getCurrentUser } from "../../server/user";
 import { addImageToBook } from "../../server/bookimage";
@@ -9,17 +9,23 @@ type UploadModalProps = {
   bookId?: number | null;
   position?: { containerIndex: number | null; insertPosition: number | null };
   setUploadModal: (value: boolean) => void;
-  onUploadComplete: () => void; // Add this callback
+  onUploadComplete: () => void;
   imageid?: string | null;
 };
 
-export default function UploadModal({ bookId, position, setUploadModal,onUploadComplete, imageid }: UploadModalProps) {
-
+export default function UploadModal({ bookId, position, setUploadModal, onUploadComplete, imageid }: UploadModalProps) {
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // 🧠 Handle upload via file picker
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     if (files.length > 0) {
@@ -27,7 +33,6 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
     }
   };
 
-  // 🧠 Handle upload via drag & drop
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(true);
@@ -47,12 +52,10 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
     }
   };
 
-  // 🧠 Function to trigger hidden input
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  // 🧠 Core Supabase upload logic
   const uploadFilesToSupabase = async (files: File[]) => {
     const userId = await getCurrentUser();
     if (!userId) {
@@ -62,19 +65,18 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
     setUploading(true);
     try {
       for (const file of files) {
-            // ✅ sanitize file name: remove spaces and special chars
         const safeFileName = file.name
-          .replace(/[^\w.-]+/g, "_") // replaces spaces, colons, etc with underscores
+          .replace(/[^\w.-]+/g, "_")
           .toLowerCase();
 
-        const filePath = `user-uploads/${userId.sub}/${Date.now()}-${safeFileName}`;
+        const filePath = `${process.env.NEXT_PUBLIC_S3_PATH}/${userId.sub}/${Date.now()}-${safeFileName}`;
         const { error } = await supabase.storage
-          .from("photos")
+          .from(process.env.NEXT_PUBLIC_S3_BUCKET!)
           .upload(filePath, file, { upsert: false });
 
         if (error) throw error;
 
-        const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+        const { data } = supabase.storage.from(process.env.NEXT_PUBLIC_S3_BUCKET!).getPublicUrl(filePath);
         const publicUrl = data.publicUrl;
 
         const req = {
@@ -83,18 +85,11 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
           userId: userId.sub,
           filename: file.name,
         }
-        // Save to DB
         await addImageToBook(req);
-
       }
 
       onUploadComplete();
-
-      // Close the modal
       setUploadModal(false);
-
-      // ✅ Redirect back to book page after upload
-      // router.push(`/books/${bookId}/bookeditor`);
     } catch (err: any) {
       alert(`Upload failed: ${err.message}`);
     } finally {
@@ -103,15 +98,23 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
   };
 
   return (
-
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white rounded-2xl p-6 max-w-lg w-full mx-4 shadow-2xl">
+    <div 
+      className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      style={{ 
+        zIndex: 99999,
+        position: 'fixed',
+        margin: 0,
+        transform: 'none'
+      }}
+    >
+      <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl">
         {/* Close button */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Upload Image</h2>
           <button
             onClick={() => setUploadModal(false)}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            disabled={uploading}
+            className="text-gray-500 hover:text-gray-700 text-2xl disabled:opacity-50"
           >
             ✕
           </button>
@@ -124,7 +127,7 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
               ? "border-indigo-600 bg-indigo-50 scale-[1.01]"
               : "border-indigo-300 bg-gray-50"
           }`}
-          onClick={handleUploadClick}
+          onClick={!uploading ? handleUploadClick : undefined}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -176,6 +179,7 @@ export default function UploadModal({ bookId, position, setUploadModal,onUploadC
             ref={fileInputRef}
             onChange={handleFileChange}
             className="hidden"
+            disabled={uploading}
           />
         </div>
       </div>

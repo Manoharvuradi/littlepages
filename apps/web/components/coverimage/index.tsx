@@ -39,10 +39,10 @@ const CoverImage = ({ formData, setFormData, onNext }: Props) => {
       .replace(/[^\w.-]+/g, "_")
       .toLowerCase();
 
-    const filePath = `user-uploads/${userId}/${Date.now()}-${safeFileName}`;
+    const filePath = `${process.env.NEXT_PUBLIC_S3_PATH}/${userId}/${Date.now()}-${safeFileName}`;
 
     const { error } = await supabase.storage
-      .from("photos")
+      .from(process.env.NEXT_PUBLIC_S3_BUCKET!)
       .upload(filePath, file, { upsert: false });
 
     if (error) {
@@ -51,7 +51,7 @@ const CoverImage = ({ formData, setFormData, onNext }: Props) => {
       return;
     }
 
-    const { data } = supabase.storage.from("photos").getPublicUrl(filePath);
+    const { data } = supabase.storage.from(process.env.NEXT_PUBLIC_S3_BUCKET!).getPublicUrl(filePath);
 
     const coverImage = await addImage(data.publicUrl, file.name, userId);
 
