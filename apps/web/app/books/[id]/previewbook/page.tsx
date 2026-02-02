@@ -48,7 +48,7 @@ const PreviewBook = () => {
   const [bookTitle, setBookTitle] = useState<string>("");
   const [textAlign] = useState<string>("center");
   const [bookLength, setBookLength] = useState<number>(0);
-    const { setCoverPagePicture } = useSelectedImages();
+    const { setCoverPagePicture,setCtxBookId } = useSelectedImages();
     const [displaySettings, setDisplaySettings] = useState<{
       showCaption?: boolean;
       showName?: boolean;
@@ -62,7 +62,7 @@ const PreviewBook = () => {
         setBookId(Number(params.id));
         const user = await getCurrentUser();
         const data: BookData = await getBook(Number(params.id), user?.sub);
-
+        setCtxBookId(Number(params.id));
         setDisplaySettings(data?.displaySettings!);
         // Fetch cover photo URL
         const url = await showCoverPhoto(data.coverPhotoUrl);
