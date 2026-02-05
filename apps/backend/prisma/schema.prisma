@@ -1,140 +1,123 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  // output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model Users {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   name      String?
   password  String
-  role      Role     @default(USER)
-  images    Images[]
-  Book      Book[]
-  orders    Order[]
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   addresses Address[]
-  payments Payment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  Book      Book[]
+  images    Images[]
+  orders    Order[]
+  payments  Payment[]
 }
 
 model Images {
   id             String      @id @default(uuid())
   url            String
   filename       String
-  displayOptions Json?
   userId         Int
-  user           Users       @relation(fields: [userId], references: [id])
-  bookId         Int?
-  book           Book?       @relation(fields: [bookId], references: [id])
-  bookImages     BookImage[]
   createdAt      DateTime    @default(now())
+  displayOptions Json?
+  bookId         Int?
+  bookImages     BookImage[]
+  book           Book?       @relation(fields: [bookId], references: [id])
+  user           Users       @relation(fields: [userId], references: [id])
 }
 
 model Book {
-  id     Int   @id @default(autoincrement())
-  userId Int
-  user   Users @relation(fields: [userId], references: [id])
-  bookSize String
-  coverPhotoUrl String?
-  bookTitle String
-  displaySettings Json?
-  images          Images[] // directly link to Images
-  bookImages      BookImage[] // additional metadata for each image
-  orderItems  OrderItem[]
+  id              Int         @id @default(autoincrement())
+  userId          Int
+  coverPhotoUrl   String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+  displaySettings Json?
+  bookTitle       String
+  bookSize        String
+  bookTitleAlign  String? @default("center")
+  user            Users       @relation(fields: [userId], references: [id])
+  bookImages      BookImage[]
+  images          Images[]
+  orderItems      OrderItem[]
+  orders          Order?
 }
 
-// model BookSize {
-//   id        Int     @id @default(autoincrement())
-//   label     String  // e.g. "11in x 8.5in", "8in x 8in"
-//   createdAt DateTime @default(now())
-//   Book      Book[]
-// }
-
 model BookImage {
-  id      Int    @id @default(autoincrement())
-  bookId  Int
-  imageId String
-  book  Book   @relation(fields: [bookId], references: [id])
-  image Images @relation(fields: [imageId], references: [id])
+  id        Int       @id @default(autoincrement())
+  bookId    Int
+  imageId   String
   caption   String?
   name      String?
   age       String?
   date      DateTime?
   tags      String?
-  pageOrder Int? // for ordering images within a book
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  pageOrder Int?
+  book      Book      @relation(fields: [bookId], references: [id])
+  image     Images    @relation(fields: [imageId], references: [id])
 
+  @@unique([bookId, imageId])
   @@index([bookId])
   @@index([bookId, pageOrder])
-  @@unique([bookId, imageId]) // prevent adding same image twice
 }
 
-// Order Table (Main)
 model Order {
-  id                String   @id @default(cuid())
-  orderNumber       String   @unique // e.g., "ORD-2024-001234"
+  id                String               @id @default(cuid())
+  orderNumber       String               @unique
   userId            Int
   email             String
-  status            OrderStatus @default(CONFIRMED)
+  status            OrderStatus          @default(CONFIRMED)
   subtotal          Float
   shipping          Float
   tax               Float
-  discount          Float    @default(0)
+  discount          Float                @default(0)
   total             Float
   shippingAddressId String
   billingAddressId  String
-  shippingMethod    String   // e.g., "Standard Shipping", "Express"
+  shippingMethod    String
   trackingNumber    String?
   trackingUrl       String?
   estimatedDelivery DateTime
-  payments         Payment[]
-  user              Users            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  billingAddress    Address              @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  shippingAddress   Address              @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  user              Users                @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
   statusHistory     OrderStatusHistory[]
-  shippingAddress   Address         @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
-  billingAddress    Address         @relation("BillingAddress", fields: [billingAddressId], references: [id])
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  payments          Payment[]
+  bookId            Int?                 @unique
+  book              Book?                @relation(fields: [bookId], references: [id])
   @@index([userId])
   @@index([orderNumber])
   @@index([status])
 }
 
-// Order Items Table
 model OrderItem {
   id        String   @id @default(cuid())
   orderId   String
   bookId    Int
-  name      String   // Store product name at time of order
-  image     String   // Product image URL
-  variant   String?  // e.g., "Size: L, Color: Blue"
+  name      String
+  image     String
+  variant   String?
   quantity  Int
-  price     Float    // Price per unit at time of order
+  price     Float
   createdAt DateTime @default(now())
+  book      Book     @relation(fields: [bookId], references: [id])
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  book   Book  @relation(fields: [bookId], references: [id])
+
   @@index([orderId])
   @@index([bookId])
 }
@@ -143,57 +126,61 @@ model OrderStatusHistory {
   id          String      @id @default(cuid())
   orderId     String
   status      OrderStatus
-  description String      // e.g., "Order confirmed and processing"
+  description String
   createdAt   DateTime    @default(now())
   order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
   @@index([orderId])
   @@index([createdAt])
 }
 
-// Address Table (Reusable for shipping and billing)
 model Address {
-  id        String   @id @default(cuid())
-  userId    Int
-  name      String   // Full name for delivery
-  street    String   // Street address
-  apartment String?
-  city      String
-  state     String
-  zip       String   // Postal/ZIP code
-  country   String
-  phone     String?
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user              Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shippingOrders    Order[] @relation("ShippingAddress")
-  billingOrders     Order[] @relation("BillingAddress")
-  
+  id             String   @id @default(cuid())
+  userId         Int
+  name           String
+  street         String
+  city           String
+  state          String
+  zip            String
+  country        String
+  phone          String?
+  isDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  apartment      String?
+  user           Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billingOrders  Order[]  @relation("BillingAddress")
+  shippingOrders Order[]  @relation("ShippingAddress")
+
   @@index([userId])
 }
 
 model Payment {
-  id                String   @id @default(cuid())
+  id                String        @id @default(cuid())
   userId            Int
   orderId           String?
-  razorpayOrderId   String    @unique
+  razorpayOrderId   String        @unique
   razorpayPaymentId String?
   razorpaySignature String?
   amount            Float
-  currency          String   @default("INR")
+  currency          String        @default("INR")
   status            PaymentStatus @default(PENDING)
-  method            String?   // card, upi, wallet
+  method            String?
   email             String?
   contact           String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  order   Order?  @relation(fields: [orderId], references: [id])
-  user    Users  @relation(fields: [userId], references: [id])
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  order             Order?        @relation(fields: [orderId], references: [id])
+  user              Users         @relation(fields: [userId], references: [id])
 
   @@index([orderId])
   @@index([razorpayOrderId])
   @@index([razorpayPaymentId])
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 enum PaymentStatus {
@@ -203,7 +190,6 @@ enum PaymentStatus {
   REFUNDED
 }
 
-// Enum for Order Status
 enum OrderStatus {
   PENDING
   CONFIRMED
@@ -213,20 +199,3 @@ enum OrderStatus {
   CANCELLED
   REFUNDED
 }
-
-//About payments:
-//A) When order is created (/payment/create-order)
-
-// razorpayOrderId
-// amount
-// userId
-// orderId
-// status: "PENDING"
-
-//B) When payment is successful (/payment/verify)
-// razorpayPaymentId
-// razorpaySignature
-// status: "SUCCESS"
-// method
-// email
-// contact
