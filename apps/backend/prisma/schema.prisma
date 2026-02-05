@@ -16,6 +16,7 @@ model Users {
   role      Role      @default(USER)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  testField String?
   addresses Address[]
   Book      Book[]
   images    Images[]
@@ -45,12 +46,12 @@ model Book {
   displaySettings Json?
   bookTitle       String
   bookSize        String
-  bookTitleAlign  String? @default("center")
+  bookTitleAlign  String?     @default("center")
   user            Users       @relation(fields: [userId], references: [id])
   bookImages      BookImage[]
   images          Images[]
-  orderItems      OrderItem[]
   orders          Order?
+  orderItems      OrderItem[]
 }
 
 model BookImage {
@@ -92,14 +93,15 @@ model Order {
   estimatedDelivery DateTime
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
+  bookId            Int?                 @unique
   billingAddress    Address              @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  book              Book?                @relation(fields: [bookId], references: [id])
   shippingAddress   Address              @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
   user              Users                @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
   statusHistory     OrderStatusHistory[]
   payments          Payment[]
-  bookId            Int?                 @unique
-  book              Book?                @relation(fields: [bookId], references: [id])
+
   @@index([userId])
   @@index([orderNumber])
   @@index([status])
