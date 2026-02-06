@@ -15,7 +15,7 @@ export default function ReviewStep({ flowData, quantity, pricePerBook, onNext, o
 
 
   // Destructure address fields (adjust these keys based on what your AddressStep actually saves)
-  const { name, addressLine1, city, state, zipCode, phone, country } = flowData;
+  const { name, addressLine1, city, state, zipCode, phone, country } = flowData.address;
 
   return (
     <div className="space-y-6">

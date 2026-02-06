@@ -37,7 +37,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       setLoading(false);
     };
     fetchUser();
-  }, []);
+  }, [userId]);
 
   if (loading) {
     return (
