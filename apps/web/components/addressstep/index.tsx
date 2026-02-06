@@ -48,18 +48,18 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (flowData) {
+    if (flowData && flowData.address) {
       setForm(prev => ({ ...prev, 
-        name: flowData.name || '',
-        phone: flowData.phone || '',
-        street: flowData.street || '',
-        apartment: flowData.apartment || '',
-        city: flowData.city || '',
-        state: flowData.state || '',
-        zip: flowData.zip || '',
+        name: flowData.address.name || '',
+        phone: flowData.address.phone || '',
+        street: flowData.address.street || '',
+        apartment: flowData.address.apartment || '',
+        city: flowData.address.city || '',
+        state: flowData.address.state || '',
+        zip: flowData.address.zip || '',
        }));
     }
-  }, [flowData]);
+  }, [flowData?.address]);
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -84,7 +84,10 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
     const newErrors = validate();
     setErrors(newErrors);
     if(flowData != null && flowData != undefined){
-      setFlowData((prev: any) => ({ ...prev, address: form }));
+      setFlowData((prev: any)=>({
+        ...prev,
+        address: form
+      }))
       onNext();
     }
     else if (Object.keys(newErrors).length === 0) {

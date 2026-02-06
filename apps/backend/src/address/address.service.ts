@@ -24,13 +24,15 @@ export class AddressService {
 
     async getAddresses(userId: number) {
         try{
-
             const address = await this.prisma.address.findFirst({
                 where: {
-                    userId: Number(userId),
+                  userId: Number(userId),
                 },
-            });
-            return [address];
+                orderBy: {
+                  createdAt: 'desc',
+                },
+              });
+            return address;
         } catch (error) {
             console.error("Error fetching addresses:", error);
             throw error;

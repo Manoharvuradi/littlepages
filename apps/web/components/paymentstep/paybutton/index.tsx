@@ -1,17 +1,17 @@
 "use client";
 import Script from "next/script";
 import { useState } from "react";
-import OrderFailure from "../../checkoutview/orderfailure";
-import { on } from "events";
 
 export default function PayButton({ 
   amount, 
   setFlowData, 
+  flowData,
   onNext 
 }: { 
   amount: number; 
   setFlowData: any; 
   onNext: () => void;
+  flowData: any;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,25 +20,25 @@ export default function PayButton({
     try {
       setLoading(true);
       setError(null);
-
-      // Step 1: Create Razorpay order
+  
+      // 1️⃣ Create Razorpay order from backend
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/payment/create-order`,
         {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount }),
+          body: JSON.stringify({ amount: Number(flowData.total) }),
         }
       );
-
+  
       if (!res.ok) {
         throw new Error('Failed to create order');
       }
-
+  
       const order = await res.json();
-
-      // Step 2: Open Razorpay checkout
+  
+      // 2️⃣ Razorpay options
       const options: any = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_TEST_API_KEY,
         amount: order.amount,
@@ -46,41 +46,47 @@ export default function PayButton({
         order_id: order.id,
         name: "Little Pages",
         description: "Book Purchase",
-        image: "/images/Image-Photoroom.png", // Add your logo here
-
+        image: "/images/Image-Photoroom.png",
+  
+        // ✅ SUCCESS HANDLER
         handler: async function (response: any) {
           try {
-            // Step 3: Verify payment and create order in DB
+            const req = {
+              total: flowData.total,
+              quantity: flowData.quantity,
+              bookId: flowData.bookId,
+            };
+  
             const verifyRes = await fetch(
               `${process.env.NEXT_PUBLIC_API_URL}/payment/verify`,
               {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ response, amount }),
+                body: JSON.stringify({ response, req }),
               }
             );
 
             if (!verifyRes.ok) {
               throw new Error('Payment verification failed');
             }
-
+  
             const result = await verifyRes.json();
             if (result.status === 'success') {
               // Payment successful - order created in DB
-              setFlowData((prev: any) => ({ 
-                ...prev, 
+              setFlowData((prev: any) => ({
+                ...prev,
                 payment: result,
                 orderId: result.orderId,
                 orderNumber: result.orderNumber
               }));
               onNext(); // Move to next step
             } else {
-              setFlowData((prev: any) => ({ 
-                ...prev, 
-                payment: result,
-                orderId: result.orderId,
-                orderNumber: result.orderNumber
+              setFlowData((prev: any) => ({
+                ...prev,
+                payment: null,
+                orderId: null,
+                orderNumber: null
               }));
               onNext(); // Move to next step
               throw new Error('Payment verification failed');
@@ -88,26 +94,27 @@ export default function PayButton({
           } catch (err: any) {
             console.error('Verification error:', err);
             setError(err.message || 'Payment verification failed');
-            alert('Payment verification failed. Please contact support.');
+            // alert('Payment verification failed. Please contact support.');
+            onNext();
           }
         },
-
+  
         modal: {
           ondismiss: function() {
             setLoading(false);
             console.log('Payment cancelled by user');
           }
         },
-
+  
         theme: {
           color: "#009FFF"
         }
       };
-
+  
       const razor = new (window as any).Razorpay(options);
       razor.on('payment.failed', function (response: any) {
         setFlowData((prev: any) => ({
-          ...prev, 
+          ...prev,
           payment: response,
           orderId: null,
           orderNumber: null
@@ -120,6 +127,7 @@ export default function PayButton({
     } catch (err: any) {
       console.error('Payment error:', err);
       setError(err.message || 'Failed to initiate payment');
+      onNext();
     } finally {
       setLoading(false);
     }

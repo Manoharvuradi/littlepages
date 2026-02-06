@@ -37,7 +37,7 @@ export default function OrderSuccess({ flowData, setFlowData, onBack }: OrderSuc
         {/* Order ID Badge */}
         <div className="flex justify-center mt-8">
           <div className="bg-indigo-50 px-6 py-2 rounded-full border border-indigo-100 flex items-center gap-3">
-             <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Order ID</span>
+             <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Order Number</span>
              <span className="font-mono text-indigo-900 font-bold">{flowData?.orderNumber || "ORD-7721"}</span>
           </div>
         </div>
@@ -56,8 +56,14 @@ export default function OrderSuccess({ flowData, setFlowData, onBack }: OrderSuc
                 </span>
               </div>
               <div className="flex justify-between">
+                <span className="text-gray-600">Price per book</span>
+                <span className=" px-2 py-0.5 rounded-md text-xs font-bold uppercase">
+                  {flowData?.pricePerBook}
+                </span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-gray-600">Total Paid</span>
-                <span className="font-bold text-gray-900">₹{flowData?.amount}</span>
+                <span className="font-bold text-gray-900">₹{flowData?.total}</span>
               </div>
               <div className="pt-2 border-t border-gray-200">
                  <p className="text-[10px] text-gray-400 truncate">Transaction ID: {flowData?.payment?.paymentId}</p>

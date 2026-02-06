@@ -18,12 +18,12 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(0); 
   const [quantity, setQuantity] = useState(1);
   const [flowData, setFlowData] = useState<any>({});
-  const pricePerBook = 999.00;
-  const total = (pricePerBook * quantity).toFixed(2);
+  const pricePerBook = Number(process.env.NEXT_PUBLIC_AMOUNT_PER_BOOK);
+  const total = (Number(pricePerBook) * Number(quantity)).toFixed(2);
   const params = useParams();
   const { id } = params;
   const router = useRouter();
-  const { coverPagePicture } = useSelectedImages();
+  const { coverPagePicture, ctxBookId } = useSelectedImages();
 
   useEffect(() => {
     if (coverPagePicture == null || coverPagePicture == undefined) {
@@ -41,7 +41,13 @@ useEffect(() => {
         
         // Only set state if data exists (is not null/undefined)
         if (data) {
-          setFlowData(data);
+          setFlowData({
+            address: data,
+            pricePerBook: Number(process.env.NEXT_PUBLIC_AMOUNT_PER_BOOK),
+            total: (Number(process.env.NEXT_PUBLIC_AMOUNT_PER_BOOK) * Number(quantity)).toFixed(2),
+            quantity: quantity,
+            bookId: ctxBookId
+          });
         }
       }
     } catch (error) {
@@ -52,7 +58,19 @@ useEffect(() => {
   loadAddressData();
 }, []);
 
+// Update flowData when quantity changes
+useEffect(() => {
+  const total = (pricePerBook * quantity).toFixed(2);
+  
+  setFlowData((prev: any) => ({
+    ...prev,
+    pricePerBook: pricePerBook,
+    total: total,
+    quantity: quantity,
+  }));
+}, [quantity, pricePerBook]);
 
+  console.log("CheckoutPage flowData:", flowData);
   const increment = () => setQuantity(q => q + 1);
   const decrement = () => setQuantity(q => (q > 1 ? q - 1 : 1));
 
@@ -99,12 +117,12 @@ useEffect(() => {
                   </div>
                   <button onClick={increment} className="w-12 h-12 bg-white border-2 border-gray-300 rounded-lg font-bold text-xl hover:bg-gray-50">+</button>
                 </div>
-                <div className="flex justify-center gap-2"><span className="font-medium">Price:</span><span className="font-bold text-indigo-600">₹{pricePerBook.toFixed(2)}</span></div>
+                <div className="flex justify-center gap-2"><span className="font-medium">Price:</span><span className="font-bold text-indigo-600">₹{Number(pricePerBook).toFixed(2)}</span></div>
               </div>
 
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 mb-6 w-full max-w-md border border-indigo-100 flex justify-between">
                 <span className="text-gray-700 font-semibold">Total Amount:</span>
-                <span className="text-3xl font-bold text-gray-900">₹{total}</span>
+                <span className="text-3xl font-bold text-gray-900">₹{Number(total).toFixed(2)}</span>
               </div>
 
               <button onClick={nextStep} className="w-full max-w-md px-6 py-4 bg-gradient-to-r from-[#009FFF] to-[#0A65C7] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all">
@@ -119,14 +137,14 @@ useEffect(() => {
               {step === 1 && (
                 <AddressStep 
                   onNext={nextStep} 
-                  flowData={flowData[0]} 
+                  flowData={flowData} 
                   setFlowData={setFlowData} 
                 />
               )}
 
               {step === 2 && (
                 <ReviewStep 
-                  flowData={flowData[0]} 
+                  flowData={flowData} 
                   quantity={quantity} 
                   pricePerBook={pricePerBook} 
                   onNext={nextStep} 
