@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { Prisma } from '@prisma/client';
 
@@ -15,5 +15,13 @@ export class AddressController {
     @Get("get/:userId")
     async getAddresses(@Param("userId") userId: number) {
         return this.addressService.getAddresses(userId);
+    }
+
+    @Put('update/:id')
+    async updateAddress(
+      @Param('id') id: string,
+      @Body() address: any
+    ) {
+      return this.addressService.updateExistingAddress(id, address);
     }
 }

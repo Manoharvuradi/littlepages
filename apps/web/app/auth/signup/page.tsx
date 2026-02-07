@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
-import { signupUser } from '../../../server/user';
+import { loginUser, signupUser } from '../../../server/user';
+import { useAuth } from '../../providers/AuthProvider';
 
 const SignupPage = () => {
     const [signupLoading, setSignupLoading] = useState(false);
@@ -12,21 +13,45 @@ const SignupPage = () => {
     const [signupPassword, setSignupPassword] = useState("");
     const [showSignup, setShowSignup] = useState(false);
       const router = useRouter()
-
-    async function handleSignup(e: React.FormEvent) {
+      const { refreshUser } = useAuth();
+      async function handleSignup(e: React.FormEvent) {
         e.preventDefault();
         setSignupLoading(true);
-        const { error } = await signupUser({ name: signupName, email: signupEmail, password: signupPassword });
-        if (error) alert(error.message);
-        else {
+        
+        const { error } = await signupUser({ 
+          name: signupName, 
+          email: signupEmail, 
+          password: signupPassword 
+        });
+        
+        if (error) {
+          alert(error.message);
+          setSignupLoading(false);
+        } else {
+          // ✅ Auto-login after successful signup
+          const { error: loginError } = await loginUser(signupEmail, signupPassword);
+          
+          if (loginError) {
+            alert("Signup successful! Please login.");
             setShowSignup(false);
+            // Clear signup form
+            setSignupName("");
+            setSignupEmail("");
+            setSignupPassword("");
+          } else {
+            // ✅ Login successful - refresh user data
+            await refreshUser();
+            setShowSignup(false);
+            // Clear signup form
             setSignupName("");
             setSignupEmail("");
             setSignupPassword("");
             router.push("/photos");
+          }
+          
+          setSignupLoading(false);
         }
-        setSignupLoading(false);
-    }
+      }
     return (
 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
   {/* Modal */}

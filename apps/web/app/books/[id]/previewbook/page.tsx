@@ -49,6 +49,7 @@ const PreviewBook = () => {
   const [textAlign] = useState<string>("center");
   const [bookLength, setBookLength] = useState<number>(0);
     const { setCoverPagePicture,setCtxBookId } = useSelectedImages();
+    const { setCtxBookTitle } = useSelectedImages();
     const [displaySettings, setDisplaySettings] = useState<{
       showCaption?: boolean;
       showName?: boolean;
@@ -70,6 +71,7 @@ const PreviewBook = () => {
         setCoverPagePicture(url?.url);
         // Set book title
         setBookTitle(data?.bookTitle || "");
+        setCtxBookTitle(data?.bookTitle!);
         setBookLength(data?.bookImages ? data.bookImages.length : 0);
         
         const transformed = data?.bookImages?.map((item: Book) => ({

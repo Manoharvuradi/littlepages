@@ -55,6 +55,8 @@ export default function PayButton({
               total: flowData.total,
               quantity: flowData.quantity,
               bookId: flowData.bookId,
+              bookTitle: flowData.bookTitle,
+              coverPagePicture: flowData.coverPagePicture
             };
   
             const verifyRes = await fetch(

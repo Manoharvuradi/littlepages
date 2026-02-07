@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { createAddress } from '../../server/address';
+import { createAddress, updateAddress } from '../../server/address';
 import { getCurrentUser } from '../../server/user';
 
 interface AddressStepProps {
   onNext: () => void;
   flowData?: any;
   setFlowData?: any;
+  address?: any
 }
 
 export interface IFormAddress {
@@ -28,7 +29,7 @@ interface Errors {
   [key: string]: string;
 }
 
-export default function AddressStep({ onNext, flowData, setFlowData }: AddressStepProps) {
+export default function AddressStep({ onNext, flowData, setFlowData, address }: AddressStepProps) {
   const inputBaseClasses =
     'w-full mt-1 border rounded-lg px-4 py-3 text-sm';
 
@@ -48,7 +49,7 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (flowData && flowData.address) {
+    if (flowData.address != null) {
       setForm(prev => ({ ...prev, 
         name: flowData.address.name || '',
         phone: flowData.address.phone || '',
@@ -83,10 +84,13 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
     setIsSubmitting(true);
     const newErrors = validate();
     setErrors(newErrors);
-    if(flowData != null && flowData != undefined){
+    console.log("address", address)
+    if(address != null && address != undefined){
+      const {id} = address;
+      const response = await updateAddress(id, form);
       setFlowData((prev: any)=>({
         ...prev,
-        address: form
+        address: response
       }))
       onNext();
     }
@@ -182,7 +186,7 @@ export default function AddressStep({ onNext, flowData, setFlowData }: AddressSt
 
         <div>
           <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
-            Apartment, Suite, Locality (optional)
+            Apartment, Suite, Locality
           </label>
           <input
             name="apartment"

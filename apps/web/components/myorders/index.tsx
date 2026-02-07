@@ -158,11 +158,11 @@ export default function OrderViewPage() {
             />
 
             {/* Delivery Information */}
-            {/* <DeliveryInfo 
+            <DeliveryInfo 
               shippingAddress={selectedOrder.shippingAddress}
               billingAddress={selectedOrder.billingAddress}
               shippingMethod={selectedOrder.shippingMethod}
-            /> */}
+            />
           </div>
 
           <div className="space-y-6">
@@ -174,12 +174,12 @@ export default function OrderViewPage() {
               total={selectedOrder.total}
             />
 
-            <OrderActions 
+            {/* <OrderActions 
               orderId={selectedOrder.id}
               orderNumber={selectedOrder.orderNumber}
               status={selectedOrder.status}
               trackingUrl={selectedOrder.trackingUrl}
-            />
+            /> */}
           </div>
         </div>
       </div>
