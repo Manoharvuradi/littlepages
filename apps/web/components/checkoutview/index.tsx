@@ -23,7 +23,7 @@ export default function CheckoutPage() {
   const params = useParams();
   const { id } = params;
   const router = useRouter();
-  const { coverPagePicture, ctxBookId } = useSelectedImages();
+  const { coverPagePicture, ctxBookId, ctxBookTitle } = useSelectedImages();
 
   useEffect(() => {
     if (coverPagePicture == null || coverPagePicture == undefined) {
@@ -37,7 +37,7 @@ useEffect(() => {
       const user = await getCurrentUser();
       
       if (user && user.sub) {
-        const data = await fetchAddresses(user.sub);
+        const data = await fetchAddresses(user.sub); 
         
         // Only set state if data exists (is not null/undefined)
         if (data) {
@@ -46,7 +46,9 @@ useEffect(() => {
             pricePerBook: Number(process.env.NEXT_PUBLIC_AMOUNT_PER_BOOK),
             total: (Number(process.env.NEXT_PUBLIC_AMOUNT_PER_BOOK) * Number(quantity)).toFixed(2),
             quantity: quantity,
-            bookId: ctxBookId
+            bookId: ctxBookId,
+            bookTitle: ctxBookTitle,
+            coverPagePicture: coverPagePicture
           });
         }
       }
@@ -70,7 +72,6 @@ useEffect(() => {
   }));
 }, [quantity, pricePerBook]);
 
-  console.log("CheckoutPage flowData:", flowData);
   const increment = () => setQuantity(q => q + 1);
   const decrement = () => setQuantity(q => (q > 1 ? q - 1 : 1));
 
@@ -138,7 +139,8 @@ useEffect(() => {
                 <AddressStep 
                   onNext={nextStep} 
                   flowData={flowData} 
-                  setFlowData={setFlowData} 
+                  setFlowData={setFlowData}
+                  address={flowData.address}
                 />
               )}
 

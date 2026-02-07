@@ -71,7 +71,7 @@ export class PaymentService {
       }
   
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body.response;
-      const { total, quantity, bookId } = body.req || {};
+      const { total, quantity, bookId, bookTitle, coverPagePicture } = body.req || {};
       
   
       // ✅ Validate required fields
@@ -137,8 +137,8 @@ export class PaymentService {
           
           items: {
             create: {
-              name: "Photobook",
-              image: "",
+              name: bookTitle,
+              image: coverPagePicture,
               price: pricePerBook,
               quantity: orderQuantity,
               book: { connect: { id: parseInt(bookId) } }

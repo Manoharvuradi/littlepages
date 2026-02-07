@@ -13,6 +13,8 @@ type SelectedImagesContextType = {
   setCoverPagePicture: React.Dispatch<React.SetStateAction<string | null>>;
   ctxBookId: number | null;
   setCtxBookId: React.Dispatch<React.SetStateAction<number | null>>
+  ctxBookTitle: string | null;
+  setCtxBookTitle: React.Dispatch<React.SetStateAction<string | null>>
 };
 
 const SelectedImagesContext = createContext<SelectedImagesContextType | null>(null);
@@ -23,8 +25,9 @@ export const SelectedImagesProvider = ({ children }: { children: React.ReactNode
   const hasSelection = selected.length > 0;
   const [coverPagePicture, setCoverPagePicture] = useState<string | null>(null);
   const [ctxBookId, setCtxBookId] = useState<number | null>(null);
+  const [ctxBookTitle, setCtxBookTitle] = useState<string | null>(null);
   return (
-    <SelectedImagesContext.Provider value={{ selectedImages, setSelectedImages, hasSelection , selected, setSelected, coverPagePicture, setCoverPagePicture, ctxBookId, setCtxBookId }}>
+    <SelectedImagesContext.Provider value={{ selectedImages, setSelectedImages, hasSelection , selected, setSelected, coverPagePicture, setCoverPagePicture, ctxBookId, setCtxBookId, ctxBookTitle, setCtxBookTitle }}>
       {children}
     </SelectedImagesContext.Provider>
   );

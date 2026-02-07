@@ -19,12 +19,14 @@ export default function OrderItems({
         {items.map((item) => (
           <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
             <div className="relative w-20 h-20 flex-shrink-0">
-              <Image
-                src={item.image}
-                alt={item.name}
-                fill
-                className="object-cover rounded"
-              />
+              {item.image &&
+                (<Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover rounded"
+                />)
+              }
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900">{item.name}</h3>

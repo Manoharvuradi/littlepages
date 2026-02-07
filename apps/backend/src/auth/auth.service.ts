@@ -65,7 +65,6 @@ async login(email: string, pass: string) {
   }
 
   async showUserBooks(userId: number) {
-    // console.log("userId: ", userId);
     const userWithBooks = await this.prisma.users.findUnique({
       where: { id: userId },
       include: {

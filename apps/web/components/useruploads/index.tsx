@@ -25,10 +25,12 @@ export interface FormItem {
 
 const UserUploads = ({ 
     previewUrls, 
-    fetchImages
+    fetchImages,
+    loading
 }: { 
     previewUrls: PreviewItem[], 
-    fetchImages: () => Promise<void>
+    fetchImages: () => Promise<void>,
+    loading: Boolean
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
@@ -178,6 +180,16 @@ const handleChange = (e: any) => {
       console.error("Error deleting image:", err);
     }
   };
+
+  if(loading){
+    return (
+      <div className="flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        </div>
+      </div>
+    )
+  }
 
 
   return (

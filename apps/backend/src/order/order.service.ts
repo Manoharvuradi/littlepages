@@ -13,9 +13,18 @@ export class OrderService {
     }
 
     async fetchAllOrders(userId: number) {
-        return this.prisma.order.findMany({
-            where: { userId: Number(userId) },
-            orderBy: { createdAt: 'desc' },
-        });
+    return this.prisma.order.findMany({
+        where: { 
+        userId: Number(userId),
+        },
+        include: {
+            items: true,
+            shippingAddress: true,
+            billingAddress: true,
+            book: true,
+            payments: true,
+        },
+        orderBy: { createdAt: 'desc' },
+    });
     }
 }

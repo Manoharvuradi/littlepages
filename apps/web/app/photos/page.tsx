@@ -19,6 +19,7 @@ const PhotosPage = () => {
   const [dragActive, setDragActive] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { selected, setSelected, setSelectedImages } = useSelectedImages();
   const router = useRouter();
@@ -32,6 +33,7 @@ const PhotosPage = () => {
   }, []);
 
   const fetchImages = useCallback(async () => {
+    setLoading(true);
     if (!userId) return;
     const images = await getMyImages();
     setPreviewUrls(
@@ -43,6 +45,7 @@ const PhotosPage = () => {
         age: img?.displayOptions?.age,
       }))
     );
+    setLoading(false);
   }, [userId]);
 
   useEffect(() => {
@@ -115,8 +118,8 @@ const PhotosPage = () => {
 
   // ✅ Navbar color and layout change when selection exists
   return (
-    <div className={`p-6 bg-gray-100 ${styles.photosPage}`}>
-      <div className={`flex items-center justify-between mb-6 ${styles.headerRow}`}>
+    <div className={`p-6 bg-blue-50/50 ${styles.photosPage}`}>
+      <div className={`flex items-center justify-between my-3 ${styles.headerRow}`}>
         <h1 className="text-2xl font-bold">
           My Photos
           <span className="mx-2 text-gray-400">•</span>
@@ -165,7 +168,7 @@ const PhotosPage = () => {
           </div>
         </div>
       </div>
-      <div className={`mb-6 bg-white p-6 ${styles.uploadSection}`}>
+      <div className={`mb-6 bg-white border border-gray-200 min-h-[100vh] p-6 ${styles.uploadSection}`}>
         <div className={`gap-4 space-y-4 ${styles.uploadGrid}`}>
           <div
             className={`w-42 h-32 border-2 border-dashed flex flex-col items-center justify-center rounded-lg cursor-pointer transition relative ${styles.uploadBox}
@@ -217,6 +220,7 @@ const PhotosPage = () => {
           <UserUploads 
             previewUrls={previewUrls}
             fetchImages={fetchImages}
+            loading={loading}
           />
         </div>
       </div>

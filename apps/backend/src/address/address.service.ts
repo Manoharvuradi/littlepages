@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { compareSync } from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
 @Injectable()
 export class AddressService {
@@ -37,5 +38,24 @@ export class AddressService {
             console.error("Error fetching addresses:", error);
             throw error;
         }
+    }
+
+    async updateExistingAddress(id: string, addressData: any) {
+        const { user, ...rest } = addressData;
+        const req: any = {
+            ...rest,
+            name: rest.name,
+            street: rest.street,
+            city: rest.city,
+            state: rest.state,
+            zip: rest.zip,
+            phone: rest.phone,
+        };
+        return await this.prisma.address.update({
+            where: { id: id },
+            data: {
+                ...req,
+            },
+        });
     }
 }
