@@ -7,7 +7,7 @@ export type OrderStatus =
   | 'REFUNDED'
   | 'PENDING';
 
-export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED';
 
 export interface Address {
   id: string;

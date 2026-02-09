@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getCurrentUser, logout } from '../../server/user';
+import { useAuth } from '../providers/AuthProvider';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -9,6 +11,22 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { setUserId } = useAuth();
+
+  useEffect(()=>{
+    const fetchUser = async () => {
+      const user = await getCurrentUser();
+      if (user?.role == "USER") {
+        const res = await logout();
+          if (res) {
+            setUserId(null);
+            router.push("/admin");
+          }
+      }
+    }
+
+    fetchUser();
+  },[])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

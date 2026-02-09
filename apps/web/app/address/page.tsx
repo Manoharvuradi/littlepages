@@ -36,7 +36,6 @@ const Address = () => {
         }
         
         const data = await fetchAddresses(user.sub);
-        console.log("Fetched address data:", data);
         
         setAddresses(data || null);
         
@@ -175,7 +174,7 @@ const Address = () => {
         {/* Edit Modal Overlay */}
 {editing && (
   <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden ring-1 ring-black/5">
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden ring-1 ring-black/5 animate-in zoom-in-95 duration-200">
       <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
         <h2 className="text-lg font-bold text-slate-900">Edit Address</h2>
         <button onClick={() => setEditing(null)} className="text-slate-400 hover:text-slate-600 transition-colors">

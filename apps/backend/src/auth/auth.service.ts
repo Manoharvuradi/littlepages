@@ -41,7 +41,7 @@ async login(email: string, pass: string) {
   const valid = await bcrypt.compare(pass, user.password);
   if (!valid) throw new UnauthorizedException('Invalid credentials');
 
-  const payload = { sub: user.id, email: user.email };
+  const payload = { sub: user.id, email: user.email, name: user.name, role: user.role };
 
   return {
     access_token: await this.jwtService.signAsync(payload),
@@ -49,6 +49,7 @@ async login(email: string, pass: string) {
       id: user.id,
       email: user.email,
       name: user.name,
+      role: user.role
     },
   };
 }

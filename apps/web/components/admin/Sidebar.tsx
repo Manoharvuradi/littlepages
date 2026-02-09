@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { logout } from '../../server/user';
+import { useAuth } from '../../app/providers/AuthProvider';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
@@ -9,11 +11,21 @@ const navigation = [
   { name: 'Customers', href: '/admin/customers', icon: '👥' },
   { name: 'Analytics', href: '/admin/analytics', icon: '📈' },
   { name: 'Settings', href: '/admin/settings', icon: '⚙️' },
+  {name: 'Logout', href: '/', icon: '🚪'},
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+    const router = useRouter();
+    const { setUserId } = useAuth();
 
+  const handleLogout = async () => {
+    const res = await logout();
+      if (res) {
+        setUserId(null);
+        router.push("/");
+      }
+  }
   return (
     <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
       <div className="flex flex-col flex-grow bg-gray-900 overflow-y-auto">
@@ -24,23 +36,37 @@ export default function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-2 pb-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition ${
-                  isActive
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                }`}
-              >
-                <span className="mr-3 text-xl">{item.icon}</span>
-                {item.name}
-              </Link>
-            );
-          })}
+          {navigation.filter(item => item.name !== 'Logout').map((item) => {
+  const isActive = pathname.startsWith(item.href);
+  return (
+    <Link
+      key={item.name}
+      href={item.href}
+      className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition ${
+        isActive
+          ? 'bg-gray-800 text-white'
+          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+      }`}
+    >
+      <span className="mr-3 text-xl">{item.icon}</span>
+      {item.name}
+    </Link>
+  );
+})}
+
+{/* Logout button separately */}
+      {navigation.find(item => item.name === 'Logout') && (
+        <div
+          // href={navigation.find(item => item.name === 'Logout')!.href}
+          className="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition text-gray-300 hover:bg-gray-700 hover:text-white"
+          onClick={() => handleLogout()}
+        >
+          <span className="mr-3 text-xl">
+            {navigation.find(item => item.name === 'Logout')!.icon}
+          </span>
+          Logout
+        </div>
+      )}
         </nav>
 
         {/* User */}
