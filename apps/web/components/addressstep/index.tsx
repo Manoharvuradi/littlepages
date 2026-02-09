@@ -84,7 +84,6 @@ export default function AddressStep({ onNext, flowData, setFlowData, address }: 
     setIsSubmitting(true);
     const newErrors = validate();
     setErrors(newErrors);
-    console.log("address", address)
     if(address != null && address != undefined){
       const {id} = address;
       const response = await updateAddress(id, form);

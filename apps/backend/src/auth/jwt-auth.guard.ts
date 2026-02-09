@@ -11,6 +11,7 @@ interface RequestWithUser extends Request {
     email: string;
     iat?: number;
     exp?: number;
+    role: string;
   };
 }
 

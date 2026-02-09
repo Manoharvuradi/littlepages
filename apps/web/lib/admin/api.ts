@@ -35,16 +35,32 @@ export async function fetchOrder(id: string) {
   return res.json();
 }
 
-export async function updateOrderStatus(id: string, status: string, note?: string) {
+export async function updateOrderStatus(
+  id: string,
+  status: string,
+  note?: string
+) {
   const res = await fetch(`${API_URL}/admin/orders/${id}/status`, {
     method: 'PATCH',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status, note }),
   });
-  
-  if (!res.ok) throw new Error('Failed to update order status');
-  return res.json();
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to update order status');
+  }
+
+  // ✅ SAFETY CHECK
+  const contentType = res.headers.get('content-type');
+
+  if (contentType?.includes('application/json')) {
+    return await res.json();
+  }
+
+  // ✅ For 204 / empty responses
+  return null;
 }
 
 export async function updateOrder(id: string, data: Partial<Order>) {
@@ -87,12 +103,22 @@ export async function fetchCustomer(id: number) {
 }
 
 export async function fetchDashboardStats() {
-  const res = await fetch(`${API_URL}/admin/dashboard/stats`, {
-    credentials: 'include',
-  });
-  
-  if (!res.ok) throw new Error('Failed to fetch dashboard stats');
-  return res.json();
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/admin/dashboard/stats`,
+    {
+      credentials: 'include',
+      cache: 'no-store',
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch dashboard stats');
+  }
+
+  const data = await res.json();
+  console.log("Dashboard stats:", data);
+
+  return data;
 }
 
 export async function exportOrders(params?: {

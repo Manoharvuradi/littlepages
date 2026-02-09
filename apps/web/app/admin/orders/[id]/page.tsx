@@ -65,6 +65,8 @@ export default function OrderDetailsPage() {
     }
   };
 
+  console.log("order", order);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -161,8 +163,8 @@ export default function OrderDetailsPage() {
                       <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">${item.total.toFixed(2)}</p>
-                      <p className="text-xs text-gray-500">${item.price.toFixed(2)} each</p>
+                      <p className="text-sm font-medium text-gray-900">₹{item.price.toFixed(2) || "0"}</p>
+                      <p className="text-xs text-gray-500">₹{item.price.toFixed(2)} each</p>
                     </div>
                   </div>
                 ))}
@@ -248,25 +250,25 @@ export default function OrderDetailsPage() {
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="text-gray-900">${order.subtotal.toFixed(2)}</span>
+                  <span className="text-gray-900">₹{order.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="text-gray-900">${order.shipping.toFixed(2)}</span>
+                  <span className="text-gray-900">₹{order.shipping.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tax</span>
-                  <span className="text-gray-900">${order.tax.toFixed(2)}</span>
+                  <span className="text-gray-900">₹{order.tax.toFixed(2)}</span>
                 </div>
                 {order.discount > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Discount</span>
-                    <span className="text-green-600">-${order.discount.toFixed(2)}</span>
+                    <span className="text-green-600">-₹{order.discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="pt-3 border-t border-gray-200 flex justify-between">
                   <span className="text-base font-semibold text-gray-900">Total</span>
-                  <span className="text-base font-semibold text-gray-900">${order.total.toFixed(2)}</span>
+                  <span className="text-base font-semibold text-gray-900">₹{order.total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -300,7 +302,7 @@ export default function OrderDetailsPage() {
                     </div>
                     <div className="mt-2">
                       <p className="text-sm font-medium text-gray-700">Amount</p>
-                      <p className="text-sm text-gray-900">${payment.amount.toFixed(2)}</p>
+                      <p className="text-sm text-gray-900">₹{payment.amount.toFixed(2)}</p>
                     </div>
                     {payment.transactionId && (
                       <div className="mt-2">

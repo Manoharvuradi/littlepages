@@ -1,8 +1,12 @@
-import { Body, Controller, Get, Header, Param, Patch, Query, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Header, Param, Patch, Query, Res, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { OrderStatus } from '@prisma/client';
 
 // NestJS Controller endpoints needed:
+class UpdateOrderStatusDto {
+  status: OrderStatus;
+  note?: string;
+}
 
 @Controller('admin')
 // @UseGuards(AdminAuthGuard)
@@ -11,7 +15,9 @@ export class AdminController {
 
   // Dashboard
   @Get('dashboard/stats')
-  async getDashboardStats() { }
+  async getDashboardStats() {
+    return this.adminService.getDashboardStats();
+  }
 
   // Orders
     @Get('orders')
@@ -30,13 +36,39 @@ export class AdminController {
     }
   
   @Get('orders/:id')
-  async getOrder(@Param('id') id: string) { }
+  async getOrder(@Param('id') id: string) {
+    return this.adminService.getOrder(id);
+  }
   
   @Patch('orders/:id')
   async updateOrder(@Param('id') id: string, @Body() data) { }
   
-  @Patch('orders/:id/status')
-  async updateOrderStatus(@Param('id') id: string, @Body() data) { }
+@Patch('orders/:id/status')
+  async updateOrderStatus(
+    @Param('id') id: string, 
+    @Body() data: UpdateOrderStatusDto
+  ) {
+    const { status, note } = data;
+
+    // Validate status
+    const validStatuses: OrderStatus[] = [
+      'CONFIRMED',
+      'PROCESSING',
+      'SHIPPED',
+      'DELIVERED',
+      'CANCELLED',
+      'REFUNDED',
+    ];
+
+    if (!validStatuses.includes(status)) {
+      throw new BadRequestException(
+        `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+      );
+    }
+
+    return this.adminService.updateOrderStatus(id, status, note);
+  }
+
   
   @Get('orders/export')
   @Header('Content-Type', 'text/csv')
