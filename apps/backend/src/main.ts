@@ -10,10 +10,10 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.use(cookieParser());
 
+  console.log("Frontend URL:", process.env.FRONTEND_URL);
   app.enableCors({
     origin: [
-      process.env.FRONTEND_URL || 'http://localhost:3000',
-      'http://localhost:4000'
+      process.env.FRONTEND_URL
     ],
     credentials: true,
   });
