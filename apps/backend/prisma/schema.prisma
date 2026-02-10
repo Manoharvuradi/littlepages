@@ -130,7 +130,7 @@ model OrderStatusHistory {
   description String
   createdAt   DateTime    @default(now())
   order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
+  createdBy   String?
   @@index([orderId])
   @@index([createdAt])
 }
